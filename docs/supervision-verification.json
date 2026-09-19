@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0",
+  "runtime_revision": "83b424fd6a382f115a663e7cc4f9b003b58258fd",
+  "recorded_at_utc": "2026-09-19T23:23:31.416813+00:00",
+  "command_placeholders": "Repository, socket, session and operator label are redacted; commands retain exact tested flags.",
+  "native_checks": {
+    "prime_approved": {
+      "command": ".venv/bin/python -m foreman.supervision.rollout_canary --repo REPOSITORY --approved-by OPERATOR --approve-stop",
+      "exit_code": 0,
+      "report": {
+        "checkpoint_assessed": true,
+        "control": "executed",
+        "delivery_claims": 1,
+        "executable": true,
+        "mode": "approval_required",
+        "native_fixture_removed": true,
+        "prompt_sent": false,
+        "provider": "prime-agent",
+        "status": "passed",
+        "stdin_approval": true,
+        "verification": "session_failed",
+        "version": "0.9.5"
+      }
+    },
+    "opencode": {
+      "command": ".venv/bin/python -m foreman.supervision.opencode_canary --attachment",
+      "exit_code": 0,
+      "report": {
+        "controls_enabled": false,
+        "executable": true,
+        "existing_session_preserved": true,
+        "fixture_session_created": true,
+        "history": "unavailable",
+        "isolated_native_storage": true,
+        "native_history_complete": false,
+        "observation": "live_native_stream",
+        "prompt_sent": false,
+        "provider": "opencode",
+        "session_created_by_attachment": false,
+        "status": "passed",
+        "supervise_observe_only": true,
+        "version": "1.18.30"
+      }
+    },
+    "codex": {
+      "command": ".venv/bin/python -m foreman.supervision.codex_canary --timeout 30",
+      "exit_code": 0,
+      "report": {
+        "event": "SessionEnd",
+        "exit_code": 0,
+        "hook_trust": "native-private-approval",
+        "native_sha256": "4f85982624b3898c8991cb80c0981b2aa71070e3537046c9a95950318a95afcc",
+        "network": "sandbox-deny",
+        "prompt_sent": false,
+        "provider": "codex",
+        "reason": "other",
+        "session_id_valid": true,
+        "status": "passed",
+        "temporary_tree_removed": true,
+        "version": "0.154.0"
+      }
+    },
+    "prime_observe": {
+      "command": ".venv/bin/python -m foreman.supervision.attachment_canary --agent prime-agent --repo REPOSITORY --socket EXISTING_SOCKET --session OWNED_SESSION",
+      "exit_code": 0,
+      "report": {
+        "controls_enabled": false,
+        "executable": true,
+        "existing_session_preserved": true,
+        "history": "snapshot_metadata_only",
+        "native_history_complete": false,
+        "observation": "live_native_stream",
+        "prompt_sent": false,
+        "provider": "prime-agent",
+        "session_created_by_attachment": false,
+        "status": "passed",
+        "supervise_observe_only": true,
+        "version": "0.9.5"
+      }
+    }
+  },
+  "limits": [
+    "No work prompts sent to native agents. LocalJev metadata assessment did run for approved Prime stop.",
+    "No live automatic native control, Codex queue, OpenCode control, or complete native history proof.",
+    "Codex standalone native hook and helper-to-broker tests are separate evidence paths."
+  ],
+  "assessor_deployment": {
+    "checked_at_utc": "2026-09-19T23:29:31.930362+00:00",
+    "ready_command": "curl --noproxy '*' --fail --silent --show-error --max-time 5 http://127.0.0.1:8080/ready",
+    "tag_command": "curl --noproxy '*' --fail --silent --show-error --max-time 5 http://127.0.0.1:11434/api/tags | .venv/bin/python -c 'import json, sys; print(json.dumps([{ \"name\": m[\"name\"], \"digest\": m[\"digest\"] } for m in json.load(sys.stdin)[\"models\"] if m[\"name\"] == \"qwen3:14b\"]))'",
+    "ready_http_status": 200,
+    "reported_upstream_model": "qwen3:14b",
+    "installed_tag_digest": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "loaded_model_count_at_probe": 0,
+    "per_response_weight_attestation": false,
+    "scope": "Reported readiness and installed Ollama tag match; no claim that each assessment attests its weights."
+  },
+  "automated_checks": {
+    "full_suite": {
+      "command": ".venv/bin/python -m pytest -q",
+      "passed": 497,
+      "failed": 0
+    },
+    "focused_suite": {
+      "passed": 346,
+      "command": "See the complete focused command in supervision-verification.md."
+    },
+    "documentation_tests": {
+      "command": ".venv/bin/python -m pytest tests/test_supervision_operator_docs.py -q",
+      "passed": 8
+    },
+    "ruff": "passed",
+    "dependency_compatibility": "passed",
+    "diff_check": "passed",
+    "executable_help": "passed",
+    "known_baseline_timing_failure": "test_noisy_events_are_coalesced did not recur in this run; it remains a previously reproduced baseline race."
+  }
+}

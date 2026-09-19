@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "baseline_id": "localjev-qwen3-14b-v1",
+  "captured_at": "2026-09-19T16:17:11.936844Z",
+  "role": "authoritative",
+  "provider": {
+    "id": "localjev-qwen3-14b",
+    "implementation": "localjev",
+    "endpoint": "http://127.0.0.1:8080",
+    "request_model": "jev-latest"
+  },
+  "service": {
+    "repository": "githubnext/localjev",
+    "revision": "0a2d1b889ce1a056e13feddce8fd04532c116d78",
+    "package_version": "0.2.0",
+    "model_version": "localjev-0.2",
+    "runner": "bun",
+    "runner_version": "1.4.2"
+  },
+  "upstream": {
+    "runner": "ollama",
+    "runner_version": "0.16.2",
+    "endpoint": "http://127.0.0.1:11434",
+    "model": "qwen3:14b",
+    "digest": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "parameter_size": "14.8B",
+    "quantization": "Q4_K_M",
+    "format": "gguf"
+  },
+  "questions": {
+    "version": "foreman-assessment-v1",
+    "sha256": "beaf0cc0188c26e906d6ad81299379ec5f3ad2a153fffc0335f7eba74e843e38",
+    "foreman_revision": "209182dac7a3467033fd093ab4ca47d21279984a",
+    "source": "src/foreman/foreman/jev.py:ASSESSMENT_QUESTIONS"
+  },
+  "inference": {
+    "temperature": 0,
+    "timeout_seconds": 180,
+    "max_output_tokens": 2048,
+    "malformed_retries": 2,
+    "max_inflight": 2,
+    "max_queue": 64,
+    "questions_per_call": 16,
+    "outcomes_per_call": 128,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "reasoning_effort": "none",
+    "seed_strategy": "sha256(state,questions) first uint32; +7919 per retry; +104729 per group"
+  },
+  "client": {
+    "library": "typesafe-sdk",
+    "version": "0.7.0",
+    "timeout_seconds": 180.0,
+    "max_retries": 2
+  },
+  "verification": {
+    "localjev_tests": 20,
+    "localjev_typecheck": "passed",
+    "health": "ok",
+    "ready": "ready"
+  }
+}

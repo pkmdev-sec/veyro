@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "foreman-factory"
+version = "0.3.0"
+description = "A semantic supervisory loop for coding agents"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Foreman contributors" }]
+dependencies = [
+  "pydantic>=2.7,<3",
+  "python-dotenv>=1.0,<2",
+  "rich>=13.7,<15",
+  "typer>=0.12,<1",
+  "typesafe-sdk>=0.7.0,<1",
+  "httpx2>=2,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2,<10",
+  "pytest-asyncio>=0.23,<2",
+  "ruff>=0.6,<1",
+]
+
+[project.scripts]
+foreman = "foreman.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]

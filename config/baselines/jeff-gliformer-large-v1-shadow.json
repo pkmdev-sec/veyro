@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "canary_id": "jeff-gliformer-large-v1-shadow-v1",
+  "captured_at": "2026-09-19T16:40:00Z",
+  "enabled": false,
+  "role": "shadow",
+  "provider": {
+    "id": "jeff-gliformer-large-v1",
+    "implementation": "jeff",
+    "endpoint": "http://127.0.0.1:8081",
+    "request_model": "jev-latest",
+    "checkpoint": "knowledgator/gliformer-large-v1@d0a4e53d09cebe6bc963dd9be319d4279084bb2d#sha256:f80b29199d66f878669f283703e4dba9fd726755dcc20aba1ed0d24fce4a23f1"
+  },
+  "service": {
+    "repository": "logan-markewich/jeff",
+    "revision": "230d85d29e5df3454f7eb1aad374da01808191a2",
+    "package_version": "0.1.0",
+    "python_version": "3.12"
+  },
+  "model": {
+    "repository": "knowledgator/gliformer-large-v1",
+    "revision": "d0a4e53d09cebe6bc963dd9be319d4279084bb2d",
+    "weights_file": "pytorch_model.bin",
+    "expected_sha256": "f80b29199d66f878669f283703e4dba9fd726755dcc20aba1ed0d24fce4a23f1",
+    "expected_bytes": 2302735855,
+    "local_path": "~/.local/share/jeff/models/gliformer-large-v1"
+  },
+  "questions": {
+    "version": "foreman-assessment-v1",
+    "sha256": "beaf0cc0188c26e906d6ad81299379ec5f3ad2a153fffc0335f7eba74e843e38",
+    "foreman_revision": "b9375a215017fb43a2c63328d9a6bc38db84a1a7",
+    "source": "src/foreman/foreman/jev.py:ASSESSMENT_QUESTIONS"
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8081,
+    "authentication_required": true,
+    "client_api_key_env": "JEFF_API_KEY",
+    "server_api_keys_env": "JEFF_API_KEYS",
+    "max_state_characters": 20000,
+    "max_questions": 64,
+    "max_labels_per_question": 64
+  },
+  "inference": {
+    "backend": "torch",
+    "device": "mps",
+    "dtype": "float32",
+    "attention": "eager",
+    "temperature": 3.2,
+    "isolate": "nouls",
+    "noul_mode": "yes_no",
+    "state_format": "kv",
+    "compile": false,
+    "warmup": true,
+    "max_batch": 16,
+    "max_wait_ms": 5,
+    "max_queue": 256
+  },
+  "client": {
+    "library": "typesafe-sdk",
+    "version": "0.7.0",
+    "timeout_seconds": 10,
+    "max_retries": 2,
+    "preflight_state_characters": 20000
+  },
+  "verification": {
+    "source_tests": 24,
+    "source_tests_status": "passed",
+    "weights_installed": false,
+    "weights_sha256_verified": false,
+    "service_hardened": false,
+    "live_canary": "blocked",
+    "blocker": "Corporate CDN policy returns an HTML block page instead of the 2.3 GB weight object."
+  }
+}
