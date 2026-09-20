@@ -1,0 +1,6 @@
+include .env.example
+recursive-include config *.json
+recursive-include docs *.md *.json *.svg *.png *.gif
+recursive-include tools *.py
+recursive-include tests *.py
+global-exclude *.py[cod]

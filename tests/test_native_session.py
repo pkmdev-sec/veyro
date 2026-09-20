@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from foreman.agents import AgentId, agent_definition
-from foreman.native_session import ManagedNativeSession, workspace_snapshot
+from veyro.agents import AgentId, agent_definition
+from veyro.native_session import ManagedNativeSession, workspace_snapshot
 
 
 class FakeProcess:
@@ -57,10 +57,10 @@ def test_managed_session_inherits_terminal_and_persists_lifecycle(monkeypatch, t
             {"head": "abc", "changed_paths": 1, "state_sha256": "two"},
         ]
     )
-    monkeypatch.setattr("foreman.native_session._foreground_terminal", lambda: None)
-    monkeypatch.setattr("foreman.native_session.subprocess.Popen", popen)
+    monkeypatch.setattr("veyro.native_session._foreground_terminal", lambda: None)
+    monkeypatch.setattr("veyro.native_session.subprocess.Popen", popen)
     monkeypatch.setattr(
-        "foreman.native_session.workspace_snapshot",
+        "veyro.native_session.workspace_snapshot",
         lambda repository: next(
             snapshots, {"head": "abc", "changed_paths": 1, "state_sha256": "two"}
         ),
@@ -74,8 +74,8 @@ def test_managed_session_inherits_terminal_and_persists_lifecycle(monkeypatch, t
     assert calls["command"] == ["/bin/claude", "inspect this"]
     assert calls["cwd"] == tmp_path.resolve()
     assert calls["start_new_session"] is True
-    assert calls["env"]["FOREMAN_SESSION_ID"] == result.session_id
-    assert calls["env"]["FOREMAN_SESSION_FILE"] == str(result.record_path)
+    assert calls["env"]["VEYRO_SESSION_ID"] == result.session_id
+    assert calls["env"]["VEYRO_SESSION_FILE"] == str(result.record_path)
     assert "stdin" not in calls and "stdout" not in calls and "stderr" not in calls
 
     record = json.loads(result.record_path.read_text())
@@ -97,12 +97,12 @@ def test_managed_session_inherits_terminal_and_persists_lifecycle(monkeypatch, t
 
 
 def test_managed_session_preserves_native_failure_status(monkeypatch, tmp_path) -> None:
-    monkeypatch.setattr("foreman.native_session._foreground_terminal", lambda: None)
+    monkeypatch.setattr("veyro.native_session._foreground_terminal", lambda: None)
     monkeypatch.setattr(
-        "foreman.native_session.subprocess.Popen",
+        "veyro.native_session.subprocess.Popen",
         lambda *args, **kwargs: FakeProcess(exit_code=7, wait_seconds=0),
     )
-    monkeypatch.setattr("foreman.native_session.workspace_snapshot", lambda repository: None)
+    monkeypatch.setattr("veyro.native_session.workspace_snapshot", lambda repository: None)
 
     result = session(tmp_path).run()
     record = json.loads(result.record_path.read_text())
@@ -113,12 +113,12 @@ def test_managed_session_preserves_native_failure_status(monkeypatch, tmp_path) 
 
 
 def test_managed_session_records_launch_failure(monkeypatch, tmp_path) -> None:
-    monkeypatch.setattr("foreman.native_session._foreground_terminal", lambda: None)
+    monkeypatch.setattr("veyro.native_session._foreground_terminal", lambda: None)
 
     def fail(*args, **kwargs):
         raise OSError("cannot launch")
 
-    monkeypatch.setattr("foreman.native_session.subprocess.Popen", fail)
+    monkeypatch.setattr("veyro.native_session.subprocess.Popen", fail)
     managed = session(tmp_path)
 
     with pytest.raises(OSError, match="cannot launch"):
@@ -157,12 +157,12 @@ def test_terminal_session_hands_foreground_to_native_process_and_restores_it(
     managed = session(tmp_path)
     process = FakeProcess(wait_seconds=0)
     groups = []
-    monkeypatch.setattr("foreman.native_session.os.getpgrp", lambda: 111)
+    monkeypatch.setattr("veyro.native_session.os.getpgrp", lambda: 111)
     monkeypatch.setattr(
-        "foreman.native_session.os.tcsetpgrp", lambda fd, group: groups.append((fd, group))
+        "veyro.native_session.os.tcsetpgrp", lambda fd, group: groups.append((fd, group))
     )
-    monkeypatch.setattr("foreman.native_session.os.waitpid", lambda pid, options: (process.pid, 0))
-    monkeypatch.setattr("foreman.native_session.signal.signal", lambda signum, handler: "previous")
+    monkeypatch.setattr("veyro.native_session.os.waitpid", lambda pid, options: (process.pid, 0))
+    monkeypatch.setattr("veyro.native_session.signal.signal", lambda signum, handler: "previous")
 
     result = managed._wait_with_terminal(process, 0)
 

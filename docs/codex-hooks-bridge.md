@@ -12,7 +12,7 @@ It does not start or connect to App Server. Direct Codex usage remains unchanged
 From this repository, use its installed Python environment:
 
 ```sh
-.venv/bin/python -m foreman.bridges.codex_hooks serve \
+.venv/bin/python -m veyro.bridges.codex_hooks serve \
   --repository /absolute/path/to/project \
   --codex-home "$HOME/.codex" \
   --executable /opt/homebrew/bin/codex
@@ -26,7 +26,7 @@ printed. Keep the listener alive while using Codex in that exact repository.
 Review the generated command. Merge the desired event definitions into Codex's
 `hooks.json` using Codex's native configuration and trust workflow (`/hooks` or
 startup review). Do not overwrite existing hooks or duplicate TOML and JSON
-handlers. Foreman does not modify native configuration, trust hashes, credentials,
+handlers. Veyro does not modify native configuration, trust hashes, credentials,
 plugins, transcripts, or native session storage. Do not bypass hook trust or
 managed policy. Listener restart creates a new connection path, so review and
 approve the updated hook command before using it. Remove those definitions when
@@ -55,10 +55,10 @@ connection file/socket, and an authentication token. It accepts metadata, never
 control requests. Input frames are bounded to 16 KiB, active clients and sessions
 to 64. A per-session OS lock prevents simultaneous journal writers.
 
-The mapping of repository + CODEX_HOME + native thread UUID to Foreman session ID
+The mapping of repository + CODEX_HOME + native thread UUID to Veyro session ID
 is deterministic. Explicit queue opt-in/opt-out changes reconcile capabilities
 under the writer lock without discarding observation history. Each thread has a private broker journal under
-`.foreman/supervision/`. Resuming the same thread continues that local journal.
+`.veyro/supervision/`. Resuming the same thread continues that local journal.
 Receipt sequence is contiguous local observation order, **not provider execution
 order**. Broker replay does not imply native replay. Multiple sessions remain
 separate; subagent scope is retained rather than counted as root activity.
@@ -69,7 +69,7 @@ separate; subagent scope is retained rather than counted as root activity.
 | --- | --- |
 | Lifecycle, prompt, tool, permission boundaries | Supported, metadata only |
 | Native event replay / attach-existing discovery | Unsupported in this bridge |
-| Follow-up queue | Explicit opt-in, experimental Foreman integration |
+| Follow-up queue | Explicit opt-in, experimental Veyro integration |
 | Active-turn steering / remote interrupt / session stop | Unsupported |
 | Approval reply through the sidecar | Unsupported |
 | Synchronous hook policy decisions | Not enabled |
@@ -101,7 +101,7 @@ codex queue --thread <UUID> --message <TEXT>
 This queues follow-up input, not active-turn steering. An idle loaded thread may
 start immediately. Native Codex can persist the queued message and exposes text
 in process argv; enable this only after accepting those native privacy properties.
-Foreman never logs argv or stores message content. Use the same CODEX_HOME and
+Veyro never logs argv or stores message content. Use the same CODEX_HOME and
 repository as the observed session. Native queue routing to an unloaded thread
 does not prove delivery to a live TUI.
 
@@ -116,7 +116,7 @@ resubmit with a new command ID without reconciling delivery with the operator.
 ## Experimental App Server is separate
 
 The existing factory worker now defaults to `exec`. Use
-`FOREMAN_CODEX_BACKEND=app-server` only to explicitly opt into its experimental
+`VEYRO_CODEX_BACKEND=app-server` only to explicitly opt into its experimental
 controls. The hook bridge never silently switches to RPC if a hook/control is
 unavailable. See [steering.md](steering.md) for that separate legacy worker path.
 
@@ -124,7 +124,7 @@ unavailable. See [steering.md](steering.md) for that separate legacy worker path
 
 ```sh
 .venv/bin/python -m pytest tests/test_codex_hooks.py tests/test_bridge_contract.py -q
-.venv/bin/python -m foreman.supervision.codex_canary
+.venv/bin/python -m veyro.supervision.codex_canary
 ```
 
 Focused tests exercise a real helper process, authenticated socket publication,

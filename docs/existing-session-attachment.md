@@ -3,7 +3,7 @@
 For current procedures and recovery, use the [operator guide](supervision-operator-guide.md).
 For the dated cross-provider checks, see [verification results](supervision-verification.md).
 
-`foreman sessions` discovers metadata. `foreman attach` connects a read-only
+`veyro sessions` discovers metadata. `veyro attach` connects a read-only
 observer. Neither command starts or resumes a native session, sends a prompt,
 or enables controls. Run the native agent separately with its normal interface.
 These commands do not call the semantic supervisor or change its authority.
@@ -15,7 +15,7 @@ Pinned LocalJev/Qwen3 remains the sole authoritative semantic supervisor.
 | --- | --- | --- | --- |
 | Prime Agent `0.9.5` | Loaded sessions on an explicit daemon | Live structured daemon events | Snapshot counts and replay status only; no transcript replay requested |
 | OpenCode `1.18.30` | Sessions on an explicit authenticated server | Live SSE after connection | No history or replay fetched |
-| Codex hooks `0.154.0` | Existing private Foreman hook journals | Local reads and optional follow | Local receipt order, not complete native history |
+| Codex hooks `0.154.0` | Existing private Veyro hook journals | Local reads and optional follow | Local receipt order, not complete native history |
 | Pi, Claude Code | Outside the supervision roadmap | None | None |
 
 A Codex journal does not prove Codex or its listener is running. Native liveness
@@ -28,13 +28,13 @@ Use an exact repository and endpoint. Discovery emits one JSON document.
 Copy a `selector` from its `sessions` array into `--session`.
 
 ```sh
-foreman sessions --agent prime-agent --repo /path/to/repo \
+veyro sessions --agent prime-agent --repo /path/to/repo \
   --socket /path/to/existing/daemon.sock
 
-foreman sessions --agent opencode --repo /path/to/repo \
+veyro sessions --agent opencode --repo /path/to/repo \
   --server http://127.0.0.1:4096
 
-foreman sessions --agent codex --repo /path/to/repo
+veyro sessions --agent codex --repo /path/to/repo
 ```
 
 OpenCode requires `OPENCODE_SERVER_PASSWORD` in the environment.
@@ -54,14 +54,14 @@ pagination cursor or a guarantee of global ordering.
 ## Attach without control
 
 ```sh
-foreman attach --agent prime-agent --repo /path/to/repo \
+veyro attach --agent prime-agent --repo /path/to/repo \
   --socket /path/to/existing/daemon.sock --session ACTIVE_ID --watch-seconds 30
 
-foreman attach --agent opencode --repo /path/to/repo \
+veyro attach --agent opencode --repo /path/to/repo \
   --server http://127.0.0.1:4096 --session SESSION_ID --watch-seconds 30
 
-foreman attach --agent codex --repo /path/to/repo \
-  --session FOREMAN_JOURNAL_ID --after-sequence 25 --watch-seconds 30
+veyro attach --agent codex --repo /path/to/repo \
+  --session VEYRO_JOURNAL_ID --after-sequence 25 --watch-seconds 30
 ```
 
 The command emits newline-delimited JSON:
@@ -83,7 +83,7 @@ cleanup have separate timeouts. Output goes only to stdout; no new journal is
 created. Protect redirected output: session IDs and repository paths are metadata,
 not anonymous data.
 
-Prime and OpenCode use a fresh Foreman attachment ID. Their local output sequence
+Prime and OpenCode use a fresh Veyro attachment ID. Their local output sequence
 is not a resumable native cursor. Codex alone accepts `--after-sequence`, validated
 from the start of its local journal, with a five-second cursor scan budget and
 cancellation points between bounded pages. A cursor beyond complete local records is
@@ -97,7 +97,7 @@ Native TUIs, commands, configuration, and credentials remain intact.
 
 ## Read-only storage checks
 
-Codex discovery never opens native transcripts. It reads only existing Foreman
+Codex discovery never opens native transcripts. It reads only existing Veyro
 `identity.json` and `events.jsonl` files. It does not create storage, change
 permissions, acquire writer locks, or open token, capability, or control files.
 
@@ -113,14 +113,14 @@ bytes, permissions, and modification times are not changed.
 For a selected existing Prime session:
 
 ```sh
-python -m foreman.supervision.attachment_canary --agent prime-agent \
+python -m veyro.supervision.attachment_canary --agent prime-agent \
   --repo /path/to/repo --socket /path/to/existing/daemon.sock --session ACTIVE_ID
 ```
 
 For an isolated OpenCode fixture:
 
 ```sh
-python -m foreman.supervision.opencode_canary --attachment
+python -m veyro.supervision.opencode_canary --attachment
 ```
 
 The second canary starts a disposable authenticated server and creates one empty
@@ -128,7 +128,7 @@ session **before** testing discovery and attachment. HOME and XDG storage are
 isolated. It sends no model prompt, closes its server, and removes temporary
 storage. The attachment command itself never creates a session.
 
-Both canaries drive the actual Foreman executable, then rediscover the original
+Both canaries drive the actual Veyro executable, then rediscover the original
 session after detaching. They test read-only connection and session preservation,
 not model execution, control delivery, or complete native event coverage.
 

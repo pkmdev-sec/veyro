@@ -3,11 +3,11 @@
 For current procedures and recovery, use the [operator guide](supervision-operator-guide.md).
 For the dated cross-provider checks, see [verification results](supervision-verification.md).
 
-`foreman supervise` evaluates **one** proposal against an existing Prime Agent or
+`veyro supervise` evaluates **one** proposal against an existing Prime Agent or
 OpenCode session. It does not start or resume a native session. The default is
-observe-only. `foreman attach` remains strictly read-only.
+observe-only. `veyro attach` remains strictly read-only.
 
-Codex hook journals remain available through `foreman attach`; this command does
+Codex hook journals remain available through `veyro attach`; this command does
 not expose a Codex queue channel. Pi and Claude Code are outside the supervision
 roadmap. Their existing native launch commands are unchanged.
 
@@ -82,10 +82,10 @@ automatic, even if labeled as a repository read. A native denial uses
 `reply_to_approval`, `decision: "deny"`, an observed `approval_id`, and
 `operation: "decline_approval"`.
 
-Discover the selector with `foreman sessions`, then run:
+Discover the selector with `veyro sessions`, then run:
 
 ```sh
-foreman supervise --agent prime-agent --repo /path/to/repo \
+veyro supervise --agent prime-agent --repo /path/to/repo \
   --socket /path/to/existing/daemon.sock --session ACTIVE_ID \
   --proposal /private/path/proposal.json
 ```
@@ -94,7 +94,7 @@ This default invocation reports a decision and sends no control. For explicit
 approval-required operation:
 
 ```sh
-foreman supervise --agent prime-agent --repo /path/to/repo \
+veyro supervise --agent prime-agent --repo /path/to/repo \
   --socket /path/to/existing/daemon.sock --session ACTIVE_ID \
   --proposal /private/path/proposal.json --policy /private/path/policy.json \
   --ledger-dir /real/private/path/delivery --timeout-seconds 180
@@ -106,7 +106,7 @@ For OpenCode, use `--agent opencode --server http://127.0.0.1:PORT` instead of
 
 Executing modes require a persistent private ledger directory. Every path
 component must be nonsymlinked. On macOS, use the real path, such as
-`/private/var/...`, not the `/var` or `/tmp` aliases. Foreman creates missing ledger
+`/private/var/...`, not the `/var` or `/tmp` aliases. Veyro creates missing ledger
 directories with owner-only permissions. Observe/advisory modes create no ledger.
 
 ## Approve the exact request
@@ -154,7 +154,7 @@ already in flight was undone.
 - Boundaries bind to the complete request digest. Changed requests cannot reuse
   boundary evidence. Checkpoint caches distinguish changed state, risky-action
   evidence, and task context.
-- Foreman checks the live normalized event cursor after assessment and after
+- Veyro checks the live normalized event cursor after assessment and after
   approval, and revalidates approval time and the cursor after durable persistence.
   Changed observations reject the proposal; the CLI does not silently
   rebase approval or retry. This check is not a provider-side atomic transaction.
@@ -163,9 +163,9 @@ already in flight was undone.
   is no backfill of approvals that predate the connection.
 - Native history is still partial. A successful control receipt is not proof of
   task completion. An executed stop requires a later terminal provider event.
-- Before native delivery, Foreman exclusively creates and fsyncs a no-retry claim.
+- Before native delivery, Veyro exclusively creates and fsyncs a no-retry claim.
   Its key uses repository, provider, native session, and command ID, so a fresh
-  Foreman attachment cannot resend that command. Concurrent, duplicate, restarted,
+  Veyro attachment cannot resend that command. Concurrent, duplicate, restarted,
   failed, and uncertain deliveries all retain the fence.
 - Claims store only digests. They prove an attempted delivery was reserved, not
   that it executed. Keep the same ledger across invocations. Do not delete claims,
@@ -174,9 +174,9 @@ already in flight was undone.
 - Stdout omits control text, transcripts, model input/output, provider error text,
   and credentials. It includes session IDs and repository paths. Protect redirected
   output. The operator-created proposal file intentionally contains control text;
-  Foreman does not copy it into its ledger.
+  Veyro does not copy it into its ledger.
 
-These gates cover controls issued by Foreman. They do not intercept all native
+These gates cover controls issued by Veyro. They do not intercept all native
 tool execution or replace the native agent's own permission system. This command
 is a bounded one-proposal controller, not an unattended proposal-generating daemon.
 
@@ -190,14 +190,14 @@ Run the focused tests through the project environment:
   tests/test_supervision_checkpoints.py tests/test_bridge_contract.py -q
 ```
 
-The existing attachment canaries also run the real `foreman supervise` executable
+The existing attachment canaries also run the real `veyro supervise` executable
 in default observe-only mode and check that the original native session remains.
 The disposable Prime control canary explicitly selects approval-required mode,
 uses a private delivery ledger, requests pinned LocalJev assessment, and verifies
 an approved stop without sending a model prompt:
 
 ```sh
-.venv/bin/python -m foreman.supervision.prime_canary --repo /path/to/repo \
+.venv/bin/python -m veyro.supervision.prime_canary --repo /path/to/repo \
   --approved-by OPERATOR --approve-stop
 ```
 
@@ -209,7 +209,7 @@ operator command instead reports the stale decision and stops.
 For an end-to-end test of the **actual executable and approval stdin protocol**:
 
 ```sh
-.venv/bin/python -m foreman.supervision.rollout_canary --repo /path/to/repo \
+.venv/bin/python -m veyro.supervision.rollout_canary --repo /path/to/repo \
   --approved-by OPERATOR --approve-stop
 ```
 

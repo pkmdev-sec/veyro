@@ -9,8 +9,8 @@ import pytest
 from test_supervision_control_loop import FakeAssessor
 from typer.testing import CliRunner
 
-from foreman.cli import app
-from foreman.models import (
+from veyro.cli import app
+from veyro.models import (
     AuthorizationOutcome,
     AuthorizationReason,
     BoundaryAction,
@@ -27,23 +27,23 @@ from foreman.models import (
     SessionIdentity,
     SupervisionEvent,
 )
-from foreman.models.rollout import RolloutMode, RolloutPolicy
-from foreman.supervision.authorization import (
+from veyro.models.rollout import RolloutMode, RolloutPolicy
+from veyro.supervision.authorization import (
     AuthorizedControlDispatcher,
     ControlAuthorizationGate,
     control_request_sha256,
 )
-from foreman.supervision.checkpoints import CheckpointAssessmentService
-from foreman.supervision.control_loop import SupervisionControlLoop
-from foreman.supervision.delivery import DeliveryLedger
-from foreman.supervision.reducer import SessionReducer
-from foreman.supervision.supervisor import ControlProposal
+from veyro.supervision.checkpoints import CheckpointAssessmentService
+from veyro.supervision.control_loop import SupervisionControlLoop
+from veyro.supervision.delivery import DeliveryLedger
+from veyro.supervision.reducer import SessionReducer
+from veyro.supervision.supervisor import ControlProposal
 
 
 class ObservedBridge:
     def __init__(self, repository: Path, *, stability="stable", availability="supported"):
         self.identity = SessionIdentity(
-            foreman_session_id="rollout-test",
+            veyro_session_id="rollout-test",
             provider_id="test-provider",
             provider_session_id="native-session",
             repository=str(repository.resolve()),
@@ -94,7 +94,7 @@ class ObservedBridge:
     async def execute(self, request):
         self.calls.append(request)
         return ControlResult(
-            foreman_session_id=self.identity.foreman_session_id,
+            veyro_session_id=self.identity.veyro_session_id,
             provider_id=self.identity.provider_id,
             command_id=request.command_id,
             action=request.intent.action,
@@ -335,7 +335,7 @@ async def test_observe_and_forbidden_never_invoke_assessor(tmp_path, mode, opera
 
 
 def test_risk_configuration_only_strengthens_policy(tmp_path):
-    from foreman.supervision.boundary_policy import BoundaryPolicy
+    from veyro.supervision.boundary_policy import BoundaryPolicy
 
     bridge = ObservedBridge(tmp_path)
     request = control(bridge)
@@ -363,7 +363,7 @@ def private_json(path, value):
 
 @pytest.mark.parametrize("mode", ["observe_only", "advisory", "approval_required", "automatic"])
 def test_real_cli_drives_policy_and_sanitizes_results(tmp_path, monkeypatch, mode):
-    from foreman.supervision import supervisor
+    from veyro.supervision import supervisor
 
     bridge = ObservedBridge(tmp_path)
     assessor = FakeAssessor()
@@ -439,7 +439,7 @@ def test_real_cli_drives_policy_and_sanitizes_results(tmp_path, monkeypatch, mod
     "kind", ["exposed", "symlink", "oversized", "mode_in_proposal", "fifo", "hardlink"]
 )
 def test_cli_rejects_unsafe_input_before_connecting(tmp_path, monkeypatch, kind):
-    from foreman.supervision import supervisor
+    from veyro.supervision import supervisor
 
     async def forbidden(*args, **kwargs):
         pytest.fail("must not connect")
@@ -490,7 +490,7 @@ def test_cli_rejects_unsafe_input_before_connecting(tmp_path, monkeypatch, kind)
 async def test_approval_pipe_is_bounded_and_cancellable(tmp_path, monkeypatch):
     import os
 
-    from foreman.supervision import supervisor
+    from veyro.supervision import supervisor
 
     reader_fd, writer_fd = os.pipe()
     with os.fdopen(reader_fd, "rb", buffering=0) as pipe:
@@ -509,7 +509,7 @@ async def test_approval_pipe_is_bounded_and_cancellable(tmp_path, monkeypatch):
 
 
 async def test_changed_context_and_boundary_do_not_reuse_semantic_cache(tmp_path):
-    from foreman.supervision.boundary_policy import BoundaryPolicy
+    from veyro.supervision.boundary_policy import BoundaryPolicy
 
     bridge = ObservedBridge(tmp_path)
     request = control(bridge, message=True)
@@ -535,7 +535,7 @@ async def test_changed_context_and_boundary_do_not_reuse_semantic_cache(tmp_path
 
 @pytest.mark.parametrize("change", ["expiry", "cursor"])
 async def test_persistence_cannot_outlive_approval_or_snapshot(tmp_path, monkeypatch, change):
-    from foreman.supervision import authorization as module
+    from veyro.supervision import authorization as module
 
     bridge = ObservedBridge(tmp_path)
     request = control(bridge)

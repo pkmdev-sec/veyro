@@ -1,34 +1,34 @@
 # Agent router
 
-Foreman supports five coding-agent harnesses through one executable interface without replacing any
+Veyro supports five coding-agent harnesses through one executable interface without replacing any
 provider's native user experience.
 
 ## Caller interface
 
 ```text
-# Discover installed agents and the machine interface Foreman will use.
-foreman agents
-foreman agents --json
+# Discover installed agents and the machine interface Veyro will use.
+veyro agents
+veyro agents --json
 
 # Enter a native interactive harness. Arguments after `--` pass through unchanged.
-foreman agent codex --repo . --prompt "Fix the failing test"
-foreman agent claude --repo . -- --model sonnet
-foreman agent prime-agent --repo .
-foreman agent pi --repo .
-foreman agent opencode --repo .
+veyro agent codex --repo . --prompt "Fix the failing test"
+veyro agent claude --repo . -- --model sonnet
+veyro agent prime-agent --repo .
+veyro agent pi --repo .
+veyro agent opencode --repo .
 
-# Run one agent under Foreman's supervisor.
-foreman run --agent claude --repo . --job "Fix the failing test"
+# Run one agent under Veyro's supervisor.
+veyro run --agent claude --repo . --job "Fix the failing test"
 ```
 
-`foreman agent` keeps Foreman alive as a sidecar parent and starts the native executable as the
-foreground terminal process. The child inherits the real terminal directly; Foreman does not parse,
+`veyro agent` keeps Veyro alive as a sidecar parent and starts the native executable as the
+foreground terminal process. The child inherits the real terminal directly; Veyro does not parse,
 redraw, or proxy human-oriented terminal output. The provider still owns its terminal UI, commands,
 configuration, credentials, session storage, and updates. The commands `codex`, `claude`,
-`prime-agent`, `pi`, and `opencode` remain valid and do not depend on Foreman.
+`prime-agent`, `pi`, and `opencode` remain valid and do not depend on Veyro.
 
-`foreman agents --json` is the language-neutral discovery interface. Shell scripts, Node programs,
-Go programs, and other clients can consume it without importing Foreman's Python package.
+`veyro agents --json` is the language-neutral discovery interface. Shell scripts, Node programs,
+Go programs, and other clients can consume it without importing Veyro's Python package.
 
 ## Boundary
 
@@ -37,11 +37,11 @@ operator or automation
         |
         +-- native executable ----------------------> native interactive harness
         |
-        +-- foreman agent --------------------------> managed native interactive harness
+        +-- veyro agent --------------------------> managed native interactive harness
                 |                                      (real foreground terminal)
-                +-- Foreman sidecar ----------------> lifecycle + workspace evidence
+                +-- Veyro sidecar ----------------> lifecycle + workspace evidence
         |
-        +-- foreman run
+        +-- veyro run
                 |
                 v
         AgentDefinition + NativeCliWorker
@@ -54,13 +54,13 @@ operator or automation
 ```
 
 A managed native session writes versioned evidence under
-`.foreman/native-sessions/<session-id>/`. `session.json` records process identity and terminal status.
+`.veyro/native-sessions/<session-id>/`. `session.json` records process identity and terminal status.
 `events.jsonl` records ordered lifecycle and workspace-state events. Prompts, native arguments, terminal
 output, environment values, and file contents are not persisted. The native child receives only the
-session ID and local evidence paths through `FOREMAN_SESSION_*` variables.
+session ID and local evidence paths through `VEYRO_SESSION_*` variables.
 
-Direct invocation such as `claude` remains valid but is not automatically observed. Foreman is present
-when the session is started with `foreman agent ...`; observing independently started sessions still
+Direct invocation such as `claude` remains valid but is not automatically observed. Veyro is present
+when the session is started with `veyro agent ...`; observing independently started sessions still
 requires a provider hook, extension, or attach API. This boundary is explicit rather than claiming that
 process discovery is equivalent to integration.
 
@@ -73,27 +73,27 @@ The registry describes an agent. It does not implement the agent's harness. A de
 
 `NativeCliWorker` owns bounded subprocess execution, event streaming, output limits, timeout, and
 process-group cancellation. Codex keeps its deeper App Server adapter because that interface supports
-active-turn steering. Other adapters report steering as unavailable. Foreman must stop or retry those
+active-turn steering. Other adapters report steering as unavailable. Veyro must stop or retry those
 workers instead of pretending a steering request succeeded.
 
 ## Compatibility
 
-Codex remains the default agent. Existing `FOREMAN_CODEX_BACKEND`, Codex App Server behavior, and
+Codex remains the default agent. Existing `VEYRO_CODEX_BACKEND`, Codex App Server behavior, and
 persisted `codex_thread_id` and `codex_turn_id` fields remain supported. New records also carry neutral
 `agent_id`, `session_id`, and `turn_id` fields. The legacy fields can be removed only through a separate
 persisted-data migration.
 
 For the version-pinned Codex hook listener, see [Codex hooks bridge](codex-hooks-bridge.md).
-The factory defaults to `exec`; App Server controls require `FOREMAN_CODEX_BACKEND=app-server`.
+The factory defaults to `exec`; App Server controls require `VEYRO_CODEX_BACKEND=app-server`.
 
 ## Existing-session supervision
 
-The launcher sidecar, legacy `foreman run` workers, and existing-session control
+The launcher sidecar, legacy `veyro run` workers, and existing-session control
 plane are separate interfaces. Starting a native agent does not automatically
 connect its provider bridge or enable controls.
 
-Use `foreman sessions` for metadata discovery, `foreman attach` for read-only
-observation, and `foreman supervise` for one policy-gated proposal. See the
+Use `veyro sessions` for metadata discovery, `veyro attach` for read-only
+observation, and `veyro supervise` for one policy-gated proposal. See the
 [operator guide](supervision-operator-guide.md),
 [capability matrix](supervision-reference.md#adapter-capabilities), and
 [version-pinned checks](supervision-verification.md).
@@ -116,7 +116,7 @@ text and agent output.
 
 ## Native interfaces currently mapped
 
-| Agent | Native command | Supervised interface | Current Foreman capabilities |
+| Agent | Native command | Supervised interface | Current Veyro capabilities |
 | --- | --- | --- | --- |
 | Codex | `codex` | `exec --json` (default), App Server JSON-RPC (explicit opt-in) | start, stream, cancel, wait, result, steer on App Server |
 | Claude Code | `claude` | `--print --output-format stream-json` | start, stream, cancel, wait, result |

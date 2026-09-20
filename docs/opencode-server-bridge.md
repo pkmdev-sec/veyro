@@ -3,23 +3,23 @@
 For current procedures and recovery, use the [operator guide](supervision-operator-guide.md).
 For the dated cross-provider checks, see [verification results](supervision-verification.md).
 
-Foreman supports OpenCode `1.18.30` through its authenticated HTTP server. OpenCode still owns the native TUI, provider credentials, configuration, prompts, and session database. Foreman connects beside it through SSE and documented control endpoints.
+Veyro supports OpenCode `1.18.30` through its authenticated HTTP server. OpenCode still owns the native TUI, provider credentials, configuration, prompts, and session database. Veyro connects beside it through SSE and documented control endpoints.
 
-Direct `opencode` use is unchanged. Use this bridge only when a session needs Foreman observation, evidence, policy, or approved controls.
+Direct `opencode` use is unchanged. Use this bridge only when a session needs Veyro observation, evidence, policy, or approved controls.
 
 ## Start an authenticated loopback server
 
 Generate a new high-entropy password for each server process. Put it in the child environment, not in argv, a URL, a log, or a repository file.
 
 ```bash
-export OPENCODE_SERVER_USERNAME=foreman
+export OPENCODE_SERVER_USERNAME=veyro
 export OPENCODE_SERVER_PASSWORD="$(openssl rand -base64 32)"
 opencode serve --pure --hostname 127.0.0.1 --port 0
 ```
 
 OpenCode first tries port `4096` for `--port 0`, then selects an available ephemeral port. Use the exact loopback URL printed by the process. Keep mDNS disabled and do not add CORS origins.
 
-Foreman rejects:
+Veyro rejects:
 
 - non-loopback addresses;
 - HTTPS or non-HTTP schemes;
@@ -38,7 +38,7 @@ opencode attach http://127.0.0.1:<port> \
   --session ses_...
 ```
 
-The native attached TUI and Foreman can use the same server and session. The TUI keeps full control of rendering and keyboard input. Foreman does not scrape terminal output.
+The native attached TUI and Veyro can use the same server and session. The TUI keeps full control of rendering and keyboard input. Veyro does not scrape terminal output.
 
 ## Capability contract
 
@@ -56,7 +56,7 @@ The native attached TUI and Foreman can use the same server and session. The TUI
 | Steer active turn | Unsupported | — | An async prompt queues another user message; it does not steer the active model call |
 | Stop session | Unsupported | — | Abort preserves a session; delete permanently erases it |
 
-Approval replies are request-bound. Foreman replies only to an approval ID observed on the attached session. `APPROVE` maps to `once`; it never silently grants `always` permission.
+Approval replies are request-bound. Veyro replies only to an approval ID observed on the attached session. `APPROVE` maps to `once`; it never silently grants `always` permission.
 
 ## Evidence and privacy
 
@@ -76,7 +76,7 @@ SSE is live-only. A disconnect can create an observation gap. The bridge reports
 ## Run the live canary
 
 ```bash
-.venv/bin/python -m foreman.supervision.opencode_canary
+.venv/bin/python -m veyro.supervision.opencode_canary
 ```
 
 The canary uses the real `~/.opencode/bin/opencode` binary and requires exactly `1.18.30`. It:

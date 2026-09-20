@@ -8,7 +8,7 @@ from uuid import uuid4
 
 import pytest
 
-from foreman.bridges.prime_agent import (
+from veyro.bridges.prime_agent import (
     BRIDGE_ID,
     BRIDGE_VERSION,
     DAEMON_PROTOCOL_NAME,
@@ -22,7 +22,7 @@ from foreman.bridges.prime_agent import (
     _map_native_event,
     prime_daemon_capabilities,
 )
-from foreman.models import (
+from veyro.models import (
     ApprovalDecision,
     BridgeCapability,
     CapabilityAvailability,
@@ -37,7 +37,7 @@ from foreman.models import (
     StopSession,
     SupervisionEventType,
 )
-from foreman.supervision import replay_session
+from veyro.supervision import replay_session
 
 
 class FakeClient:
@@ -65,7 +65,7 @@ class FakeClient:
 
 def identity() -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="foreman-prime-1",
+        veyro_session_id="veyro-prime-1",
         provider_id="prime-agent",
         provider_session_id="active-prime-1",
         repository="/tmp/repository",
@@ -162,7 +162,7 @@ async def test_foreign_session_control_is_rejected_before_dispatch() -> None:
     adapter, client = bridge()
     foreign = request(QueueFollowUp(message="Do not dispatch."))
     foreign = foreign.model_copy(
-        update={"session": foreign.session.model_copy(update={"foreman_session_id": "other"})}
+        update={"session": foreign.session.model_copy(update={"veyro_session_id": "other"})}
     )
 
     result = await adapter.execute(foreign)
@@ -233,7 +233,7 @@ def test_native_event_mapping_is_total(native_type: str, expected: SupervisionEv
 
 @pytest.mark.asyncio
 async def test_live_wire_client_requires_exact_versioned_hello() -> None:
-    socket_path = Path("/tmp") / f"foreman-prime-{uuid4().hex[:10]}.sock"
+    socket_path = Path("/tmp") / f"veyro-prime-{uuid4().hex[:10]}.sock"
 
     async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
         writer.write(
@@ -258,7 +258,7 @@ async def test_live_wire_client_requires_exact_versioned_hello() -> None:
 
 @pytest.mark.asyncio
 async def test_wire_client_sends_v7_envelope_and_acknowledges_mutation() -> None:
-    socket_path = Path("/tmp") / f"foreman-prime-{uuid4().hex[:10]}.sock"
+    socket_path = Path("/tmp") / f"veyro-prime-{uuid4().hex[:10]}.sock"
     received: list[dict[str, Any]] = []
 
     async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:

@@ -2,7 +2,7 @@
 
 This procedure installs the pinned GLiFormer weight file and starts jeff as a local,
 authenticated shadow provider. jeff remains optional and non-authoritative. LocalJev with
-`qwen3:14b` remains the only provider that can affect Foreman policy decisions.
+`qwen3:14b` remains the only provider that can affect Veyro policy decisions.
 
 ## Pinned artifacts
 
@@ -31,13 +31,13 @@ refuses to replace any existing invalid file.
 From an approved local transfer:
 
 ```console
-$ foreman import-jeff-weights --source /approved/path/pytorch_model.bin
+$ veyro import-jeff-weights --source /approved/path/pytorch_model.bin
 ```
 
 From an approved internal HTTPS artifact service:
 
 ```console
-$ foreman import-jeff-weights \
+$ veyro import-jeff-weights \
     --source https://artifacts.example.internal/gliformer-large-v1/pytorch_model.bin \
     --ca-bundle ~/.config/huggingface/ca-bundle.pem
 ```
@@ -74,7 +74,7 @@ canary.
 Create a fresh key in macOS Keychain. Do not save it in the repository or shell history:
 
 ```bash
-JEFF_KEYCHAIN_SERVICE=foreman-jeff-shadow
+JEFF_KEYCHAIN_SERVICE=veyro-jeff-shadow
 security add-generic-password -U -a "$USER" -s "$JEFF_KEYCHAIN_SERVICE" \
   -w "$(openssl rand -hex 32)"
 JEFF_API_KEYS="$(security find-generic-password \
@@ -96,7 +96,7 @@ In another shell, load the same key as the client key. Check health without auth
 check the authenticated model endpoint:
 
 ```bash
-JEFF_KEYCHAIN_SERVICE=foreman-jeff-shadow
+JEFF_KEYCHAIN_SERVICE=veyro-jeff-shadow
 JEFF_API_KEY="$(security find-generic-password \
   -a "$USER" -s "$JEFF_KEYCHAIN_SERVICE" -w)"
 export JEFF_API_KEY
@@ -114,7 +114,7 @@ with urllib.request.urlopen(request) as response:
 PY
 ```
 
-Before enabling Foreman shadow traffic, send one live nine-question System One request and record
+Before enabling Veyro shadow traffic, send one live nine-question System One request and record
 its provider, checkpoint, question version, and inference metadata. A successful health check alone
 is not proof that model inference works.
 
@@ -123,17 +123,17 @@ is not proof that model inference works.
 Set the shadow endpoint without changing the authoritative LocalJev settings:
 
 ```bash
-export FOREMAN_JEV_SHADOW_PROVIDER_ID=jeff-gliformer-large-v1
-export FOREMAN_JEV_SHADOW_BASE_URL=http://127.0.0.1:8081
-export FOREMAN_JEV_SHADOW_API_KEY_ENV=JEFF_API_KEY
-export FOREMAN_JEV_SHADOW_MODEL=jev-latest
-export FOREMAN_JEV_SHADOW_CHECKPOINT='knowledgator/gliformer-large-v1@d0a4e53d09cebe6bc963dd9be319d4279084bb2d#sha256:f80b29199d66f878669f283703e4dba9fd726755dcc20aba1ed0d24fce4a23f1'
-export FOREMAN_JEV_SHADOW_TIMEOUT_SECONDS=10
-export FOREMAN_JEV_SHADOW_MAX_STATE_CHARS=20000
-export FOREMAN_JEV_SHADOW_STATE_FORMAT=kv
+export VEYRO_JEV_SHADOW_PROVIDER_ID=jeff-gliformer-large-v1
+export VEYRO_JEV_SHADOW_BASE_URL=http://127.0.0.1:8081
+export VEYRO_JEV_SHADOW_API_KEY_ENV=JEFF_API_KEY
+export VEYRO_JEV_SHADOW_MODEL=jev-latest
+export VEYRO_JEV_SHADOW_CHECKPOINT='knowledgator/gliformer-large-v1@d0a4e53d09cebe6bc963dd9be319d4279084bb2d#sha256:f80b29199d66f878669f283703e4dba9fd726755dcc20aba1ed0d24fce4a23f1'
+export VEYRO_JEV_SHADOW_TIMEOUT_SECONDS=10
+export VEYRO_JEV_SHADOW_MAX_STATE_CHARS=20000
+export VEYRO_JEV_SHADOW_STATE_FORMAT=kv
 ```
 
-Keep `FOREMAN_JEV_BASE_URL` pointed at LocalJev. Shadow failures are recorded separately and must
-not fail, steer, stop, route, escalate, or finish a Foreman run. Do not promote jeff until both
-providers have run against the same labeled Foreman observations and the recorded promotion gates
+Keep `VEYRO_JEV_BASE_URL` pointed at LocalJev. Shadow failures are recorded separately and must
+not fail, steer, stop, route, escalate, or finish a Veyro run. Do not promote jeff until both
+providers have run against the same labeled Veyro observations and the recorded promotion gates
 pass.

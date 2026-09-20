@@ -1,6 +1,6 @@
 # Verify the supervision control plane
 
-Run from the Foreman repository with its installed `.venv`. These checks exercise
+Run from the Veyro repository with its installed `.venv`. These checks exercise
 real binaries without submitting work prompts to native agents. Check the
 [version pins](supervision-reference.md#compatibility) first. A blocked or mismatched
 canary is a failed check, not permission to bypass native security.
@@ -32,7 +32,7 @@ They do not substitute for native delivery proof.
 ## Check the assessor deployment
 
 Before enabling reviewed controls, verify that the local deployment is the one you
-intend to trust. Foreman requests `jev-latest` at fixed `http://127.0.0.1:8080`.
+intend to trust. Veyro requests `jev-latest` at fixed `http://127.0.0.1:8080`.
 Its checkpoint provenance is a configured label, not a digest attested by the
 server for each inference. A passing stop canary does not remove this limitation.
 
@@ -64,11 +64,11 @@ attestation. Loading a model just to make this check look stronger is not requir
 
 ## Verify Prime read-only observation
 
-Discover a session you own with `foreman sessions`. Use its selector and the
+Discover a session you own with `veyro sessions`. Use its selector and the
 existing daemon socket:
 
 ```sh
-.venv/bin/python -m foreman.supervision.attachment_canary --agent prime-agent \
+.venv/bin/python -m veyro.supervision.attachment_canary --agent prime-agent \
   --repo /path/to/repo --socket /path/to/existing/daemon.sock --session ACTIVE_ID
 ```
 
@@ -84,13 +84,13 @@ service must be available. `--approve-stop` is explicit approval for this fixtur
 only; the canary supplies the exact request-bound evidence through CLI stdin.
 
 ```sh
-.venv/bin/python -m foreman.supervision.rollout_canary --repo /path/to/repo \
+.venv/bin/python -m veyro.supervision.rollout_canary --repo /path/to/repo \
   --approved-by OPERATOR --approve-stop
 ```
 
 Require `status: passed`, `control: executed`, one delivery claim, a terminal
 `verification`, and `native_fixture_removed: true`. The canary uses the actual
-`foreman supervise` subprocess. It sends no model prompt, removes its private
+`veyro supervise` subprocess. It sends no model prompt, removes its private
 operator files/ledger, and verifies native roster removal. The resident fixture
 allows a separate CLI client to attach without bypassing client-owned access rules.
 This proves approved stop, not active-turn steering, interruption, or automatic
@@ -100,7 +100,7 @@ successful canary; inspect fixture cleanup before a new independent canary run.
 ## Verify OpenCode observation
 
 ```sh
-.venv/bin/python -m foreman.supervision.opencode_canary --attachment
+.venv/bin/python -m veyro.supervision.opencode_canary --attachment
 ```
 
 This starts an isolated authenticated `--pure` loopback server, verifies rejection
@@ -116,7 +116,7 @@ The current isolated canary requires macOS `sandbox-exec`, system Python, and th
 pinned native binary. It uses its own PTY only to drive native trust and exit:
 
 ```sh
-.venv/bin/python -m foreman.supervision.codex_canary --timeout 30
+.venv/bin/python -m veyro.supervision.codex_canary --timeout 30
 ```
 
 Require native-approved `SessionEnd`, a valid UUID, exit zero, denied network, and
@@ -132,13 +132,16 @@ tool outcomes, task completion, or synchronous policy enforcement.
 ## Recorded SUP-016 results
 
 See [machine-readable results](supervision-verification.json) for the tested
-runtime revision, UTC time, exact commands, and normalized native reports.
+runtime revision, UTC time, and normalized native reports. The SUP-016 record is
+pre-rename evidence. Its command spellings were translated to current equivalents;
+they are not the exact commands executed at that historical revision. For the new
+package, see [rename verification](rename-verification.json).
 These are observations of the recorded installation, not guarantees after an
 upgrade. No provider was promoted to automatic-control eligibility.
 
 The full suite passed **497 tests**. The focused control-plane/documentation suite
 passed **346 tests**, including eight documentation checks. Ruff, dependency
-compatibility, and `git diff --check` passed. The installed `.venv/bin/foreman`
+compatibility, and `git diff --check` passed. The installed pre-rename
 entry point also accepted the documented `supervise --help` command.
 
 All four native checks passed without native-agent prompts. Prime observation preserved

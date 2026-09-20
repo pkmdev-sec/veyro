@@ -4,9 +4,8 @@ import asyncio
 
 import pytest
 
-from foreman.config import FactoryConfig
-from foreman.foreman import FakeForemanModel
-from foreman.models import (
+from veyro.config import FactoryConfig
+from veyro.models import (
     AssessmentBatch,
     AssessmentProvenance,
     EventType,
@@ -16,9 +15,10 @@ from foreman.models import (
     InterventionType,
     ProviderAssessmentFailure,
 )
-from foreman.persistence import RunStore
-from foreman.runtime import FactoryRuntime
-from foreman.workers import FakeWorker
+from veyro.persistence import RunStore
+from veyro.runtime import FactoryRuntime
+from veyro.veyro import FakeVeyroModel
+from veyro.workers import FakeWorker
 
 
 def human_assessment() -> FactoryAssessment:
@@ -36,12 +36,12 @@ def human_assessment() -> FactoryAssessment:
 
 
 @pytest.mark.asyncio
-async def test_worker_events_reach_foreman_and_intervention_reaches_worker(tmp_path) -> None:
+async def test_worker_events_reach_veyro_and_intervention_reaches_worker(tmp_path) -> None:
     sink = []
     runtime = FactoryRuntime(
         repository=tmp_path,
         job="Needs credentials",
-        model=FakeForemanModel([human_assessment()]),
+        model=FakeVeyroModel([human_assessment()]),
         config=FactoryConfig(
             assessment_min_interval_seconds=0,
             periodic_assessment_seconds=0.1,
@@ -55,9 +55,9 @@ async def test_worker_events_reach_foreman_and_intervention_reaches_worker(tmp_p
     assert state.status is FactoryStatus.ESCALATED
     types = [event.event_type for event in sink]
     assert EventType.WORKER_STARTED in types
-    assert EventType.FOREMAN_ASSESSED in types
-    assert EventType.FOREMAN_INTERVENED in types
-    assessed_event = next(event for event in sink if event.event_type is EventType.FOREMAN_ASSESSED)
+    assert EventType.VEYRO_ASSESSED in types
+    assert EventType.VEYRO_INTERVENED in types
+    assessed_event = next(event for event in sink if event.event_type is EventType.VEYRO_ASSESSED)
     assert assessed_event.payload["assessment"]["provenance"]["provider_id"] == "simulation"
     persisted = RunStore(tmp_path).load_state(state.run_id)
     assert persisted.latest_assessment.provenance.provider_id == "simulation"
@@ -69,13 +69,13 @@ def test_runtime_rejects_missing_repository(tmp_path) -> None:
         FactoryRuntime(
             repository=tmp_path / "missing",
             job="job",
-            model=FakeForemanModel([human_assessment()]),
+            model=FakeVeyroModel([human_assessment()]),
         )
 
 
 def test_runtime_rejects_empty_job(tmp_path) -> None:
     with pytest.raises(ValueError, match="empty"):
-        FactoryRuntime(repository=tmp_path, job=" ", model=FakeForemanModel())
+        FactoryRuntime(repository=tmp_path, job=" ", model=FakeVeyroModel())
 
 
 @pytest.mark.asyncio
@@ -84,7 +84,7 @@ async def test_overall_timeout_terminates_worker_and_persists_failure(tmp_path) 
     runtime = FactoryRuntime(
         repository=tmp_path,
         job="Long job",
-        model=FakeForemanModel([continuing]),
+        model=FakeVeyroModel([continuing]),
         config=FactoryConfig(
             assessment_min_interval_seconds=0,
             periodic_assessment_seconds=0.01,
@@ -112,7 +112,7 @@ async def test_runtime_cancellation_stops_active_worker(tmp_path) -> None:
     runtime = FactoryRuntime(
         repository=tmp_path,
         job="Cancelled job",
-        model=FakeForemanModel([continuing]),
+        model=FakeVeyroModel([continuing]),
         config=FactoryConfig(
             assessment_min_interval_seconds=0,
             periodic_assessment_seconds=1,
@@ -148,7 +148,7 @@ async def test_shadow_scores_cannot_drive_policy_and_partial_failures_are_report
                 endpoint="http://127.0.0.1:8081",
                 request_model="jev-latest",
                 checkpoint="gliformer@sha256:abc",
-                question_version="foreman-assessment-v1",
+                question_version="veyro-assessment-v1",
                 inference=InferenceMetadata(
                     timeout_seconds=1,
                     max_retries=0,
@@ -190,8 +190,8 @@ async def test_shadow_scores_cannot_drive_policy_and_partial_failures_are_report
     assert intervention.action is InterventionType.ESCALATE
     assert runtime.state.latest_assessment is authoritative
     assert runtime.state.assessment_history == [authoritative, shadow]
-    assert [event.event_type for event in sink].count(EventType.FOREMAN_ASSESSED) == 2
+    assert [event.event_type for event in sink].count(EventType.VEYRO_ASSESSED) == 2
     failure = next(
-        event for event in sink if event.event_type is EventType.FOREMAN_ASSESSMENT_FAILED
+        event for event in sink if event.event_type is EventType.VEYRO_ASSESSMENT_FAILED
     )
     assert failure.payload["provider_id"] == "other-shadow"

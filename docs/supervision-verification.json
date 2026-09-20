@@ -2,10 +2,10 @@
   "schema_version": "1.0",
   "runtime_revision": "83b424fd6a382f115a663e7cc4f9b003b58258fd",
   "recorded_at_utc": "2026-09-19T23:23:31.416813+00:00",
-  "command_placeholders": "Repository, socket, session and operator label are redacted; commands retain exact tested flags.",
+  "command_placeholders": "Pre-rename evidence. Command spellings below are current equivalents, not the exact commands executed at the recorded runtime revision. Repository, socket, session and operator labels are redacted.",
   "native_checks": {
     "prime_approved": {
-      "command": ".venv/bin/python -m foreman.supervision.rollout_canary --repo REPOSITORY --approved-by OPERATOR --approve-stop",
+      "command": ".venv/bin/python -m veyro.supervision.rollout_canary --repo REPOSITORY --approved-by OPERATOR --approve-stop",
       "exit_code": 0,
       "report": {
         "checkpoint_assessed": true,
@@ -23,7 +23,7 @@
       }
     },
     "opencode": {
-      "command": ".venv/bin/python -m foreman.supervision.opencode_canary --attachment",
+      "command": ".venv/bin/python -m veyro.supervision.opencode_canary --attachment",
       "exit_code": 0,
       "report": {
         "controls_enabled": false,
@@ -43,7 +43,7 @@
       }
     },
     "codex": {
-      "command": ".venv/bin/python -m foreman.supervision.codex_canary --timeout 30",
+      "command": ".venv/bin/python -m veyro.supervision.codex_canary --timeout 30",
       "exit_code": 0,
       "report": {
         "event": "SessionEnd",
@@ -61,7 +61,7 @@
       }
     },
     "prime_observe": {
-      "command": ".venv/bin/python -m foreman.supervision.attachment_canary --agent prime-agent --repo REPOSITORY --socket EXISTING_SOCKET --session OWNED_SESSION",
+      "command": ".venv/bin/python -m veyro.supervision.attachment_canary --agent prime-agent --repo REPOSITORY --socket EXISTING_SOCKET --session OWNED_SESSION",
       "exit_code": 0,
       "report": {
         "controls_enabled": false,
@@ -114,5 +114,6 @@
     "diff_check": "passed",
     "executable_help": "passed",
     "known_baseline_timing_failure": "test_noisy_events_are_coalesced did not recur in this run; it remains a previously reproduced baseline race."
-  }
+  },
+  "evidence_scope": "Historical pre-rename installation; current-name checks are recorded in rename-verification.json."
 }

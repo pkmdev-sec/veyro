@@ -3,18 +3,18 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from foreman.models import (
+from veyro.models import (
     BoundaryAction,
     BoundaryDisposition,
     BoundaryOperation,
     SessionIdentity,
 )
-from foreman.supervision import BoundaryPolicy
+from veyro.supervision import BoundaryPolicy
 
 
 def identity() -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="foreman-1",
+        veyro_session_id="veyro-1",
         provider_id="prime-agent",
         provider_session_id="prime-1",
         repository="/tmp/project",

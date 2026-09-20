@@ -12,7 +12,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from foreman.supervision import codex_canary as canary
+from veyro.supervision import codex_canary as canary
 
 SESSION_ID = "019b3065-932e-72b4-96d7-b0ddbe7dd2da"
 

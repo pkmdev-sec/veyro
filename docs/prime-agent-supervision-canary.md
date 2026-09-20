@@ -24,7 +24,7 @@ The stop applies only to the newly created disposable session. A failure trigger
 The operator must state who approved the action and pass the explicit stop flag:
 
 ```bash
-.venv/bin/python -m foreman.supervision.prime_canary \
+.venv/bin/python -m veyro.supervision.prime_canary \
   --repo /path/to/repository \
   --approved-by local-operator \
   --approve-stop
@@ -49,4 +49,4 @@ The live `SUP-009` run produced:
 }
 ```
 
-`session_failed` is Foreman's provider-neutral terminal mapping for a daemon session closed with reason `killed`; it does not mean the canary failed.
+`session_failed` is Veyro's provider-neutral terminal mapping for a daemon session closed with reason `killed`; it does not mean the canary failed.

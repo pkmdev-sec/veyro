@@ -1,0 +1,112 @@
+{
+  "schema_version": "1.0",
+  "recorded_at_utc": "2026-09-20T00:26:26.600445+00:00",
+  "distribution": "veyro-factory",
+  "version": "0.4.0",
+  "runtime_source_sha256": "81475bb1f9406c6100d44963d6c59a44c607c1f7b0c1ac8d09e5fd89ed0cc647",
+  "runtime_source_hash_recipe": "Sorted src/veyro/**/*.py; SHA-256 over each UTF-8 relative path, NUL, file bytes, NUL.",
+  "native_checks": {
+    "prime_approved": {
+      "checkpoint_assessed": true,
+      "control": "executed",
+      "delivery_claims": 1,
+      "executable": true,
+      "mode": "approval_required",
+      "native_fixture_removed": true,
+      "prompt_sent": false,
+      "provider": "prime-agent",
+      "status": "passed",
+      "stdin_approval": true,
+      "verification": "session_failed",
+      "version": "0.9.5"
+    },
+    "opencode": {
+      "controls_enabled": false,
+      "executable": true,
+      "existing_session_preserved": true,
+      "fixture_session_created": true,
+      "history": "unavailable",
+      "isolated_native_storage": true,
+      "native_history_complete": false,
+      "observation": "live_native_stream",
+      "prompt_sent": false,
+      "provider": "opencode",
+      "session_created_by_attachment": false,
+      "status": "passed",
+      "supervise_observe_only": true,
+      "version": "1.18.30"
+    },
+    "codex": {
+      "event": "SessionEnd",
+      "exit_code": 0,
+      "hook_trust": "native-private-approval",
+      "native_sha256": "4f85982624b3898c8991cb80c0981b2aa71070e3537046c9a95950318a95afcc",
+      "network": "sandbox-deny",
+      "prompt_sent": false,
+      "provider": "codex",
+      "reason": "other",
+      "session_id_valid": true,
+      "status": "passed",
+      "temporary_tree_removed": true,
+      "version": "0.154.0"
+    },
+    "prime_observe": {
+      "controls_enabled": false,
+      "executable": true,
+      "existing_session_preserved": true,
+      "history": "snapshot_metadata_only",
+      "native_history_complete": false,
+      "observation": "live_native_stream",
+      "prompt_sent": false,
+      "provider": "prime-agent",
+      "session_created_by_attachment": false,
+      "status": "passed",
+      "supervise_observe_only": true,
+      "version": "0.9.5"
+    }
+  },
+  "native_scope": "New package commands ran with disposable controls only. Existing-session observation remained read-only. No native-agent work prompts.",
+  "model_provenance_limit": "Configured LocalJev identity is not per-response weight attestation.",
+  "build_verification": {
+    "wheel_installed_outside_checkout": true,
+    "new_cli_and_import_only": true,
+    "isolated_hook_helper_help": true,
+    "wheel_rebuilt_from_sdist": true,
+    "installed_wheel_demo_finished": true,
+    "installed_wheel_inspect_replayed_new_state": true
+  },
+  "full_suite": {
+    "passed": 510,
+    "failed": 1,
+    "known_baseline_failure": "test_noisy_events_are_coalesced",
+    "earlier_full_suite_before_release_and_animation_tests": {
+      "passed": 501,
+      "failed": 0
+    }
+  },
+  "retired_name_scan": "Zero case-insensitive matches required in final tracked paths and contents; private state and Git history excluded.",
+  "breaking_contract_checks": {
+    "new_environment_names_work": true,
+    "prior_environment_names_ignored": true,
+    "prior_identity_schema_rejected": true
+  },
+  "native_commands": {
+    "prime_approved": "python -m veyro.supervision.rollout_canary --repo REPOSITORY --approved-by OPERATOR --approve-stop",
+    "prime_observe": "python -m veyro.supervision.attachment_canary --agent prime-agent --repo REPOSITORY --socket EXISTING_SOCKET --session OWNED_SESSION",
+    "opencode": "python -m veyro.supervision.opencode_canary --attachment",
+    "codex": "python -m veyro.supervision.codex_canary --timeout 30"
+  },
+  "animated_logo": {
+    "dimensions": [
+      640,
+      256
+    ],
+    "frames": 40,
+    "loop_milliseconds": 4000,
+    "bytes": 376980,
+    "deterministic_regeneration": true,
+    "independent_ffmpeg_decode": true,
+    "focused_brand_release_and_docs_tests_passed": 22,
+    "visual_preview_limit": "No graphical preview tool was available; geometry and decoded frames were verified."
+  }
+}

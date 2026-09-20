@@ -7,23 +7,23 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from foreman.bridges.codex_hooks import CODEX_VERSION, codex_hook_capabilities
-from foreman.bridges.opencode import (
+from veyro.bridges.codex_hooks import CODEX_VERSION, codex_hook_capabilities
+from veyro.bridges.opencode import (
     OPENCODE_API_VERSION,
     OPENCODE_VERSION,
     opencode_server_capabilities,
 )
-from foreman.bridges.prime_agent import (
+from veyro.bridges.prime_agent import (
     DAEMON_PROTOCOL_VERSION,
     DAEMON_SCHEMA_ID,
     DAEMON_SCHEMA_REVISION,
     PRIME_AGENT_VERSION,
     prime_daemon_capabilities,
 )
-from foreman.cli import app
-from foreman.config import FactoryConfig
-from foreman.models.authorization import AuthorizationReason
-from foreman.supervision.checkpoints import (
+from veyro.cli import app
+from veyro.config import FactoryConfig
+from veyro.models.authorization import AuthorizationReason
+from veyro.supervision.checkpoints import (
     AUTHORITATIVE_MODEL_CHECKPOINT,
     AUTHORITATIVE_PROVIDER_ID,
 )
@@ -57,7 +57,7 @@ def test_capability_matrix_matches_every_adapter_declaration():
 
 def test_reference_pins_match_runtime():
     readme = (ROOT / "README.md").read_text()
-    assert f"| `FOREMAN_CODEX_BACKEND` | `{FactoryConfig().codex_backend}` |" in readme
+    assert f"| `VEYRO_CODEX_BACKEND` | `{FactoryConfig().codex_backend}` |" in readme
     reference = (DOCS / "supervision-reference.md").read_text()
     for provider, version in [
         ("Prime Agent", PRIME_AGENT_VERSION),

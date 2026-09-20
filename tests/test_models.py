@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from foreman.models import (
+from veyro.models import (
     AssessmentProvenance,
     EventType,
     FactoryAssessment,
@@ -17,7 +17,7 @@ from foreman.models import (
     WorkerRecord,
     WorkerType,
 )
-from foreman.observation import FactoryObservation
+from veyro.observation import FactoryObservation
 
 
 def test_factory_state_validation(tmp_path) -> None:
@@ -151,7 +151,7 @@ def test_provider_assessments_remain_distinct_in_persisted_state(state, assessme
             endpoint=f"http://127.0.0.1/{provider_id}",
             request_model="jev-latest",
             checkpoint=f"{provider_id}@sha256:abc",
-            question_version="foreman-assessment-v1",
+            question_version="veyro-assessment-v1",
             inference=InferenceMetadata(
                 timeout_seconds=10,
                 max_retries=2,

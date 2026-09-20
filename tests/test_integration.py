@@ -4,12 +4,12 @@ from collections import Counter
 
 import pytest
 
-from foreman.config import FactoryConfig
-from foreman.foreman import FakeForemanModel
-from foreman.models import EventType, FactoryAssessment, FactoryStatus, WorkerType
-from foreman.persistence import RunStore
-from foreman.runtime import FactoryRuntime
-from foreman.workers import FakeWorker
+from veyro.config import FactoryConfig
+from veyro.models import EventType, FactoryAssessment, FactoryStatus, WorkerType
+from veyro.persistence import RunStore
+from veyro.runtime import FactoryRuntime
+from veyro.veyro import FakeVeyroModel
+from veyro.workers import FakeWorker
 
 
 def score(**updates: float) -> FactoryAssessment:
@@ -45,7 +45,7 @@ def config(**updates) -> FactoryConfig:
 
 @pytest.mark.asyncio
 async def test_full_simulated_factory_assesses_live_and_verifies(tmp_path) -> None:
-    model = FakeForemanModel(
+    model = FakeVeyroModel(
         [
             score(implementation_complete=0.31, meaningful_progress=0.88),
             score(implementation_complete=0.72, meaningful_progress=0.94),
@@ -99,7 +99,7 @@ async def test_full_simulated_factory_assesses_live_and_verifies(tmp_path) -> No
 
 @pytest.mark.asyncio
 async def test_stuck_worker_is_steered_stopped_retried_verified_and_finished(tmp_path) -> None:
-    model = FakeForemanModel(
+    model = FakeVeyroModel(
         [
             score(meaningful_progress=0.8),
             score(meaningful_progress=0.1, worker_stuck=0.95),
@@ -167,7 +167,7 @@ async def test_noisy_events_are_coalesced(tmp_path) -> None:
         needs_verification=0.0,
         ready_to_finish=0.99,
     )
-    model = FakeForemanModel([score(), ready])
+    model = FakeVeyroModel([score(), ready])
     runtime = FactoryRuntime(
         repository=tmp_path,
         job="Small job",
@@ -189,7 +189,7 @@ async def test_noisy_events_are_coalesced(tmp_path) -> None:
 
 @pytest.mark.asyncio
 async def test_worker_timeout_reaches_terminal_state(tmp_path) -> None:
-    model = FakeForemanModel([score(needs_human=0.99)])
+    model = FakeVeyroModel([score(needs_human=0.99)])
     runtime = FactoryRuntime(
         repository=tmp_path,
         job="Blocked job",

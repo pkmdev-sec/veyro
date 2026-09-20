@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from foreman.models import (
+from veyro.models import (
     BridgeSource,
     EventProvenance,
     EventSensitivity,
@@ -14,19 +14,19 @@ from foreman.models import (
     SupervisionEvent,
     SupervisionEventType,
 )
-from foreman.supervision import journal as journal_module
-from foreman.supervision.broker import MAX_JOURNAL_ENTRY_BYTES, MAX_MESSAGE_BYTES
-from foreman.supervision.journal import JournalError, ReadOnlyJournal, discover_journal_ids
+from veyro.supervision import journal as journal_module
+from veyro.supervision.broker import MAX_JOURNAL_ENTRY_BYTES, MAX_MESSAGE_BYTES
+from veyro.supervision.journal import JournalError, ReadOnlyJournal, discover_journal_ids
 
 
 @pytest.fixture
 def journal_files(tmp_path: Path) -> tuple[Path, Path, SessionIdentity]:
     repository = tmp_path.resolve()
-    directory = repository / ".foreman" / "supervision" / "session-1"
+    directory = repository / ".veyro" / "supervision" / "session-1"
     for path in (directory.parent.parent, directory.parent, directory):
         path.mkdir(mode=0o700)
     identity = SessionIdentity(
-        foreman_session_id=directory.name,
+        veyro_session_id=directory.name,
         provider_id="codex",
         provider_session_id="11111111-1111-4111-8111-111111111111",
         repository=str(repository),
@@ -96,7 +96,7 @@ def test_readonly_discovery_and_paged_append(journal_files, monkeypatch):
 
     monkeypatch.setattr(os, "open", checked_open)
     assert discover_journal_ids(repository) == (["session-1"], False)
-    reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
     try:
         assert reader.identity == identity
         assert reader.sequence == 0
@@ -112,7 +112,7 @@ def test_readonly_discovery_and_paged_append(journal_files, monkeypatch):
         assert reader.read_page() == []
         assert set(opened) == {
             str(repository),
-            ".foreman",
+            ".veyro",
             "supervision",
             "session-1",
             "identity.json",
@@ -131,7 +131,7 @@ def test_partial_tail_is_withheld_until_newline(journal_files):
     first = event_line(identity, 1)
     second = event_line(identity, 2)
     path.write_bytes(first + second[:20])
-    reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
     try:
         assert [event.sequence for event in reader.read_page()] == [1]
         assert reader.sequence == 1
@@ -154,7 +154,7 @@ def test_partial_tail_is_withheld_until_newline(journal_files):
 def test_malformed_complete_line_fails_closed(journal_files, bad_line):
     repository, directory, identity = journal_files
     (directory / "events.jsonl").write_bytes(event_line(identity, 1) + bad_line)
-    reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
     assert len(reader.read_page(limit=1)) == 1
     with pytest.raises(JournalError) as caught:
         reader.read_page()
@@ -184,7 +184,7 @@ def test_rejects_event_identity_sequence_and_sensitivity(journal_files, violatio
     (directory / "events.jsonl").write_bytes(
         event_line(identity, 1) + event_line(identity, sequence, **updates)
     )
-    reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
     with pytest.raises(JournalError):
         reader.read_page()
     reader.close()
@@ -197,22 +197,22 @@ def test_rejects_oversized_actual_file_reads(journal_files, filename):
     (directory / filename).write_bytes(b"x" * (maximum + 1) + b"\n")
     if filename == "identity.json":
         with pytest.raises(JournalError):
-            ReadOnlyJournal.open(repository, identity.foreman_session_id)
+            ReadOnlyJournal.open(repository, identity.veyro_session_id)
     else:
-        reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+        reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
         with pytest.raises(JournalError, match="size limit"):
             reader.read_page()
         reader.close()
 
 
 @pytest.mark.parametrize(
-    "part", [".foreman", "supervision", "session-1", "identity.json", "events.jsonl"]
+    "part", [".veyro", "supervision", "session-1", "identity.json", "events.jsonl"]
 )
 @pytest.mark.parametrize("violation", ["symlink", "mode", "owner"])
 def test_rejects_unsafe_owned_paths_without_repair(journal_files, monkeypatch, part, violation):
     repository, directory, identity = journal_files
     paths = {
-        ".foreman": directory.parent.parent,
+        ".veyro": directory.parent.parent,
         "supervision": directory.parent,
         "session-1": directory,
         "identity.json": directory / "identity.json",
@@ -240,7 +240,7 @@ def test_rejects_unsafe_owned_paths_without_repair(journal_files, monkeypatch, p
         monkeypatch.setattr(os, "fstat", foreign_owner)
     mode = path.lstat().st_mode
     with pytest.raises(JournalError):
-        ReadOnlyJournal.open(repository, identity.foreman_session_id)
+        ReadOnlyJournal.open(repository, identity.veyro_session_id)
     assert path.lstat().st_mode == mode
 
 
@@ -258,13 +258,13 @@ def test_rejects_nonregular_and_hardlinked_files(journal_files, filename, kind):
         else:
             path.mkdir(mode=0o700)
     with pytest.raises(JournalError):
-        ReadOnlyJournal.open(repository, identity.foreman_session_id)
+        ReadOnlyJournal.open(repository, identity.veyro_session_id)
 
 
 @pytest.mark.parametrize(
     "field,value",
     [
-        ("foreman_session_id", "other"),
+        ("veyro_session_id", "other"),
         ("repository", "/other"),
         ("repository", "relative"),
     ],
@@ -290,7 +290,7 @@ def test_follow_fails_closed_on_file_changes(journal_files, change):
     repository, directory, identity = journal_files
     path = directory / "events.jsonl"
     path.write_bytes(event_line(identity, 1) + event_line(identity, 2))
-    reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
     assert len(reader.read_page(limit=1)) == 1
     if change == "truncate":
         path.write_bytes(b"")
@@ -330,7 +330,7 @@ def test_all_descriptors_close_after_init_failure(journal_files, monkeypatch):
     monkeypatch.setattr(os, "open", tracked_open)
     monkeypatch.setattr(os, "close", tracked_close)
     with pytest.raises(JournalError) as caught:
-        ReadOnlyJournal.open(repository, identity.foreman_session_id)
+        ReadOnlyJournal.open(repository, identity.veyro_session_id)
     assert not live
     assert "SECRET" not in str(caught.value)
 
@@ -339,14 +339,14 @@ def test_repository_alias_is_canonicalized(journal_files, tmp_path):
     repository, _, identity = journal_files
     alias = tmp_path / "alias"
     alias.symlink_to(repository, target_is_directory=True)
-    reader = ReadOnlyJournal.open(alias, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(alias, identity.veyro_session_id)
     reader.close()
     assert discover_journal_ids(alias) == (["session-1"], False)
 
 
 def test_discovery_missing_root_is_empty_but_unsafe_root_fails(tmp_path):
     assert discover_journal_ids(tmp_path) == ([], False)
-    root = tmp_path / ".foreman"
+    root = tmp_path / ".veyro"
     root.mkdir(mode=0o700)
     assert discover_journal_ids(tmp_path) == ([], False)
     root.chmod(0o755)
@@ -373,7 +373,7 @@ def test_bounded_limits(journal_files, limit):
     repository, _, identity = journal_files
     with pytest.raises(JournalError, match="limit"):
         discover_journal_ids(repository, limit=limit)
-    reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
     try:
         with pytest.raises(JournalError, match="limit"):
             reader.read_page(limit=limit)
@@ -398,7 +398,7 @@ def test_metadata_open_replacement_is_rejected_and_descriptors_closed(journal_fi
 
     monkeypatch.setattr(journal_module.os, "read", replace_during_read)
     with pytest.raises(JournalError, match="replaced|private"):
-        ReadOnlyJournal.open(repository, identity.foreman_session_id)
+        ReadOnlyJournal.open(repository, identity.veyro_session_id)
 
 
 def append_from_process(path: str, line: bytes) -> None:
@@ -408,7 +408,7 @@ def append_from_process(path: str, line: bytes) -> None:
 
 def test_follow_observes_a_separate_process_append(journal_files):
     repository, directory, identity = journal_files
-    reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
     process = multiprocessing.get_context("spawn").Process(
         target=append_from_process,
         args=(str(directory / "events.jsonl"), event_line(identity, 1)),
@@ -444,7 +444,7 @@ def test_reads_are_bounded_and_never_rewind(journal_files, monkeypatch):
     def no_seek(*args):
         pytest.fail("reader must not rewind")
 
-    reader = ReadOnlyJournal.open(repository, identity.foreman_session_id)
+    reader = ReadOnlyJournal.open(repository, identity.veyro_session_id)
     monkeypatch.setattr(os, "read", bounded_read)
     monkeypatch.setattr(os, "lseek", no_seek)
     try:

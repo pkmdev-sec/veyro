@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from foreman import __version__
-from foreman.models import EventType, WorkerRecord, WorkerStatus, WorkerType
-from foreman.workers import CodexAppServerWorker, CodexWorker, FakeWorker
+from veyro import __version__
+from veyro.models import EventType, WorkerRecord, WorkerStatus, WorkerType
+from veyro.workers import CodexAppServerWorker, CodexWorker, FakeWorker
 
 
 def record() -> WorkerRecord:
@@ -173,7 +173,7 @@ async def test_codex_worker_filters_typesafe_environment(monkeypatch, tmp_path) 
 
     monkeypatch.setenv("TYPESAFE_API_KEY", "secret")
     monkeypatch.setenv("TYPESAFE_INTERNAL_TOKEN", "also-secret")
-    monkeypatch.setenv("FOREMAN_TEST_VALUE", "preserved")
+    monkeypatch.setenv("VEYRO_TEST_VALUE", "preserved")
     monkeypatch.setattr(asyncio, "create_subprocess_exec", create)
 
     async def emit(*args) -> None:
@@ -181,7 +181,7 @@ async def test_codex_worker_filters_typesafe_environment(monkeypatch, tmp_path) 
 
     await CodexWorker().run(record(), tmp_path, emit, 1)
 
-    assert subprocess_kwargs["env"]["FOREMAN_TEST_VALUE"] == "preserved"
+    assert subprocess_kwargs["env"]["VEYRO_TEST_VALUE"] == "preserved"
     assert not any(name.startswith("TYPESAFE_") for name in subprocess_kwargs["env"])
 
 
@@ -259,7 +259,7 @@ async def test_app_server_worker_runs_turn_to_completion(monkeypatch, tmp_path) 
 
     monkeypatch.setenv("TYPESAFE_API_KEY", "secret")
     monkeypatch.setenv("TYPESAFE_INTERNAL_TOKEN", "also-secret")
-    monkeypatch.setenv("FOREMAN_TEST_VALUE", "preserved")
+    monkeypatch.setenv("VEYRO_TEST_VALUE", "preserved")
     monkeypatch.setattr(asyncio, "create_subprocess_exec", create)
     worker_record = record()
     worker = CodexAppServerWorker()
@@ -283,7 +283,7 @@ async def test_app_server_worker_runs_turn_to_completion(monkeypatch, tmp_path) 
     assert result.status is WorkerStatus.COMPLETED
     assert result.codex_thread_id == "thread-1"
     assert result.codex_turn_id == "turn-1"
-    assert subprocess_kwargs["env"]["FOREMAN_TEST_VALUE"] == "preserved"
+    assert subprocess_kwargs["env"]["VEYRO_TEST_VALUE"] == "preserved"
     assert not any(name.startswith("TYPESAFE_") for name in subprocess_kwargs["env"])
     assert process.messages[0]["params"]["clientInfo"]["version"] == __version__
 

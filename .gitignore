@@ -208,7 +208,7 @@ tempCodeRunnerFile.py
 
 # Ruff stuff:
 .ruff_cache/
-.foreman/
+.veyro/
 
 # PyPI configuration file
 .pypirc

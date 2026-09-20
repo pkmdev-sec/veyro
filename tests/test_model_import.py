@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-import foreman.model_import as model_import_module
-from foreman.model_import import (
+import veyro.model_import as model_import_module
+from veyro.model_import import (
     GLIFORMER_LARGE_V1_WEIGHTS,
     ArtifactImportError,
     PinnedArtifact,

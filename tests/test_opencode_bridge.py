@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from foreman.bridges.opencode import (
+from veyro.bridges.opencode import (
     BRIDGE_ID,
     BRIDGE_VERSION,
     OPENCODE_VERSION,
@@ -16,7 +16,7 @@ from foreman.bridges.opencode import (
     attached_tui_command,
     opencode_server_capabilities,
 )
-from foreman.models import (
+from veyro.models import (
     ApprovalDecision,
     BridgeCapability,
     CapabilityAvailability,
@@ -31,7 +31,7 @@ from foreman.models import (
     StopSession,
     SupervisionEventType,
 )
-from foreman.supervision import replay_session
+from veyro.supervision import replay_session
 
 
 class FakeClient:
@@ -88,7 +88,7 @@ class AttachableFakeClient(FakeClient):
 
 def identity() -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="foreman-opencode-1",
+        veyro_session_id="veyro-opencode-1",
         provider_id="opencode",
         provider_session_id="ses_opencode_1",
         repository="/tmp/repository",
@@ -225,7 +225,7 @@ async def test_unsupported_controls_are_not_dispatched(intent: object) -> None:
 @pytest.mark.asyncio
 async def test_foreign_session_control_is_rejected_before_dispatch() -> None:
     adapter, client = bridge()
-    foreign = identity().model_copy(update={"foreman_session_id": "other"})
+    foreign = identity().model_copy(update={"veyro_session_id": "other"})
 
     result = await adapter.execute(
         request(InterruptTurn(reason="Do not dispatch."), session=foreign)
@@ -241,7 +241,7 @@ async def test_attach_requires_exact_version_and_repository() -> None:
     adapter = await OpenCodeServerBridge.attach_connected(
         client=valid_client,  # type: ignore[arg-type]
         provider_session_id="ses_opencode_1",
-        foreman_session_id="foreman-opencode-1",
+        veyro_session_id="veyro-opencode-1",
         repository=Path("/tmp/repository"),
     )
 
@@ -253,14 +253,14 @@ async def test_attach_requires_exact_version_and_repository() -> None:
         await OpenCodeServerBridge.attach_connected(
             client=AttachableFakeClient(version="1.18.29"),  # type: ignore[arg-type]
             provider_session_id="ses_opencode_1",
-            foreman_session_id="foreman-opencode-old",
+            veyro_session_id="veyro-opencode-old",
             repository=Path("/tmp/repository"),
         )
     with pytest.raises(OpenCodeError, match="different repository"):
         await OpenCodeServerBridge.attach_connected(
             client=AttachableFakeClient(directory="/tmp/other"),  # type: ignore[arg-type]
             provider_session_id="ses_opencode_1",
-            foreman_session_id="foreman-opencode-other",
+            veyro_session_id="veyro-opencode-other",
             repository=Path("/tmp/repository"),
         )
 
@@ -411,9 +411,9 @@ def test_message_and_approval_events_keep_only_provider_neutral_metadata() -> No
 
 def test_client_rejects_non_loopback_and_credentials_in_url() -> None:
     with pytest.raises(OpenCodeError, match="loopback"):
-        OpenCodeClient("http://example.com:4096", username="foreman", password="secret")
+        OpenCodeClient("http://example.com:4096", username="veyro", password="secret")
     with pytest.raises(OpenCodeError, match="credentials"):
-        OpenCodeClient("http://user:secret@127.0.0.1:4096", username="foreman", password="secret")
+        OpenCodeClient("http://user:secret@127.0.0.1:4096", username="veyro", password="secret")
 
 
 def test_attached_tui_command_uses_native_attach_without_putting_password_in_argv() -> None:
@@ -448,7 +448,7 @@ async def test_attachment_requires_working_observation_stream() -> None:
         await OpenCodeServerBridge.attach_connected(
             client=client,
             provider_session_id="ses_opencode_1",
-            foreman_session_id="foreman-opencode-1",
+            veyro_session_id="veyro-opencode-1",
             repository=Path("/tmp/repository"),
         )
     assert client.closed
@@ -466,7 +466,7 @@ async def test_cancelling_attachment_closes_observer_not_native_session() -> Non
         OpenCodeServerBridge.attach_connected(
             client=client,
             provider_session_id="ses_opencode_1",
-            foreman_session_id="foreman-opencode-1",
+            veyro_session_id="veyro-opencode-1",
             repository=Path("/tmp/repository"),
         )
     )
@@ -494,6 +494,6 @@ async def test_attach_rejects_relative_native_repository() -> None:
         await OpenCodeServerBridge.attach_connected(
             client=AttachableFakeClient(directory="."),
             provider_session_id="ses_opencode_1",
-            foreman_session_id="foreman-opencode-1",
+            veyro_session_id="veyro-opencode-1",
             repository=Path.cwd(),
         )

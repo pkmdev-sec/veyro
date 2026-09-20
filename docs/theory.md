@@ -32,7 +32,7 @@ reason → tool → observe → edit           evidence → probabilities
                                   continue / steer / stop / retry / verify
 ```
 
-Foreman's central bet is that these loops should be separated and allowed to run concurrently.
+Veyro's central bet is that these loops should be separated and allowed to run concurrently.
 The coding worker keeps its local reasoning loop. Factory events give the supervisor a bounded view
 of what is happening without forcing the worker to yield.
 
@@ -59,13 +59,13 @@ If assessment only happens after a worker exits, the architecture is a serial ju
 run agent → inspect result → run another agent
 ```
 
-Foreman instead consumes start, output, failure, repository, timeout, and completion signals while
+Veyro instead consumes start, output, failure, repository, timeout, and completion signals while
 the subprocess is live. Events are coalesced so one noisy stdout stream does not produce one model
 call per line. Important lifecycle events bypass the normal debounce delay.
 
 That makes early intervention possible. A sufficiently strong stuck or off-track signal first sends
 bounded guidance into the active worker turn. If the signal remains high after a grace period,
-Foreman can still stop the worker before its natural timeout. Quiet work continues to receive
+Veyro can still stop the worker before its natural timeout. Quiet work continues to receive
 periodic assessment.
 
 ## What the theory does not assume

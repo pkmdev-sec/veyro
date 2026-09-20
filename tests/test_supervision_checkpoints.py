@@ -5,8 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from foreman.foreman import JevForemanModel
-from foreman.models import (
+from veyro.models import (
     AssessmentProvenance,
     BoundaryAction,
     BoundaryOperation,
@@ -19,7 +18,7 @@ from foreman.models import (
     SupervisionEvent,
     SupervisionEventType,
 )
-from foreman.supervision import (
+from veyro.supervision import (
     AUTHORITATIVE_MODEL_CHECKPOINT,
     CHECKPOINT_QUESTIONS,
     CHECKPOINT_QUESTIONS_VERSION,
@@ -29,11 +28,12 @@ from foreman.supervision import (
     LocalJevCheckpointAssessor,
     SessionReducer,
 )
+from veyro.veyro import JevVeyroModel
 
 
 def identity() -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="foreman-1",
+        veyro_session_id="veyro-1",
         provider_id="prime-agent",
         provider_session_id="prime-1",
         repository="/tmp/project",
@@ -204,7 +204,7 @@ class Client:
 @pytest.mark.asyncio
 async def test_localjev_assessor_uses_authoritative_checkpoint_questions() -> None:
     client = Client()
-    model = JevForemanModel(
+    model = JevVeyroModel(
         client=client,
         provider_id="localjev-qwen3-14b",
         checkpoint=AUTHORITATIVE_MODEL_CHECKPOINT,
@@ -227,7 +227,7 @@ async def test_localjev_assessor_uses_authoritative_checkpoint_questions() -> No
 
 
 def test_localjev_assessor_rejects_shadow_authority() -> None:
-    model = JevForemanModel(client=Client(), role="shadow")
+    model = JevVeyroModel(client=Client(), role="shadow")
     with pytest.raises(ValueError, match="authoritative"):
         LocalJevCheckpointAssessor(model)
 
@@ -235,7 +235,7 @@ def test_localjev_assessor_rejects_shadow_authority() -> None:
 def test_localjev_assessor_rejects_unpinned_or_remote_authority() -> None:
     with pytest.raises(ValueError, match="pinned qwen3"):
         LocalJevCheckpointAssessor(
-            JevForemanModel(
+            JevVeyroModel(
                 client=Client(),
                 provider_id="localjev-qwen3-14b",
                 checkpoint="qwen3:14b@sha256:wrong",
@@ -243,7 +243,7 @@ def test_localjev_assessor_rejects_unpinned_or_remote_authority() -> None:
         )
     with pytest.raises(ValueError, match="loopback"):
         LocalJevCheckpointAssessor(
-            JevForemanModel(
+            JevVeyroModel(
                 client=Client(),
                 provider_id="localjev-qwen3-14b",
                 checkpoint=AUTHORITATIVE_MODEL_CHECKPOINT,

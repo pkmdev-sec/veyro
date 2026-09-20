@@ -4,7 +4,7 @@ import ssl
 
 import pytest
 
-from foreman.foreman.jev import JevForemanModel
+from veyro.veyro.jev import JevVeyroModel
 
 
 @pytest.mark.parametrize(
@@ -26,7 +26,7 @@ async def test_local_assessment_stays_local_without_weakening_external_transport
         monkeypatch.delenv(name.upper(), raising=False)
     monkeypatch.setenv("http_proxy", "http://proxy.invalid:8080")
     monkeypatch.setenv("https_proxy", "http://proxy.invalid:8080")
-    client = JevForemanModel(base_url=base_url, api_key="test-key")._make_client()
+    client = JevVeyroModel(base_url=base_url, api_key="test-key")._make_client()
     try:
         assert bool(client._http_client._mounts) is proxy_expected
         assert client._http_client._transport._pool._ssl_context.verify_mode == ssl.CERT_REQUIRED

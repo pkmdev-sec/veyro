@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from foreman.agents import AgentId
-from foreman.config import FactoryConfig
-from foreman.models import (
+from veyro.agents import AgentId
+from veyro.config import FactoryConfig
+from veyro.models import (
     FactoryAssessment,
     Intervention,
     InterventionType,
@@ -12,7 +12,7 @@ from foreman.models import (
     WorkerStatus,
     WorkerType,
 )
-from foreman.policy import FactoryPolicy
+from veyro.policy import FactoryPolicy
 
 
 def with_scores(assessment: FactoryAssessment, **scores: float) -> FactoryAssessment:

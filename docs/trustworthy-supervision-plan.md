@@ -12,7 +12,7 @@ Give Codex, Prime Agent, and OpenCode one local supervision and policy layer whi
 - Negotiate capabilities at runtime and reject unsupported controls instead of approximating them silently.
 - Store minimal local evidence by default; do not persist prompts, transcripts, file contents, credentials, or environment values without explicit opt-in.
 - Put deterministic safety rules before semantic assessment and require human approval for irreversible or unsupported actions.
-- Keep provider-specific schemas inside adapters so the Foreman policy core stays provider-neutral.
+- Keep provider-specific schemas inside adapters so the Veyro policy core stays provider-neutral.
 
 ## Tasks
 
@@ -28,7 +28,7 @@ Give Codex, Prime Agent, and OpenCode one local supervision and policy layer whi
 - [x] **SUP-010 — Integrate OpenCode server mode:** Connect an authenticated loopback OpenCode server, native attached TUI, SSE observation, async prompt, approval, and abort endpoints.
 - [x] **SUP-012 — Integrate Codex hooks:** Publish stable Codex hook events and queue controls while keeping experimental App Server capabilities explicitly opt-in. Verified Codex 0.154.0 native no-prompt `SessionEnd` delivery with native trust approval; queue execution remains opt-in and was not exercised live.
 - [x] **SUP-014 — Attach to existing sessions:** Added executable read-only discovery and bounded attachment for Prime Agent, OpenCode, and existing Codex hook journals. Reports distinguish partial history, live versus local-only observation, and disabled controls. Native no-prompt canaries preserved the selected Prime/OpenCode sessions; see [existing-session attachment](existing-session-attachment.md).
-- [x] **SUP-015 — Roll out automatic intervention safely:** Added default observe-only, advisory, approval-required, and allowlisted automatic policies through the executable `foreman supervise` command. Exact approval, fresh observations, and durable no-retry claims gate delivery. Current native capabilities still require approval; approved no-prompt Prime CLI control and Prime/OpenCode observe-only canaries passed. See [supervision rollout](supervision-rollout.md).
+- [x] **SUP-015 — Roll out automatic intervention safely:** Added default observe-only, advisory, approval-required, and allowlisted automatic policies through the executable `veyro supervise` command. Exact approval, fresh observations, and durable no-retry claims gate delivery. Current native capabilities still require approval; approved no-prompt Prime CLI control and Prime/OpenCode observe-only canaries passed. See [supervision rollout](supervision-rollout.md).
 - [x] **SUP-016 — Document and verify the control plane:** Published the [operator guide](supervision-operator-guide.md), [capability and privacy reference](supervision-reference.md), and [dated version-pinned verification](supervision-verification.md). Four native checks passed; documentation tests guard capabilities, pins, CLI flags, and recovery coverage. Model checkpoint provenance is a configured identity, not per-response weight attestation; deployment prerequisites and unverified controls are explicit.
 
 ## Execution order

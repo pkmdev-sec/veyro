@@ -65,10 +65,10 @@ Unless a task explicitly produces only research or an ADR, it is complete only w
 - [x] **BASE-002 — Install a local decision model.**
   - Ollama hosts `qwen3:14b` on `127.0.0.1:11434`.
   - Acceptance: LocalJev reports `qwen3:14b` as its ready upstream model.
-- [x] **BASE-003 — Integrate Foreman with LocalJev through the TypeSafe SDK.**
-  - Foreman uses `TYPESAFE_BASE_URL=http://127.0.0.1:8080` and `jev-latest`.
-  - Acceptance: a live `JevForemanModel` call returns all nine bounded assessment values.
-- [x] **BASE-004 — Establish the Foreman repository baseline.**
+- [x] **BASE-003 — Integrate Veyro with LocalJev through the TypeSafe SDK.**
+  - Veyro uses `TYPESAFE_BASE_URL=http://127.0.0.1:8080` and `jev-latest`.
+  - Acceptance: a live `JevVeyroModel` call returns all nine bounded assessment values.
+- [x] **BASE-004 — Establish the Veyro repository baseline.**
   - Acceptance: all 75 tests and Ruff checks pass before control-plane work begins.
 
 ---
@@ -186,7 +186,7 @@ Unless a task explicitly produces only research or an ADR, it is complete only w
 - [ ] **DISC-015 — Baseline LocalJev on representative observations.**
   - Save model version, LocalJev version, prompt/question version, inputs, outputs, latency, retries,
     and human labels.
-- [ ] **DISC-016 — Map Foreman extension points and assumptions.**
+- [ ] **DISC-016 — Map Veyro extension points and assumptions.**
   - Document worker protocol, scheduler, policy, persistence, event model, CLI, repository coupling,
     single-worker assumptions, and changes required for each later milestone.
 - [ ] **DISC-017 — Produce a discovery report.**
@@ -501,7 +501,7 @@ Unless a task explicitly produces only research or an ADR, it is complete only w
   - jeff revision: [`230d85d29e5df3454f7eb1aad374da01808191a2`](https://github.com/logan-markewich/jeff/tree/230d85d29e5df3454f7eb1aad374da01808191a2).
   - Decision: keep LocalJev with `qwen3:14b` as the only active supervisor. Add jeff only as an
     opt-in shadow provider during `JEV-013` through `JEV-016`. Do not average, vote, route, or fail
-    over between their answers until a Foreman-specific evaluation supports that policy.
+    over between their answers until a Veyro-specific evaluation supports that policy.
 
 ### Decision summary
 
@@ -510,14 +510,14 @@ and it is not an Ollama or OpenAI-compatible provider. It is a separate System O
 `knowledgator/gliformer-large-v1`, a 400M-parameter classification model. The accurate topology is:
 
 ```text
-Foreman
+Veyro
 ├── LocalJev -> Ollama -> qwen3:14b
 └── jeff     -> PyTorch/MPS -> gliformer-large-v1
 ```
 
-Foreman should eventually support multiple named semantic providers for evaluation and explicit
+Veyro should eventually support multiple named semantic providers for evaluation and explicit
 routing. It should not add active multi-model decision logic now. The current Qwen path has not been
-calibrated on representative Foreman tasks, and jeff has not been compared with this local Qwen
+calibrated on representative Veyro tasks, and jeff has not been compared with this local Qwen
 stack. Two uncalibrated answers do not become reliable because they disagree or are averaged.
 
 ### Evidence from the current installation
@@ -531,10 +531,10 @@ The following observations describe the running instance, not only repository do
 | Ollama model | `qwen3:14b`, Q4_K_M, digest `bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8`. |
 | Service process | LaunchAgent `com.githubnext.localjev`, serving from `~/localjev`. |
 | LocalJev source | Package `0.2.0`, pinned at commit `0a2d1b889ce1a056e13feddce8fd04532c116d78` with the verified Qwen 3/Ollama compatibility patch. |
-| Foreman client | `typesafe-sdk==0.7.0`; [`JevForemanModel`](src/foreman/foreman/jev.py) sends all nine Noul questions in one `system_one` request. |
-| Live Foreman smoke call | The current stack returned all nine bounded values in 14.149 seconds. This proves wire compatibility and availability. One synthetic case does not establish accuracy or calibration. |
+| Veyro client | `typesafe-sdk==0.7.0`; [`JevVeyroModel`](src/veyro/veyro/jev.py) sends all nine Noul questions in one `system_one` request. |
+| Live Veyro smoke call | The current stack returned all nine bounded values in 14.149 seconds. This proves wire compatibility and availability. One synthetic case does not establish accuracy or calibration. |
 
-The pinned LocalJev checkout passed all 20 Bun tests and `tsc --noEmit`. Foreman's
+The pinned LocalJev checkout passed all 20 Bun tests and `tsc --noEmit`. Veyro's
 [`localjev-qwen3-14b-v1`](config/baselines/localjev-qwen3-14b.json) manifest records the service
 revision, Ollama and Qwen identities, inference settings, TypeSafe client version, and assessment
 question digest. A test fails when the question definitions drift without a new baseline.
@@ -560,11 +560,11 @@ Relevant capabilities and constraints are:
 - One jeff process loads one GLiFormer checkpoint. `jev-latest` and `jev` are aliases for that
   checkpoint, not model-selection values. See
   [`server/config.py`](https://github.com/logan-markewich/jeff/blob/230d85d29e5df3454f7eb1aad374da01808191a2/src/jeff/server/config.py#L15-L20).
-- jeff isolates Noul questions by default. Foreman's nine questions therefore require nine encoder
+- jeff isolates Noul questions by default. Veyro's nine questions therefore require nine encoder
   passes, though jeff may batch those passes. See
   [`core/groups.py`](https://github.com/logan-markewich/jeff/blob/230d85d29e5df3454f7eb1aad374da01808191a2/src/jeff/core/groups.py#L27-L41).
-- The default request limit is 20,000 state characters. A Foreman observation can exceed that because
-  its configured diff limit alone is 20,000 characters and worker history adds more content. Foreman
+- The default request limit is 20,000 state characters. A Veyro observation can exceed that because
+  its configured diff limit alone is 20,000 characters and worker history adds more content. Veyro
   needs an endpoint-aware size check or a smaller shared evidence envelope before a jeff canary.
 - jeff's probabilities are normalized GLiFormer sigmoid scores with global temperature scaling.
   The source explicitly says they are not calibrated posteriors. See
@@ -574,15 +574,15 @@ Relevant capabilities and constraints are:
 
 | Question | Result |
 |---|---|
-| Can Foreman call jeff through `typesafe-sdk`? | Yes. The wire shape used by `JevForemanModel` is compatible. |
-| Can the current CLI select jeff and LocalJev at the same time? | No. It relies on one process-wide `TYPESAFE_BASE_URL` and creates one `JevForemanModel`. |
+| Can Veyro call jeff through `typesafe-sdk`? | Yes. The wire shape used by `JevVeyroModel` is compatible. |
+| Can the current CLI select jeff and LocalJev at the same time? | No. It relies on one process-wide `TYPESAFE_BASE_URL` and creates one `JevVeyroModel`. |
 | Can jeff run Qwen? | No. Its backend expects GLiFormer-specific model internals. |
 | Can LocalJev use jeff as its OpenAI upstream? | No. LocalJev calls `/v1/chat/completions`; jeff exposes `/v1/systemone`. |
 | Can jeff replace LocalJev for one run? | Yes, by pointing an endpoint-scoped TypeSafe client at jeff, subject to the 20,000-character request limit. |
 | Can both services run on this Mac? | Probably, but this needs measurement. jeff can use MPS while Ollama runs Qwen, so both will compete for unified memory and GPU time. |
 | Are outputs directly comparable? | No. The services derive probabilities differently and require separate calibration and provenance. |
 
-The clean integration point is the existing [`ForemanModel`](src/foreman/foreman/base.py) protocol.
+The clean integration point is the existing [`VeyroModel`](src/veyro/veyro/base.py) protocol.
 Do not put jeff behind LocalJev. Do not hide both providers behind the ambiguous `jev-latest` alias.
 Record the service, implementation revision, actual checkpoint and digest, backend, precision, and
 inference settings with every assessment.
@@ -608,7 +608,7 @@ tasks. Its aggregate Noul AUROC was 0.844 versus 0.975 for hosted Jev, with Bool
 0.954. It was close on binary sentiment. See
 [`bench/RESULTS.md`](https://github.com/logan-markewich/jeff/blob/230d85d29e5df3454f7eb1aad374da01808191a2/bench/RESULTS.md#L555-L599).
 These numbers do not compare jeff with this machine's LocalJev and `qwen3:14b`. They support a
-Foreman-specific trial, not a replacement decision.
+Veyro-specific trial, not a replacement decision.
 
 ### Recommended development sequence
 
@@ -620,7 +620,7 @@ Use the existing roadmap rather than starting active multi-model orchestration e
    Ollama, Qwen, inference, client, and question revisions as required by `JEV-008`.
 2. **Make providers explicit — completed 2026-09-19.** `JevProviderConfig` now validates an
    endpoint-scoped base URL, API-key environment reference, request model, provider ID, checkpoint
-   identity, and timeout. `JevForemanModel` passes the endpoint and key explicitly to the SDK and
+   identity, and timeout. `JevVeyroModel` passes the endpoint and key explicitly to the SDK and
    refuses to fall back to process-global credentials. The authoritative provider remains singular;
    shadow-provider fan-out belongs to step 4.
 3. **Persist separate assessments — completed 2026-09-19.** Every built-in model now attaches
@@ -628,20 +628,20 @@ Use the existing roadmap rather than starting active multi-model orchestration e
    model, checkpoint, question version, timeout/retry settings, and measured latency. State and event
    records retain each provider's complete nine-value assessment as a separate history entry.
 4. **Add shadow fan-out only — completed 2026-09-19, disabled by default.** The optional
-   `FOREMAN_JEV_SHADOW_*` provider receives the same observation concurrently with LocalJev/Qwen.
+   `VEYRO_JEV_SHADOW_*` provider receives the same observation concurrently with LocalJev/Qwen.
    Typed batches keep the authoritative policy input separate from shadow results. Independent
    provider timeouts bound both calls, and shadow errors produce non-fatal partial-failure events.
    The jeff canary remains disabled until step 5 can verify and harden its checkpoint.
 5. **Harden a local jeff canary — pinned configuration; activation blocked.** The disabled
    `jeff-gliformer-large-v1-shadow-v1` manifest pins the jeff commit, Hugging Face revision, expected
    weight digest, loopback port 8081, required authentication, MPS/float32 torch settings,
-   temperature, isolation, and request limits. Foreman now reproduces jeff's state serialization and
+   temperature, isolation, and request limits. Veyro now reproduces jeff's state serialization and
    rejects observations above 20,000 characters before network I/O. The 2.3 GB weights are still
    unavailable through the approved corporate CDN path, so their digest and a live hardened service
    remain unverified.
 6. **Run the shared evaluation.** Under `JEV-013` through `JEV-016`, compare critical false-negative
    rate, precision and recall, Brier score, calibration error, abstention, malformed responses,
-   latency, memory use, and Qwen contention. Use representative Foreman observations and human
+   latency, memory use, and Qwen contention. Use representative Veyro observations and human
    labels. Public news and sentiment benchmarks are not enough.
 7. **Choose a narrow policy from evidence.** Promote jeff only if it meets a predeclared threshold
    for a specific question class or provides a measured latency or resource benefit. If it does not,
@@ -651,7 +651,7 @@ Use the existing roadmap rather than starting active multi-model orchestration e
 
 jeff integration is warranted beyond shadow mode only when all of these conditions hold:
 
-- its critical false-negative rate meets the accepted bound on representative Foreman cases;
+- its critical false-negative rate meets the accepted bound on representative Veyro cases;
 - its scores are calibrated separately for the questions it will answer;
 - the routing rule names those questions and cannot lower risk or override hard checks;
 - simultaneous Qwen and GLiFormer execution stays within latency and memory budgets;
@@ -724,24 +724,24 @@ Until then, the supported runtime remains single-supervisor: LocalJev with `qwen
 
 ---
 
-# 9. Foreman-versus-new-core architecture decision
+# 9. Veyro-versus-new-core architecture decision
 
 - [ ] **ARCH-001 — Define decision criteria.**
   - Criteria: schema fit, agent neutrality, multi-repository support, state-machine fit, persistence,
     recovery, scheduler, security boundaries, testing cost, migration cost, and long-term ownership.
-- [ ] **ARCH-002 — Prototype schema integration in Foreman.**
+- [ ] **ARCH-002 — Prototype schema integration in Veyro.**
   - Load a task contract, evidence bundle, generic adapter, and policy decision without Codex-specific
     branching.
-- [ ] **ARCH-003 — Prototype multi-session state in Foreman.**
+- [ ] **ARCH-003 — Prototype multi-session state in Veyro.**
   - Demonstrate two generic sessions and independent event streams without implementing full
     orchestration.
-- [ ] **ARCH-004 — Assess Foreman persistence.**
+- [ ] **ARCH-004 — Assess Veyro persistence.**
   - Determine whether existing per-repository JSON state can support event replay, migrations,
     leases, and cross-repository change sets.
-- [ ] **ARCH-005 — Assess Foreman policy coupling.**
+- [ ] **ARCH-005 — Assess Veyro policy coupling.**
   - Determine whether policy can consume hard checks, approvals, abstentions, and graph evidence
     without replacement.
-- [ ] **ARCH-006 — Assess Foreman scheduler coupling.**
+- [ ] **ARCH-006 — Assess Veyro scheduler coupling.**
   - Identify assumptions about one worker, one repository, in-process runtime, and Codex steering.
 - [ ] **ARCH-007 — Prototype a minimal clean core alternative.**
   - Implement only schema loading, event append/replay, fake adapter lifecycle, and policy transition
@@ -750,7 +750,7 @@ Until then, the supported runtime remains single-supervisor: LocalJev with `qwen
   - Include crash recovery, cancellation, two agents, two repositories, failed hard check, approval,
     and LocalJev outage.
 - [ ] **ARCH-009 — Write the architecture ADR.**
-  - Choose: extend Foreman, extract/refactor Foreman components, or build a new core.
+  - Choose: extend Veyro, extract/refactor Veyro components, or build a new core.
   - Include migration and repository strategy.
 - [ ] **ARCH-010 — Delete the rejected prototype or clearly archive it.**
   - Avoid maintaining accidental parallel runtimes.
@@ -1210,7 +1210,7 @@ The first implementation sequence is deliberately small and evidence-driven:
 1. [ ] Complete `GOV-001` through `GOV-010`.
 2. [ ] Complete agent probes `DISC-001` through `DISC-009`.
 3. [ ] Inventory pilot repositories and build the historical corpus (`DISC-010` through `DISC-015`).
-4. [ ] Map Foreman assumptions (`DISC-016`) and publish the discovery report (`DISC-017`).
+4. [ ] Map Veyro assumptions (`DISC-016`) and publish the discovery report (`DISC-017`).
 5. [ ] Only then finalize the schemas and begin the read-only quality gateway.
 
 Do **not** begin multi-agent orchestration or cross-repository mutation before these tasks and gates

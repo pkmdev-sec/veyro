@@ -28,10 +28,10 @@
     "format": "gguf"
   },
   "questions": {
-    "version": "foreman-assessment-v1",
+    "version": "veyro-assessment-v1",
     "sha256": "beaf0cc0188c26e906d6ad81299379ec5f3ad2a153fffc0335f7eba74e843e38",
-    "foreman_revision": "209182dac7a3467033fd093ab4ca47d21279984a",
-    "source": "src/foreman/foreman/jev.py:ASSESSMENT_QUESTIONS"
+    "veyro_revision": "209182dac7a3467033fd093ab4ca47d21279984a",
+    "source": "src/veyro/veyro/jev.py:ASSESSMENT_QUESTIONS"
   },
   "inference": {
     "temperature": 0,

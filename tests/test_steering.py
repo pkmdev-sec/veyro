@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from foreman.steering import build_steering_message
+from veyro.steering import build_steering_message
 
 
 def test_stuck_assessment_produces_change_of_approach_guidance(assessment) -> None:

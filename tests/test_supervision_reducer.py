@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from foreman.models import (
+from veyro.models import (
     BridgeSource,
     EventProvenance,
     SessionIdentity,
@@ -12,12 +12,12 @@ from foreman.models import (
     SupervisionEvent,
     SupervisionEventType,
 )
-from foreman.supervision import SessionReducer, SessionReductionError, replay_session
+from veyro.supervision import SessionReducer, SessionReductionError, replay_session
 
 
 def identity() -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="foreman-1",
+        veyro_session_id="veyro-1",
         provider_id="prime-agent",
         provider_session_id="prime-1",
         repository="/tmp/project",
@@ -139,7 +139,7 @@ def test_reducer_rejects_gaps_and_foreign_sessions() -> None:
     with pytest.raises(SessionReductionError, match="expected sequence 1"):
         reducer.apply(event(session, 2, SupervisionEventType.SESSION_STARTED))
 
-    foreign = identity().model_copy(update={"foreman_session_id": "other"})
+    foreign = identity().model_copy(update={"veyro_session_id": "other"})
     with pytest.raises(SessionReductionError, match="session identity"):
         reducer.apply(event(foreign, 1, SupervisionEventType.SESSION_STARTED))
 

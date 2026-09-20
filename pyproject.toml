@@ -3,13 +3,13 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "foreman-factory"
-version = "0.3.0"
+name = "veyro-factory"
+version = "0.4.0"
 description = "A semantic supervisory loop for coding agents"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "Foreman contributors" }]
+authors = [{ name = "Veyro contributors" }]
 dependencies = [
   "pydantic>=2.7,<3",
   "python-dotenv>=1.0,<2",
@@ -27,7 +27,7 @@ dev = [
 ]
 
 [project.scripts]
-foreman = "foreman.cli:app"
+veyro = "veyro.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,4 +1,4 @@
-# Product charter: Foreman control plane
+# Product charter: Veyro control plane
 
 ## Document control
 
@@ -7,8 +7,8 @@
 | Charter ID | `GOV-001` |
 | Version | `0.1` |
 | Status | Proposed; Gate G0 approval pending |
-| Owner | Foreman maintainers |
-| Approval authority | Maintainers of the pilot repositories and the Foreman product owner |
+| Owner | Veyro maintainers |
+| Approval authority | Maintainers of the pilot repositories and the Veyro product owner |
 | Applies to | The initial control-plane releases through verified, release-ready change sets |
 
 Changes to the problem, users, product boundary, or mandatory outcomes require a reviewed charter
@@ -23,14 +23,14 @@ sessions and repositories, and a successful process exit says little about accep
 risk, regressions, or release readiness. Cross-repository effects and the reason behind supervisory
 decisions can also be lost.
 
-Foreman needs to turn a structured request into an auditable, quality-controlled change set. It must
+Veyro needs to turn a structured request into an auditable, quality-controlled change set. It must
 coordinate heterogeneous agents without trusting any one agent to define success, preserve the
 source evidence behind decisions, enforce deterministic checks and approvals, and stop short of
 autonomous production deployment.
 
 ## Product vision
 
-Foreman is an agent-neutral control plane for software change management. Given an approved task
+Veyro is an agent-neutral control plane for software change management. Given an approved task
 contract, it plans and supervises work in isolated worktrees, gathers evidence from coding agents
 and existing engineering tools, applies deterministic policy, and produces a verified,
 release-ready change set for human-controlled release.
@@ -48,7 +48,7 @@ This is quality-controlled software change management, not a multi-agent command
 
 ## Intended users
 
-| User | Need from Foreman |
+| User | Need from Veyro |
 | --- | --- |
 | Change requester | Turn a ticket or specification into explicit, traceable acceptance criteria and receive a clear outcome. |
 | Repository maintainer | Review a bounded change, impact plan, deterministic evidence, and unresolved risks without reconstructing agent history. |
@@ -57,7 +57,7 @@ This is quality-controlled software change management, not a multi-agent command
 | Agent-adapter developer | Integrate an agent through a versioned capability and event contract with compatibility fixtures. |
 | Security, compliance, or audit reviewer | Trace actions and decisions to immutable raw evidence, provenance, policy, and human approvals. |
 
-Foreman does not replace the accountable maintainer, security approver, release owner, or incident
+Veyro does not replace the accountable maintainer, security approver, release owner, or incident
 owner.
 
 ## Supported operating environments
@@ -77,11 +77,11 @@ exact supported agent versions, operating systems, machine architectures, and pr
 are discovery outputs and must be published before an adapter is declared supported.
 
 LocalJev is the initial semantic supervisor and runs locally by default. Its assessments are
-advisory until representative calibration demonstrates otherwise. Foreman must continue to expose
+advisory until representative calibration demonstrates otherwise. Veyro must continue to expose
 the underlying evidence and deterministic result when LocalJev or any other model is unavailable.
 
 The unit of delivery is a change set that is ready for an existing human-controlled release
-process. Foreman is not a production deployment environment.
+process. Veyro is not a production deployment environment.
 
 ## Mandatory outcomes
 
@@ -184,7 +184,7 @@ observable outcomes; none may be represented as successful completion.
 
 ## Constraints and assumptions
 
-- Pilot repositories expose deterministic checks that Foreman can invoke and whose result it can
+- Pilot repositories expose deterministic checks that Veyro can invoke and whose result it can
   preserve.
 - Repository owners define protected branches, paths, release policy, and authoritative checks.
 - Credentials are supplied by the operating environment and are neither persisted in task records
@@ -193,13 +193,13 @@ observable outcomes; none may be represented as successful completion.
   deletion policy before real repository use.
 - Cross-repository discovery is necessarily incomplete; freshness and confidence are part of the
   data model and user presentation.
-- Backward compatibility with the current Foreman experiment requires an explicit migration path;
+- Backward compatibility with the current Veyro experiment requires an explicit migration path;
   this charter by itself changes no runtime behavior or configuration.
 
 ## Initial release completion condition
 
 The initial program is ready to leave pilot status only when representative new-project,
-mature-single-repository, and multi-service changes demonstrate that Foreman can enforce the
+mature-single-repository, and multi-service changes demonstrate that Veyro can enforce the
 mandatory outcomes above; required deterministic checks pass; mandatory approvals are traceable;
 failure and cancellation remain safe; and known limitations are documented. Production deployment
 remains outside that completion condition.
@@ -230,7 +230,7 @@ Reviewers should explicitly answer **yes** to both acceptance questions:
 
 | Role | Reviewer | Decision | Date | Notes or evidence |
 | --- | --- | --- | --- | --- |
-| Foreman product owner | Pending | Pending | — | — |
+| Veyro product owner | Pending | Pending | — | — |
 | Pilot repository maintainer(s) | Pending | Pending | — | — |
 
 `GOV-001` remains in progress until these decisions are recorded. Gate G0 additionally requires the

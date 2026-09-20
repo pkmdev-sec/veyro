@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from foreman.models import EventType, FactoryEvent, WorkerRecord, WorkerType
-from foreman.persistence import PersistenceError, RunStore
+from veyro.models import EventType, FactoryEvent, WorkerRecord, WorkerType
+from veyro.persistence import PersistenceError, RunStore
 
 
 def test_state_persistence_and_recovery(state, tmp_path) -> None:
@@ -116,5 +116,5 @@ def test_initialize_locally_excludes_runtime_directory(state, tmp_path) -> None:
         capture_output=True,
         text=True,
     ).stdout
-    assert ".foreman" not in status
-    assert "/.foreman/" in (tmp_path / ".git" / "info" / "exclude").read_text()
+    assert ".veyro" not in status
+    assert "/.veyro/" in (tmp_path / ".git" / "info" / "exclude").read_text()

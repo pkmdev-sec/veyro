@@ -1,6 +1,7 @@
 <p align="center">
-  <img src="docs/assets/veyro-logo.svg" width="624" alt="Veyro pixel-art logo: an eye watches three agent nodes through an approval gate">
+  <img src="docs/assets/veyro-logo-animated.gif" width="640" height="256" alt="Animated Veyro voxel logo: a pixel eye watches three agent nodes through an amber approval gate">
 </p>
+<p align="center"><a href="docs/assets/veyro-logo-animated-poster.png">Static logo</a></p>
 
 <h1 align="center">Veyro</h1>
 <p align="center">Supervise coding agents without replacing their native tools.</p>
@@ -18,7 +19,9 @@ system. Veyro does not scrape terminal output.
 > The default is **observe-only**. No current native adapter qualifies for
 > automatic delivery. Controls need approval, and unsupported controls stay blocked.
 
-The CLI is still `foreman`. The Python distribution is `foreman-factory`.
+The CLI and Python package are `veyro`. Install the `veyro-factory` distribution.
+This is a breaking rename. See [upgrade notes](docs/upgrading.md) before using
+existing sessions, configuration, or delivery ledgers.
 
 ## What it does
 
@@ -81,10 +84,10 @@ uv pip install --python .venv/bin/python --editable '.[dev]'
 Choose an existing Prime session. Use its real repository and daemon socket:
 
 ```sh
-.venv/bin/foreman sessions --agent prime-agent --repo /path/to/repo \
+.venv/bin/veyro sessions --agent prime-agent --repo /path/to/repo \
   --socket /path/to/existing/daemon.sock
 
-.venv/bin/foreman attach --agent prime-agent --repo /path/to/repo \
+.venv/bin/veyro attach --agent prime-agent --repo /path/to/repo \
   --socket /path/to/existing/daemon.sock --session ACTIVE_ID --watch-seconds 30
 ```
 
@@ -103,13 +106,13 @@ OpenCode credentials, Codex hooks, proposal files, and the approval stdin protoc
 
 ## Other interfaces
 
-`foreman agent` launches a native interface with a lifecycle/workspace sidecar.
-`foreman run` is the separate legacy factory loop. Its logs can contain task text
+`veyro agent` launches a native interface with a lifecycle/workspace sidecar.
+`veyro run` is the separate legacy factory loop. Its logs can contain task text
 and agent output; it does not share the metadata-only privacy contract above.
 
 | Legacy setting | Default | Purpose |
 | --- | --- | --- |
-| `FOREMAN_CODEX_BACKEND` | `exec` | Explicit `app-server` opt-in enables experimental steering. |
+| `VEYRO_CODEX_BACKEND` | `exec` | Explicit `app-server` opt-in enables experimental steering. |
 
 See [native routing](docs/agent-router.md) and [factory runtime](docs/runtime.md).
 The [proposed product charter](docs/product-charter.md) describes future scope,

@@ -4,10 +4,10 @@ import asyncio
 
 import pytest
 
-from foreman.foreman import ShadowingForemanModel
-from foreman.foreman.base import ForemanModelError
-from foreman.models import AssessmentProvenance, FactoryAssessment, InferenceMetadata
-from foreman.observation import FactoryObservation
+from veyro.models import AssessmentProvenance, FactoryAssessment, InferenceMetadata
+from veyro.observation import FactoryObservation
+from veyro.veyro import ShadowingVeyroModel
+from veyro.veyro.base import VeyroModelError
 
 
 def assessment(provider_id: str, role: str, score: float) -> FactoryAssessment:
@@ -28,7 +28,7 @@ def assessment(provider_id: str, role: str, score: float) -> FactoryAssessment:
             endpoint=f"http://127.0.0.1/{provider_id}",
             request_model="jev-latest",
             checkpoint=f"{provider_id}@sha256:abc",
-            question_version="foreman-assessment-v1",
+            question_version="veyro-assessment-v1",
             inference=InferenceMetadata(
                 timeout_seconds=1,
                 max_retries=0,
@@ -80,7 +80,7 @@ class CoordinatedModel:
 
 class FailingModel:
     async def assess(self, value: FactoryObservation) -> FactoryAssessment:
-        raise ForemanModelError("shadow unavailable")
+        raise VeyroModelError("shadow unavailable")
 
     async def close(self) -> None:
         return None
@@ -91,7 +91,7 @@ async def test_shadowing_runs_same_observation_concurrently_and_keeps_authority_
     barrier = asyncio.Barrier(2)
     authoritative = CoordinatedModel(assessment("qwen", "authoritative", 0.2), barrier)
     shadow = CoordinatedModel(assessment("jeff", "shadow", 0.9), barrier)
-    model = ShadowingForemanModel(authoritative, {"jeff": shadow})
+    model = ShadowingVeyroModel(authoritative, {"jeff": shadow})
     frozen_observation = observation()
 
     batch = await model.assess(frozen_observation)
@@ -106,12 +106,12 @@ async def test_shadowing_runs_same_observation_concurrently_and_keeps_authority_
 async def test_shadow_failure_is_reported_without_losing_authoritative_result() -> None:
     barrier = asyncio.Barrier(1)
     authoritative = CoordinatedModel(assessment("qwen", "authoritative", 0.2), barrier)
-    model = ShadowingForemanModel(authoritative, {"jeff": FailingModel()})
+    model = ShadowingVeyroModel(authoritative, {"jeff": FailingModel()})
 
     batch = await model.assess(observation())
 
     assert batch.authoritative.provenance.provider_id == "qwen"
     assert batch.shadows == []
     assert batch.failures[0].provider_id == "jeff"
-    assert batch.failures[0].error_type == "ForemanModelError"
+    assert batch.failures[0].error_type == "VeyroModelError"
     assert batch.failures[0].message == "shadow unavailable"

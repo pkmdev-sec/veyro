@@ -11,15 +11,15 @@ from pathlib import Path
 
 import pytest
 
-from foreman.models import SessionIdentity
-from foreman.supervision.delivery import DeliveryError, DeliveryLedger
+from veyro.models import SessionIdentity
+from veyro.supervision.delivery import DeliveryError, DeliveryLedger
 
 DIGEST = hashlib.sha256(b"control text SECRET credential").hexdigest()
 
 
 def identity(repository: Path, **updates: object) -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="foreman-secret",
+        veyro_session_id="veyro-secret",
         provider_id="provider-secret",
         provider_session_id="native-secret",
         repository=str(repository),
@@ -84,7 +84,7 @@ def test_restart_reconnect_and_changed_digest_never_retry(scope):
     claim(DeliveryLedger(root), session)
     reconnected = session.model_copy(
         update={
-            "foreman_session_id": "fresh-foreman",
+            "veyro_session_id": "fresh-veyro",
             "started_at": datetime.now(UTC) + timedelta(days=1),
             "provider_version": "new",
             "bridge_id": "different-bridge",

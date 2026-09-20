@@ -8,8 +8,8 @@ from uuid import uuid4
 import pytest
 from typer.testing import CliRunner
 
-from foreman.agents import AgentId
-from foreman.bridges.codex_hooks import (
+from veyro.agents import AgentId
+from veyro.bridges.codex_hooks import (
     BRIDGE_ID,
     BRIDGE_VERSION,
     CODEX_VERSION,
@@ -18,16 +18,16 @@ from foreman.bridges.codex_hooks import (
     codex_hook_capabilities,
     sanitize_hook,
 )
-from foreman.bridges.opencode import OPENCODE_VERSION, OpenCodeClient, OpenCodeError
-from foreman.bridges.prime_agent import (
+from veyro.bridges.opencode import OPENCODE_VERSION, OpenCodeClient, OpenCodeError
+from veyro.bridges.prime_agent import (
     PrimeAgentDaemonBridge,
     PrimeDaemonClient,
     PrimeDaemonError,
 )
-from foreman.cli import app
-from foreman.models import BridgeCapability, SessionIdentity
-from foreman.supervision.attachment import AttachmentError, attach_existing, discover_sessions
-from foreman.supervision.broker import BrokerStore
+from veyro.cli import app
+from veyro.models import BridgeCapability, SessionIdentity
+from veyro.supervision.attachment import AttachmentError, attach_existing, discover_sessions
+from veyro.supervision.broker import BrokerStore
 
 
 class PrimeListClient(PrimeDaemonClient):
@@ -153,7 +153,7 @@ async def test_prime_attach_binds_repo_discards_content_and_only_detaches(tmp_pa
     bridge = await PrimeAgentDaemonBridge.attach_connected(
         client=client,
         active_session_id="active-1",
-        foreman_session_id="attachment",
+        veyro_session_id="attachment",
         repository=tmp_path,
     )
     assert bridge.attachment_history.snapshot_message_count == 7
@@ -180,7 +180,7 @@ async def test_prime_attach_rejects_wrong_binding(tmp_path, wrong):
         await PrimeAgentDaemonBridge.attach_connected(
             client=client,
             active_session_id="active-1",
-            foreman_session_id="attachment",
+            veyro_session_id="attachment",
             repository=tmp_path,
         )
 
@@ -189,7 +189,7 @@ async def test_prime_attach_rejects_wrong_binding(tmp_path, wrong):
 def hook_journal(tmp_path):
     repository = tmp_path.resolve()
     identity = SessionIdentity(
-        foreman_session_id="codex-local",
+        veyro_session_id="codex-local",
         provider_id="codex",
         provider_session_id=str(uuid4()),
         repository=str(repository),
@@ -233,7 +233,7 @@ async def test_codex_discovery_and_attachment_are_readonly_and_not_native(hook_j
     discovery = await discover_sessions(AgentId.CODEX, repository)
     assert len(discovery.sessions) == 1
     candidate = discovery.sessions[0]
-    assert candidate.selector == store.identity.foreman_session_id
+    assert candidate.selector == store.identity.veyro_session_id
     assert candidate.native_liveness == "unknown"
     attachment = await attach_existing(
         AgentId.CODEX, repository, candidate.selector, after_sequence=1
@@ -360,7 +360,7 @@ def test_cli_codex_machine_output_is_bounded_and_content_free(hook_journal):
 
 
 def test_cli_errors_do_not_echo_native_errors_or_credentials(tmp_path, monkeypatch):
-    from foreman.supervision import attachment
+    from veyro.supervision import attachment
 
     async def failing(*args, **kwargs):
         raise RuntimeError("SECRET")
@@ -376,7 +376,7 @@ async def test_opencode_directory_and_limit_are_separate_query_parameters(tmp_pa
     import io
     import urllib.parse
 
-    from foreman.bridges import opencode
+    from veyro.bridges import opencode
 
     seen = []
 
@@ -402,7 +402,7 @@ async def test_opencode_directory_and_limit_are_separate_query_parameters(tmp_pa
 
 
 async def test_cli_canary_runs_real_executable_against_existing_journal(hook_journal):
-    from foreman.supervision.attachment_canary import run_canary
+    from veyro.supervision.attachment_canary import run_canary
 
     repository, _, _ = hook_journal
     before = tree_snapshot(repository)
@@ -414,8 +414,8 @@ async def test_cli_canary_runs_real_executable_against_existing_journal(hook_jou
 
 
 async def test_codex_cursor_budget_is_cancellable_and_closes_reader(hook_journal, monkeypatch):
-    from foreman.supervision import attachment as module
-    from foreman.supervision.journal import ReadOnlyJournal
+    from veyro.supervision import attachment as module
+    from veyro.supervision.journal import ReadOnlyJournal
 
     repository, _, _ = hook_journal
     reader = ReadOnlyJournal.open(repository, "codex-local")
@@ -450,7 +450,7 @@ def test_loopback_opencode_credentials_never_use_environment_proxy(monkeypatch):
 
 @pytest.mark.parametrize("native_event_first", [False, True])
 async def test_prime_eof_reaches_observer_as_metadata_failure(tmp_path, native_event_first):
-    from foreman.models import SupervisionEventType
+    from veyro.models import SupervisionEventType
 
     client = PrimeDaemonClient(Path("/unused"))
     client._reader = asyncio.StreamReader()
@@ -458,7 +458,7 @@ async def test_prime_eof_reaches_observer_as_metadata_failure(tmp_path, native_e
     bridge = await PrimeAgentDaemonBridge.attach_connected(
         client=adapter_client,
         active_session_id="active-1",
-        foreman_session_id="attachment",
+        veyro_session_id="attachment",
         repository=tmp_path,
     )
     bridge._pump.cancel()
@@ -492,8 +492,8 @@ async def test_prime_eof_reaches_observer_as_metadata_failure(tmp_path, native_e
 
 
 def test_cli_source_failure_is_not_successful_deadline(hook_journal, monkeypatch):
-    from foreman.models import SupervisionEventType
-    from foreman.supervision import attachment as module
+    from veyro.models import SupervisionEventType
+    from veyro.supervision import attachment as module
 
     repository, store, _ = hook_journal
     original = module.attach_existing

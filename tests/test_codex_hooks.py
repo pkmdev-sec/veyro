@@ -7,14 +7,14 @@ from uuid import uuid4
 
 import pytest
 
-from foreman.bridges import (
+from veyro.bridges import (
     AgentBridge,
     validate_connection,
     validate_control_result,
     validate_event_batch,
 )
-from foreman.bridges import codex_hooks as codex
-from foreman.models import (
+from veyro.bridges import codex_hooks as codex
+from veyro.models import (
     BridgeCapability,
     ControlOutcome,
     ControlRequest,
@@ -22,7 +22,7 @@ from foreman.models import (
     StopSession,
     SupervisionEventType,
 )
-from foreman.supervision.reducer import replay_session
+from veyro.supervision.reducer import replay_session
 
 
 def native_hook(repository, name="SessionEnd", session=None, **extra):
@@ -89,7 +89,7 @@ async def test_real_hook_process_to_private_broker(listener):
     process = await asyncio.create_subprocess_exec(
         sys.executable,
         "-m",
-        "foreman.bridges.codex_hooks",
+        "veyro.bridges.codex_hooks",
         "publish",
         "--connection",
         str(listener.connection_path),
@@ -208,7 +208,7 @@ async def test_hook_outage_emits_no_provider_feedback(tmp_path):
     process = await asyncio.create_subprocess_exec(
         sys.executable,
         "-m",
-        "foreman.bridges.codex_hooks",
+        "veyro.bridges.codex_hooks",
         "publish",
         "--connection",
         str(tmp_path / "missing"),
@@ -345,14 +345,14 @@ async def test_two_listeners_cannot_write_one_session(listener):
 
 
 async def test_approval_gate_prevents_unapproved_queue(listener, monkeypatch):
-    from foreman.models import AuthorizationOutcome, BoundaryAction, BoundaryOperation
-    from foreman.models.rollout import RolloutPolicy
-    from foreman.supervision.authorization import (
+    from veyro.models import AuthorizationOutcome, BoundaryAction, BoundaryOperation
+    from veyro.models.rollout import RolloutPolicy
+    from veyro.supervision.authorization import (
         AuthorizedControlDispatcher,
         ControlAuthorizationGate,
         control_request_sha256,
     )
-    from foreman.supervision.boundary_policy import BoundaryPolicy
+    from veyro.supervision.boundary_policy import BoundaryPolicy
 
     bridge = await queue_bridge(listener)
     request = ControlRequest(
@@ -387,7 +387,7 @@ async def test_generated_hook_ignores_project_python_and_environment(listener, t
     import os
     import shlex
 
-    package = tmp_path / "foreman"
+    package = tmp_path / "veyro"
     package.mkdir()
     (package / "__init__.py").write_text("print('PROJECT_PACKAGE_EXECUTED')")
     command = codex.hook_configuration(listener.connection_path)

@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from foreman.models import (
+from veyro.models import (
     PROTOCOL_VERSION,
     ApprovalDecision,
     BridgeCapability,
@@ -32,7 +32,7 @@ from foreman.models import (
 
 def session() -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="foreman-1",
+        veyro_session_id="veyro-1",
         provider_id="prime-agent",
         provider_session_id="prime-1",
         repository="/tmp/project",
@@ -144,7 +144,7 @@ def test_approval_control_requires_an_explicit_decision() -> None:
 def test_control_result_requires_detail_when_not_executed() -> None:
     with pytest.raises(ValidationError, match="detail"):
         ControlResult(
-            foreman_session_id="foreman-1",
+            veyro_session_id="veyro-1",
             provider_id="claude",
             command_id="command-3",
             action=ControlAction.STOP_SESSION,
@@ -152,7 +152,7 @@ def test_control_result_requires_detail_when_not_executed() -> None:
         )
 
     result = ControlResult(
-        foreman_session_id="foreman-1",
+        veyro_session_id="veyro-1",
         provider_id="claude",
         command_id="command-3",
         action=ControlAction.STOP_SESSION,

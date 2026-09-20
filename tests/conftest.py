@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from foreman.models import FactoryAssessment, FactoryState
+from veyro.models import FactoryAssessment, FactoryState
 
 
 @pytest.fixture

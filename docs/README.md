@@ -1,4 +1,4 @@
-# Foreman documentation
+# Veyro documentation
 
 For the implemented existing-session control plane:
 
@@ -11,8 +11,8 @@ These notes define the control plane and explain the experiment behind its curre
 - [Product charter](product-charter.md) defines the problem, users, boundaries, and mandatory
   outcomes for the agent-neutral control plane.
 - [Theory: semantic supervision](theory.md) describes the two-loop architecture.
-- [Why Jev fits](why-jev.md) maps Jev's actual primitives to Foreman's needs.
-- [What Foreman is proving](what-foreman-proves.md) states the hypotheses and evidence boundaries.
+- [Why Jev fits](why-jev.md) maps Jev's actual primitives to Veyro's needs.
+- [What Veyro is proving](what-veyro-proves.md) states the hypotheses and evidence boundaries.
 - [Runtime and event flow](runtime.md) is the implementation guide.
 - [Live steering](steering.md) explains how Jev guidance reaches an active Codex turn.
 

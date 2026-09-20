@@ -6,14 +6,14 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from foreman import agents
-from foreman.agents import AgentId, agent_definition, launch_native_agent, probe_agent
-from foreman.cli import app
-from foreman.config import FactoryConfig
-from foreman.foreman import FakeForemanModel
-from foreman.models import WorkerType
-from foreman.runtime import FactoryRuntime
-from foreman.workers import CodexAppServerWorker, CodexWorker, NativeCliWorker
+from veyro import agents
+from veyro.agents import AgentId, agent_definition, launch_native_agent, probe_agent
+from veyro.cli import app
+from veyro.config import FactoryConfig
+from veyro.models import WorkerType
+from veyro.runtime import FactoryRuntime
+from veyro.veyro import FakeVeyroModel
+from veyro.workers import CodexAppServerWorker, CodexWorker, NativeCliWorker
 
 
 def test_registry_covers_every_agent_id() -> None:
@@ -112,7 +112,7 @@ def test_probe_reports_runtime_version_and_capability_evidence(monkeypatch) -> N
     assert "steer" not in result["capabilities"]
 
 
-def test_native_launcher_keeps_foreman_as_the_sidecar(monkeypatch, tmp_path) -> None:
+def test_native_launcher_keeps_veyro_as_the_sidecar(monkeypatch, tmp_path) -> None:
     calls = {}
     monkeypatch.setattr(agents.shutil, "which", lambda executable: f"/bin/{executable}")
     monkeypatch.setattr(
@@ -129,7 +129,7 @@ def test_native_launcher_keeps_foreman_as_the_sidecar(monkeypatch, tmp_path) -> 
             calls["ran"] = True
             return "managed-result"
 
-    monkeypatch.setattr("foreman.native_session.ManagedNativeSession", Session)
+    monkeypatch.setattr("veyro.native_session.ManagedNativeSession", Session)
 
     result = launch_native_agent(
         AgentId.PRIME_AGENT,
@@ -155,7 +155,7 @@ def test_factory_selects_agent_without_codex_branching_in_caller(tmp_path) -> No
     runtime = FactoryRuntime(
         repository=tmp_path,
         job="do work",
-        model=FakeForemanModel(),
+        model=FakeVeyroModel(),
         config=FactoryConfig(agent_provider=AgentId.CLAUDE),
     )
     worker = runtime._agent_factory(WorkerType.CODING)
@@ -165,20 +165,20 @@ def test_factory_selects_agent_without_codex_branching_in_caller(tmp_path) -> No
     codex_runtime = FactoryRuntime(
         repository=tmp_path,
         job="do work",
-        model=FakeForemanModel(),
+        model=FakeVeyroModel(),
     )
     assert isinstance(codex_runtime._agent_factory(WorkerType.CODING), CodexWorker)
     opted_in = FactoryRuntime(
         repository=tmp_path,
         job="do work",
-        model=FakeForemanModel(),
+        model=FakeVeyroModel(),
         config=FactoryConfig(codex_backend="app-server"),
     )
     assert isinstance(opted_in._agent_factory(WorkerType.CODING), CodexAppServerWorker)
 
 
 def test_agent_provider_environment(monkeypatch) -> None:
-    monkeypatch.setenv("FOREMAN_AGENT_PROVIDER", "opencode")
+    monkeypatch.setenv("VEYRO_AGENT_PROVIDER", "opencode")
     config = FactoryConfig.from_environment()
     assert config.agent_provider is AgentId.OPENCODE
     assert config.active_turn_steering_supported is False
@@ -186,7 +186,7 @@ def test_agent_provider_environment(monkeypatch) -> None:
 
 def test_agents_json_is_a_language_neutral_discovery_document(monkeypatch) -> None:
     monkeypatch.setattr(
-        "foreman.cli.probes_json",
+        "veyro.cli.probes_json",
         lambda: json.dumps({"protocol_version": "1.0", "agents": []}),
     )
     result = CliRunner().invoke(app, ["agents", "--json"])
@@ -212,12 +212,12 @@ def test_agent_command_passes_native_arguments_to_launcher(monkeypatch, tmp_path
 
         class Result:
             session_id = "session-1"
-            record_path = tmp_path / ".foreman/native-sessions/session-1/session.json"
+            record_path = tmp_path / ".veyro/native-sessions/session-1/session.json"
             exit_code = 0
 
         return Result()
 
-    monkeypatch.setattr("foreman.cli.launch_native_agent", launch)
+    monkeypatch.setattr("veyro.cli.launch_native_agent", launch)
     result = CliRunner().invoke(
         app,
         [

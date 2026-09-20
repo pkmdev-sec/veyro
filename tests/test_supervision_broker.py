@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from foreman.models import (
+from veyro.models import (
     BridgeCapability,
     BridgeSource,
     BridgeStability,
@@ -24,7 +24,7 @@ from foreman.models import (
     SupervisionEvent,
     SupervisionEventType,
 )
-from foreman.supervision import (
+from veyro.supervision import (
     MAX_MESSAGE_BYTES,
     BrokerConflictError,
     BrokerError,
@@ -35,7 +35,7 @@ from foreman.supervision import (
 
 def identity() -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="foreman-1",
+        veyro_session_id="veyro-1",
         provider_id="prime-agent",
         provider_session_id="prime-1",
         repository="/tmp/project",
@@ -97,7 +97,7 @@ def control(
 
 def control_result(request: ControlRequest, detail: str = "") -> ControlResult:
     return ControlResult(
-        foreman_session_id=request.session.foreman_session_id,
+        veyro_session_id=request.session.veyro_session_id,
         provider_id=request.session.provider_id,
         command_id=request.command_id,
         action=request.intent.action,
@@ -112,7 +112,7 @@ def test_store_is_private_and_recovers_replay_cursor(tmp_path: Path) -> None:
     store.append_event(event(1, session=session))
     store.append_event(event(2, session=session))
 
-    reopened = BrokerStore.open(tmp_path, "foreman-1")
+    reopened = BrokerStore.open(tmp_path, "veyro-1")
 
     assert (store.directory.stat().st_mode & 0o777) == 0o700
     assert (store.token_path.stat().st_mode & 0o777) == 0o600
@@ -130,7 +130,7 @@ def test_store_rejects_sequence_gaps_and_wrong_sessions(tmp_path: Path) -> None:
         store.append_event(event(2, session=session))
 
     foreign = event(1, session=session).model_copy(
-        update={"session": identity().model_copy(update={"foreman_session_id": "other"})}
+        update={"session": identity().model_copy(update={"veyro_session_id": "other"})}
     )
     with pytest.raises(BrokerConflictError, match="session identity"):
         store.append_event(foreign)
@@ -143,7 +143,7 @@ def test_store_requires_explicit_content_retention_opt_in(tmp_path: Path) -> Non
     with pytest.raises(BrokerError, match="content retention"):
         store.append_event(event(1, session=session, sensitivity=EventSensitivity.CONTENT_OPT_IN))
 
-    opted_in_session = session.model_copy(update={"foreman_session_id": "foreman-2"})
+    opted_in_session = session.model_copy(update={"veyro_session_id": "veyro-2"})
     opted_in = BrokerStore.create(
         tmp_path,
         opted_in_session,
@@ -184,7 +184,7 @@ def test_reopened_store_preserves_control_idempotency(tmp_path: Path) -> None:
     original = control_result(request_value)
     store.record_control(request_value, original)
 
-    reopened = BrokerStore.open(tmp_path, session.foreman_session_id)
+    reopened = BrokerStore.open(tmp_path, session.veyro_session_id)
 
     assert reopened.lookup_control(request_value.command_id) == original
     assert (
@@ -227,13 +227,13 @@ def test_store_refuses_an_exposed_token_file(tmp_path: Path) -> None:
     store.token_path.chmod(0o644)
 
     with pytest.raises(BrokerError, match="token permissions"):
-        BrokerStore.open(tmp_path, session.foreman_session_id)
+        BrokerStore.open(tmp_path, session.veyro_session_id)
 
 
 def test_store_refuses_a_symlinked_private_root(tmp_path: Path) -> None:
     target = tmp_path / "elsewhere"
     target.mkdir()
-    (tmp_path / ".foreman").symlink_to(target, target_is_directory=True)
+    (tmp_path / ".veyro").symlink_to(target, target_is_directory=True)
 
     with pytest.raises(BrokerError, match="symlinked broker directory"):
         BrokerStore.create(tmp_path, identity(), capabilities())

@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from foreman.bridges.prime_agent import prime_daemon_capabilities
-from foreman.models import (
+from veyro.bridges.prime_agent import prime_daemon_capabilities
+from veyro.models import (
     AssessmentProvenance,
     AuthorizationOutcome,
     BoundaryAction,
@@ -24,15 +24,15 @@ from foreman.models import (
     SupervisionEvent,
     SupervisionEventType,
 )
-from foreman.models.rollout import RolloutPolicy
-from foreman.supervision import CheckpointAssessmentService, control_request_sha256
-from foreman.supervision.control_loop import ControlLoopError, SupervisionControlLoop
-from foreman.supervision.delivery import DeliveryLedger
+from veyro.models.rollout import RolloutPolicy
+from veyro.supervision import CheckpointAssessmentService, control_request_sha256
+from veyro.supervision.control_loop import ControlLoopError, SupervisionControlLoop
+from veyro.supervision.delivery import DeliveryLedger
 
 
 def identity(repository: Path = Path("/tmp/repository")) -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="prime-loop-1",
+        veyro_session_id="prime-loop-1",
         provider_id="prime-agent",
         provider_session_id="prime-native-1",
         repository=str(repository),
@@ -127,7 +127,7 @@ class FakePrimeBridge:
         if self.verify_stop:
             self._events.append(event(self.identity, 2, SupervisionEventType.SESSION_FAILED))
         return ControlResult(
-            foreman_session_id=request.session.foreman_session_id,
+            veyro_session_id=request.session.veyro_session_id,
             provider_id=request.session.provider_id,
             command_id=request.command_id,
             action=request.intent.action,

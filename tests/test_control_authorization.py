@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from foreman.models import (
+from veyro.models import (
     ApprovalDecision,
     AssessmentProvenance,
     AuthorizationOutcome,
@@ -30,8 +30,8 @@ from foreman.models import (
     SupervisionEvent,
     SupervisionEventType,
 )
-from foreman.models.rollout import RolloutMode, RolloutPolicy
-from foreman.supervision import (
+from veyro.models.rollout import RolloutMode, RolloutPolicy
+from veyro.supervision import (
     AUTHORITATIVE_MODEL_CHECKPOINT,
     AUTHORITATIVE_PROVIDER_ID,
     CHECKPOINT_QUESTIONS_VERSION,
@@ -42,12 +42,12 @@ from foreman.supervision import (
     SessionReducer,
     control_request_sha256,
 )
-from foreman.supervision.delivery import DeliveryLedger
+from veyro.supervision.delivery import DeliveryLedger
 
 
 def identity() -> SessionIdentity:
     return SessionIdentity(
-        foreman_session_id="session-1",
+        veyro_session_id="session-1",
         provider_id="prime-agent",
         provider_session_id="prime-1",
         repository="/tmp/project",
@@ -311,7 +311,7 @@ class Bridge:
     async def execute(self, control: ControlRequest) -> ControlResult:
         self.calls += 1
         return ControlResult(
-            foreman_session_id=control.session.foreman_session_id,
+            veyro_session_id=control.session.veyro_session_id,
             provider_id=control.session.provider_id,
             command_id=control.command_id,
             action=control.intent.action,

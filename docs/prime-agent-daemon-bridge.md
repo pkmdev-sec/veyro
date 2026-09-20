@@ -3,7 +3,7 @@
 For current procedures and recovery, use the [operator guide](supervision-operator-guide.md).
 For the dated cross-provider checks, see [verification results](supervision-verification.md).
 
-Foreman attaches beside the native Prime Agent TUI. Prime Agent continues to own the terminal, credentials, configuration, and session files. Foreman does not scrape terminal output.
+Veyro attaches beside the native Prime Agent TUI. Prime Agent continues to own the terminal, credentials, configuration, and session files. Veyro does not scrape terminal output.
 
 ## Pinned compatibility
 
@@ -36,5 +36,5 @@ Run focused checks with:
 
 ```bash
 .venv/bin/pytest -q tests/test_prime_agent_bridge.py tests/test_bridge_contract.py
-.venv/bin/ruff check src/foreman/bridges tests/test_prime_agent_bridge.py
+.venv/bin/ruff check src/veyro/bridges tests/test_prime_agent_bridge.py
 ```
