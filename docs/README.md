@@ -16,6 +16,10 @@ evaluator/calibration additions are excluded. See [scope and checks](release-sco
 - [Operate existing sessions](supervision-operator-guide.md): discovery, read-only observation, exact approval, and recovery.
 - [Upgrade an installation](upgrading.md): package, configuration, journals, and no-retry ledgers.
 
+## Model variants
+
+- [Qwen3 4B Instruct and Qwen3 14B](qwen-models.md): sizes, memory tradeoffs, use cases, and release status.
+
 ## Reference
 
 - [Capabilities, version pins, and privacy](supervision-reference.md).

@@ -4,6 +4,13 @@ Veyro separates native execution from local semantic assessment. A coding agent
 keeps its tools, terminal, and permission system. localjev uses Qwen3-14B to assess
 structured evidence at review checkpoints. Veyro, not the model, authorizes controls.
 
+## Model sizes and release status
+
+**Qwen3 14B** is the pinned assessor in the released path below. **Qwen3 4B Instruct**
+is a lower-memory development profile; it is not merged into `main` and has no edge in
+this control flow. The separate local GGUF readout experiments are unmerged for both
+sizes. See the [model comparison](qwen-models.md) for tags, use cases, and limits.
+
 ## Existing-session data flow
 
 ```text

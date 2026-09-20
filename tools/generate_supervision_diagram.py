@@ -16,7 +16,7 @@ from pathlib import Path
 from PIL import Image, ImageColor, ImageDraw, ImageFilter, ImageFont
 
 ASSETS = Path(__file__).resolve().parents[1] / "docs" / "assets"
-SIZE = (1120, 1000)
+SIZE = (1120, 1200)
 FRAMES = 120
 FRAME_MS = 40
 BG = "#10121c"
@@ -138,6 +138,27 @@ def build_scene() -> tuple[Image.Image, list[list[tuple[int, int]]]]:
     draw.line((40, 934, 1080, 934), fill=BORDER, width=1)
     label(40, 951, "One proposal. No unattended autopilot.", 23, WHITE)
     label(1080, 952, "Codex: observation only", 23, MUTED, "ra")
+    draw.line((40, 995, 1080, 995), fill=BORDER, width=1)
+    label(40, 1010, "MODEL VARIANTS / RELEASE STATUS", 20, MUTED)
+    card(
+        (40, 1050, 540, 1150),
+        "Qwen3 14B",
+        "In main: localjev assessor",
+        MINT,
+    )
+    card(
+        (580, 1050, 1080, 1150),
+        "Qwen3 4B Instruct",
+        "Experimental: not shipped",
+        AMBER,
+    )
+    label(
+        40,
+        1168,
+        "4B is a lower-memory development profile, not an alternate assessor in this release.",
+        22,
+        MUTED,
+    )
     paths = [
         [(560, 335), (560, 362)],
         [(692, 414), (768, 414)],

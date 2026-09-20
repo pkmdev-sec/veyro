@@ -97,3 +97,16 @@ def test_readme_separates_new_logo_introduction_and_animated_diagram():
                 document.name,
                 target,
             )
+
+
+def test_model_comparison_distinguishes_released_and_unmerged_variants():
+    baseline = json.loads((ROOT / "config/baselines/localjev-qwen3-14b.json").read_text())
+    for name in ("README.md", "docs/qwen-models.md"):
+        text = (ROOT / name).read_text()
+        assert "Qwen3 4B Instruct" in text
+        assert "qwen3:4b-instruct-2507-q4_K_M" in text
+        assert "Qwen3 14B" in text
+        assert baseline["upstream"]["model"] in text
+        assert "unmerged" in text.lower()
+        assert "not shipped" in text.lower()
+        assert "memory" in text

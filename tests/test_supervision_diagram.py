@@ -13,9 +13,9 @@ DIAGRAM = ROOT / "docs/assets/veyro-supervision.gif"
 
 
 def test_single_diagram_is_bounded_and_loops():
-    frames, applications, _ = read_gif(DIAGRAM, (1120, 1000), max_bytes=2_000_000)
+    frames, applications, _ = read_gif(DIAGRAM, (1120, 1200), max_bytes=2_000_000)
     assert len(frames) == 120
-    assert frames[0]["bounds"] == (0, 0, 1120, 1000)
+    assert frames[0]["bounds"] == (0, 0, 1120, 1200)
     assert {frame["delay"] for frame in frames} == {4}
     assert applications == [(b"NETSCAPE2.0", b"\x01\x00\x00")]
 
@@ -77,4 +77,12 @@ def test_still_diagram_has_expected_dimensions():
     data = DIAGRAM.with_suffix(".png").read_bytes()
     assert data[:8] == b"\x89PNG\r\n\x1a\n"
     assert data[12:16] == b"IHDR"
-    assert struct.unpack(">II", data[16:24]) == (1120, 1000)
+    assert struct.unpack(">II", data[16:24]) == (1120, 1200)
+
+
+def test_diagram_names_both_qwen_variants_and_release_status():
+    generator = (ROOT / "tools/generate_supervision_diagram.py").read_text()
+    assert '"Qwen3 14B"' in generator
+    assert '"In main: localjev assessor"' in generator
+    assert '"Qwen3 4B Instruct"' in generator
+    assert '"Experimental: not shipped"' in generator

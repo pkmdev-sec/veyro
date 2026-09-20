@@ -83,6 +83,7 @@ def check(wheel: Path, sdist: Path, retired_name: str | None = None) -> dict[str
         "docs/assets/veyro-supervision.gif",
         "docs/assets/veyro-supervision.png",
         "docs/release-scope.md",
+        "docs/qwen-models.md",
         "tools/generate_supervision_diagram.py",
         "docs/assets/veyro-relay-logo.svg",
         "tools/generate_header_logo.py",

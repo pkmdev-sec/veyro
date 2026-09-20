@@ -44,7 +44,7 @@ Choose the interface that matches your task:
 The diagram shows the existing-session review path. The factory runtime is separate.
 
 <p align="center">
-  <img src="docs/assets/veyro-supervision.gif" width="1120" alt="Front-facing Veyro workflow: native agents send metadata; read-only is the default; opt-in proposals pass policy, localjev with Qwen3-14B, exact human approval, a durable claim, and freshness checks before supported control">
+  <img src="docs/assets/veyro-supervision.gif" width="1120" alt="Existing-session supervision uses Qwen3 14B through localjev, policy checks, and exact human approval. The model key also shows Qwen3 4B Instruct as experimental and not shipped; it is not connected to the active control path.">
 </p>
 
 [Open the still diagram](docs/assets/veyro-supervision.png) if you prefer no animation.
@@ -68,6 +68,18 @@ weight digest and tested service settings. The [deployment guide](docs/localjev.
 explains how to check them. localjev returns model-generated probability estimates,
 not calibrated guarantees or direct token-logit measurements. The checkpoint label
 records configuration; it does not attest the weights used for each response.
+
+### Qwen model variants
+
+| Variant | Size and format | Role | Availability |
+| --- | --- | --- | --- |
+| **Qwen3 14B** (`qwen3:14b`) | 14.8B parameters, Q4_K_M | Current localjev assessor for existing-session review; higher weight-memory needs | Included in `main` |
+| **Qwen3 4B Instruct** (`qwen3:4b-instruct-2507-q4_K_M`) | 4.0B parameters, Q4_K_M | Lower-memory local coding and evaluator experiments | Unmerged development work; not shipped |
+
+The sizes are not interchangeable settings in this release. Existing-session supervision
+stays pinned to **14B**. The experimental **4B** profile is intended for smaller-memory
+setups, not as a proven quality upgrade. Neither size establishes reliable autonomous
+completion or calibrated probabilities. See [model variants and limits](docs/qwen-models.md).
 
 For existing-session supervision, there is one authoritative assessor. No cloud fallback, alternate-model routing,
 or shadow voting participates in the existing-session control plane. Native coding
