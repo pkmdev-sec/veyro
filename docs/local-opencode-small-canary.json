@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-09-20T07:28:14.135994+00:00",
+  "platform": "Darwin",
+  "python": "3.12.12",
+  "result": {
+    "kind": "live_native_tui",
+    "native_cleanup": {
+      "success": true
+    },
+    "agent": "opencode",
+    "native_executable": "~/.opencode/bin/opencode",
+    "version": "1.18.31",
+    "model": "qwen3:4b",
+    "model_manifest_digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "model_requests": [
+      {
+        "timestamp": 1789889299527,
+        "provider": "veyro-local",
+        "model": "qwen3:4b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      }
+    ],
+    "local_profile": "small",
+    "phase": "planning",
+    "adapter_error": {
+      "reason": "deadline"
+    },
+    "judge_enabled": true,
+    "judge_result": null,
+    "elapsed_seconds": 180.71788370900322,
+    "assertions_passed": 2,
+    "assertions_total": 8,
+    "accuracy": 0.25,
+    "verifier_unchanged": true,
+    "transitions": [],
+    "checkpoint_latency_ms": [],
+    "artifact_directory": "/var/folders/mg/wdx8vj9d419dcvk_v8_xs82c0000gn/T/veyro-live-opencode-aa8pmkeo",
+    "human_task_inputs": 0,
+    "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout."
+  }
+}

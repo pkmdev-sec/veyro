@@ -3,7 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = ["pillow==12.3.0"]
 # ///
-"""Render one front-facing animated overview of Veyro's reviewed-control path."""
+"""Render README diagrams for reviewed controls, native tasks, and local evaluation."""
 
 from __future__ import annotations
 
@@ -139,23 +139,23 @@ def build_scene() -> tuple[Image.Image, list[list[tuple[int, int]]]]:
     label(40, 951, "One proposal. No unattended autopilot.", 23, WHITE)
     label(1080, 952, "Codex: observation only", 23, MUTED, "ra")
     draw.line((40, 995, 1080, 995), fill=BORDER, width=1)
-    label(40, 1010, "MODEL VARIANTS / RELEASE STATUS", 20, MUTED)
+    label(40, 1010, "LOCAL MODEL ROLES / SEPARATE TASK PATH", 20, MUTED)
     card(
         (40, 1050, 540, 1150),
         "Qwen3 14B",
-        "In main: localjev assessor",
+        "Typed evaluation after checks",
         MINT,
     )
     card(
         (580, 1050, 1080, 1150),
         "Qwen3 4B Instruct",
-        "Experimental: not shipped",
+        "Native coding loop",
         AMBER,
     )
     label(
         40,
         1168,
-        "4B is a lower-memory development profile, not an alternate assessor in this release.",
+        "Separate task path. G4 native-task qualification and G6 calibration remain open.",
         22,
         MUTED,
     )
@@ -169,6 +169,101 @@ def build_scene() -> tuple[Image.Image, list[list[tuple[int, int]]]]:
         [(400, 842), (355, 842)],
     ]
     return image, paths
+
+
+def build_task_readout_scene() -> Image.Image:
+    image = Image.new("RGB", (1120, 900), BG)
+    draw = ImageDraw.Draw(image)
+
+    def text(x, y, value, size=22, color=WHITE):
+        bounds = draw.textbbox((x, y), value, font=font(size))
+        assert 0 <= bounds[0] < bounds[2] <= 1120, value
+        assert 0 <= bounds[1] < bounds[3] <= 900, value
+        draw.text((x, y), value, font=font(size), fill=color)
+
+    def box(x, y, width, title, lines, color):
+        draw.rounded_rectangle((x, y, x + width, y + 126), radius=14, fill=PANEL, outline=BORDER)
+        draw.rectangle((x + 16, y + 18, x + 20, y + 42), fill=color)
+        for offset, value, size in [
+            (18, title, 25),
+            *[(58 + i * 27, line, 20) for i, line in enumerate(lines)],
+        ]:
+            assert draw.textbbox((0, 0), value, font=font(size))[2] <= width - 48, value
+            text(x + 30, y + offset, value, size)
+
+    def arrow(points, color=MINT):
+        draw.line(points, fill=color, width=3)
+        x, y = points[-1]
+        px, py = points[-2]
+        angle = math.atan2(y - py, x - px)
+        draw.polygon(
+            [(x, y)]
+            + [
+                (
+                    x - 10 * math.cos(angle) + s * 6 * math.sin(angle),
+                    y - 10 * math.sin(angle) - s * 6 * math.cos(angle),
+                )
+                for s in (-1, 1)
+            ],
+            fill=color,
+        )
+
+    text(40, 28, "NATIVE TASKS + LOCAL EVALUATION", 20, MUTED)
+    text(40, 68, "Different paths. Different guarantees.", 38)
+    text(40, 140, "01 / DUAL-MODEL TASK LOOP     Prime Agent or OpenCode", 22, BLUE)
+    box(40, 185, 240, "4B coder", ["Plan + edit", "Native tools"], BLUE)
+    box(310, 185, 240, "Run checks", ["Shell commands", "Authoritative"], AMBER)
+    box(580, 185, 240, "14B evaluator", ["Typed criteria", "Evidence only"], LAVENDER)
+    box(850, 185, 230, "Complete", ["Both gates pass", "Within limits"], MINT)
+    for x in (280, 550, 820):
+        arrow([(x + 2, 248), (x + 28, 248)])
+    arrow([(700, 314), (700, 345), (430, 345), (430, 314)], AMBER)
+    text(
+        40,
+        369,
+        "Failed checks or criteria return to 4B for bounded repair. Errors never complete.",
+        22,
+        AMBER,
+    )
+
+    draw.line((40, 420, 1080, 420), fill=BORDER)
+    text(40, 440, "02 / PINNED MODEL ROLES     Separate local runtimes", 22, LAVENDER)
+    box(
+        40,
+        486,
+        500,
+        "Qwen3 4B Instruct / coding",
+        [
+            "Ollama :11434 -> native coding agent",
+            "Generates edits; cannot approve completion",
+        ],
+        BLUE,
+    )
+    box(
+        580,
+        486,
+        500,
+        "Qwen3 14B / typed evaluation",
+        [
+            "GGUF readout :8082 -> finite-label scores",
+            "Runs only after executable checks pass",
+        ],
+        LAVENDER,
+    )
+
+    text(40, 651, "03 / EVALUATOR WORKFLOW     Noul / Choice / Score", 22, MINT)
+    box(40, 694, 240, "Preview + run", ["Render questions", "Score via readout"], BLUE)
+    box(310, 694, 240, "Correct", ["Reviewed cases", "For later runs"], LAVENDER)
+    box(580, 694, 240, "Calibrate", ["Fit temperature", "Training data only"], AMBER)
+    box(850, 694, 230, "Validate", ["Separate holdout", "May get worse"], MINT)
+    text(
+        40,
+        851,
+        "G4 native task reliability and G6 independent calibration remain open. See GATES.md.",
+        22,
+        AMBER,
+    )
+    return image
 
 
 def point_on_path(points: list[tuple[int, int]], progress: float) -> tuple[float, float]:
@@ -218,7 +313,13 @@ def render_assets() -> dict[str, bytes]:
     )
     still = BytesIO()
     base.save(still, format="PNG")
-    return {"veyro-supervision.gif": data.getvalue(), "veyro-supervision.png": still.getvalue()}
+    workflow = BytesIO()
+    build_task_readout_scene().save(workflow, format="PNG")
+    return {
+        "veyro-supervision.gif": data.getvalue(),
+        "veyro-supervision.png": still.getvalue(),
+        "veyro-task-readout.png": workflow.getvalue(),
+    }
 
 
 def main() -> int:
@@ -235,7 +336,7 @@ def main() -> int:
         if stale:
             print("Diagram needs regeneration: " + ", ".join(stale))
             return 1
-        print("Supervision diagrams are current.")
+        print("README diagrams are current.")
         return 0
     ASSETS.mkdir(parents=True, exist_ok=True)
     for name, data in assets.items():

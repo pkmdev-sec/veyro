@@ -88,7 +88,7 @@ completion or unrestricted intervention.
 ## Follow-up queue
 
 `CodexHookListener(..., allow_queue=True)` enables the adapter seam for a control
-orchestrator. The executable listener above is observe-only. Existing
+external controller. The executable listener above is observe-only. Existing
 `AuthorizedControlDispatcher` must authorize each queue request; the experimental
 declaration requires current exact-request human approval. The message must also
 pass deterministic boundary policy and any required authoritative LocalJev review.

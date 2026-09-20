@@ -75,7 +75,7 @@ def render_svg(pixels: list[list[str]]) -> bytes:
         'role="img" aria-labelledby="veyro-title veyro-desc" shape-rendering="crispEdges">',
         '  <title id="veyro-title">Veyro</title>',
         '  <desc id="veyro-desc">A mint and teal pixel sentinel V shelters a small amber '
-        'approval beacon, beside a level VEYRO wordmark on deep navy.</desc>',
+        "approval beacon, beside a level VEYRO wordmark on deep navy.</desc>",
     ]
     for color, (red, green, blue, _) in PALETTE.items():
         lines.append(f'  <g fill="#{red:02x}{green:02x}{blue:02x}">')

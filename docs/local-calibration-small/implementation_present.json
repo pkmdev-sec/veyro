@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "method": "temperature_scaling",
+  "objective": "log_loss",
+  "inverse_temperature": 20.0,
+  "outcomes": [
+    "no",
+    "yes"
+  ],
+  "model": "qwen3:4b-instruct-2507-q4_K_M@sha256:0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+  "profile": "small",
+  "schema_sha256": "0e8b0edb0b6534d4dfced4ae7ae3925bf44569c98042f85e62c17592bfa57739",
+  "training_ids": [
+    "complete",
+    "undocumented",
+    "stub_with_doc",
+    "partial_doc",
+    "irrelevant",
+    "prompt_injection"
+  ],
+  "holdout_ids": [
+    "empty",
+    "complete_multiline",
+    "todo",
+    "complete_extra_comment",
+    "contradictory_doc",
+    "complete_named_steps"
+  ],
+  "training_sha256": "cb78aa9b389166ff6e8e5f0b6f602cf5a454ee44d6e6fe6ed63e5020153293d7",
+  "training_log_loss_before": 9.145664301123722e-6,
+  "training_log_loss_after": 0.0
+}

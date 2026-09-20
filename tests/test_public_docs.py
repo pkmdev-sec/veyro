@@ -16,7 +16,7 @@ from veyro.supervision.checkpoints import (
 ROOT = Path(__file__).resolve().parents[1]
 DOCUMENTS = [
     ROOT / "README.md",
-    *sorted((ROOT / "docs").glob("*.md")),
+    *sorted((ROOT / "docs").rglob("*.md")),
     *sorted((ROOT / "examples").glob("*.md")),
 ]
 
@@ -74,7 +74,11 @@ def test_readme_separates_new_logo_introduction_and_animated_diagram():
     readme = (ROOT / "README.md").read_text()
     assert 'src="docs/assets/veyro-supervision.gif"' in readme
     images = re.findall(r'<img\b[^>]*src="([^"]+)"', readme)
-    assert images == ["docs/assets/veyro-relay-logo.svg", "docs/assets/veyro-supervision.gif"]
+    assert images == [
+        "docs/assets/veyro-relay-logo.svg",
+        "docs/assets/veyro-supervision.gif",
+        "docs/assets/veyro-task-readout.png",
+    ]
     logo = readme.index('src="docs/assets/veyro-relay-logo.svg"')
     intro_start = readme.index("Veyro observes Prime Agent")
     intro_end = readme.index("structured events, not terminal scraping.")
@@ -99,14 +103,54 @@ def test_readme_separates_new_logo_introduction_and_animated_diagram():
             )
 
 
-def test_model_comparison_distinguishes_released_and_unmerged_variants():
-    baseline = json.loads((ROOT / "config/baselines/localjev-qwen3-14b.json").read_text())
-    for name in ("README.md", "docs/qwen-models.md"):
-        text = (ROOT / name).read_text()
-        assert "Qwen3 4B Instruct" in text
-        assert "qwen3:4b-instruct-2507-q4_K_M" in text
-        assert "Qwen3 14B" in text
-        assert baseline["upstream"]["model"] in text
-        assert "unmerged" in text.lower()
-        assert "not shipped" in text.lower()
-        assert "memory" in text
+def test_readme_evaluator_example_renders_without_inference():
+    from veyro.evaluators import EvaluationCase, EvaluatorDefinition, build_evaluation_request
+
+    definition = EvaluatorDefinition.load(ROOT / "examples/evaluator-definition.json")
+    case = EvaluationCase.model_validate_json((ROOT / "examples/evaluator-case.json").read_text())
+    request = build_evaluation_request(definition, case)
+    assert request["state"]["case"] == "Task: What is 2 + 3?\nAnswer: 5\nReference: 5"
+    assert set(request["questions"]) == {"correct", "route", "quality"}
+
+
+def test_retired_controller_term_is_absent_from_repository_text():
+    retired = "orchestr" + "at"
+    roots = [ROOT / name for name in ("src", "tests", "tools", "docs")]
+    files = [
+        path
+        for directory in roots
+        for path in directory.rglob("*")
+        if path.suffix in {".py", ".md", ".mjs", ".toml"}
+    ]
+    files += [ROOT / name for name in ("README.md", "GATES.md", "PLAN.md", "pyproject.toml")]
+    offenders = [
+        str(path.relative_to(ROOT))
+        for path in files
+        if path.is_file() and retired in path.read_text().lower()
+    ]
+    assert offenders == []
+
+
+def test_dual_model_harness_roles_are_documented_from_runtime_profiles():
+    profiles = json.loads((ROOT / "config/model-profiles.json").read_text())
+    documents = [
+        (ROOT / "README.md").read_text(),
+        (ROOT / "docs/qwen-models.md").read_text(),
+        (ROOT / "docs/local-harness.md").read_text(),
+    ]
+    for text in documents:
+        assert profiles["small"]["ollama_model"] in text
+        assert profiles["14b"]["ollama_model"] in text
+        assert "--coding-profile small" in text
+        assert "--evaluation-profile 14b" in text
+    role_guide = documents[1]
+    assert "Executable checks remain authoritative" in role_guide
+    assert "G4 remains open" in role_guide
+    assert "G6 remains open" in role_guide
+
+
+def test_live_model_docs_do_not_claim_the_implemented_profiles_are_unmerged():
+    for name in ("README.md", "docs/qwen-models.md", "docs/theory.md"):
+        text = (ROOT / name).read_text().lower()
+        assert "not shipped" not in text
+        assert "unmerged" not in text

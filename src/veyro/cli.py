@@ -13,6 +13,7 @@ from rich.table import Table
 
 from veyro.agents import AgentId, launch_native_agent, probe_agents, probes_json
 from veyro.config import FactoryConfig
+from veyro.local_cli import evaluator_app, local_app
 from veyro.model_import import (
     GLIFORMER_LARGE_V1_WEIGHTS,
     ArtifactImportError,
@@ -35,6 +36,8 @@ app = typer.Typer(
     help="Supervise native coding agents with localjev and Qwen3-14B.",
     no_args_is_help=True,
 )
+app.add_typer(local_app, name="local")
+app.add_typer(evaluator_app, name="evaluator")
 console = Console()
 
 
@@ -261,6 +264,40 @@ def open_agent(
     prompt: Annotated[
         str | None, typer.Option("--prompt", help="Optional initial native prompt")
     ] = None,
+    autonomous: Annotated[bool, typer.Option("--autonomous")] = False,
+    coding_profile: Annotated[
+        str | None,
+        typer.Option("--coding-profile", help="Pinned local model used for coding"),
+    ] = None,
+    evaluation_profile: Annotated[
+        str | None,
+        typer.Option("--evaluation-profile", help="Pinned local model used for typed evaluation"),
+    ] = None,
+    allow_uncalibrated_judge: Annotated[
+        bool,
+        typer.Option(
+            "--allow-uncalibrated-evaluator",
+            "--allow-uncalibrated-judge",
+            help="Allow an uncalibrated local evaluator experiment",
+        ),
+    ] = False,
+    check: Annotated[
+        list[str] | None, typer.Option("--check", help="Completion command; repeatable")
+    ] = None,
+    max_continuations: Annotated[int, typer.Option("--max-continuations", min=1)] = 6,
+    check_timeout: Annotated[float, typer.Option("--check-timeout", min=0.01)] = 120,
+    timeout: Annotated[float, typer.Option("--timeout", min=0.01)] = 1800,
+    judge: Annotated[
+        Path | None,
+        typer.Option(
+            "--evaluator",
+            "--judge",
+            exists=True,
+            dir_okay=False,
+            resolve_path=True,
+            help="Typed completion rubric/provider JSON",
+        ),
+    ] = None,
 ) -> None:
     """Run a provider's native interactive harness with a Veyro sidecar."""
 
@@ -268,20 +305,56 @@ def open_agent(
         console.print(f"Veyro sidecar: [bold]{record.session_id}[/bold]")
         console.print(f"Evidence: {repo / '.veyro' / 'native-sessions' / record.session_id}")
 
+    from veyro.autonomy import AutonomyOptions, CodingModel, HarnessModels
+
     try:
+        local_models = None
+        if evaluation_profile is not None and coding_profile is None:
+            raise ValueError("--evaluation-profile requires --coding-profile")
+        if coding_profile is not None:
+            local_models = (
+                HarnessModels(coding_profile, evaluation_profile)
+                if evaluation_profile is not None
+                else CodingModel(coding_profile)
+            )
+        if (check or judge or local_models or allow_uncalibrated_judge) and not autonomous:
+            raise ValueError("harness options require --autonomous")
+        if evaluation_profile is not None and judge is None:
+            raise ValueError("--evaluation-profile requires --evaluator")
+        if judge is not None and coding_profile is not None and evaluation_profile is None:
+            raise ValueError("local evaluation requires --evaluation-profile")
+        options = (
+            AutonomyOptions(
+                checks=tuple(check or ()),
+                max_continuations=max_continuations,
+                check_timeout=check_timeout,
+                timeout=timeout,
+                judge_file=judge,
+                models=local_models,
+                allow_uncalibrated_judge=allow_uncalibrated_judge,
+            )
+            if autonomous
+            else None
+        )
         result = launch_native_agent(
             provider,
             repo,
             prompt,
             tuple(ctx.args),
             on_started=announce,
+            autonomy=options,
         )
+    except ValueError as error:
+        console.print(str(error))
+        raise typer.Exit(code=2) from error
     except FileNotFoundError as error:
         console.print(str(error))
         raise typer.Exit(code=127) from error
     except OSError as error:
         console.print(f"Native agent launch failed: {error}")
         raise typer.Exit(code=126) from error
+    if result.autonomy_directory:
+        console.print(f"Autonomy evidence: {result.autonomy_directory}")
     if result.exit_code != 0:
         code = result.exit_code if result.exit_code > 0 else 128 - result.exit_code
         raise typer.Exit(code=code)

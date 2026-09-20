@@ -1,0 +1,3879 @@
+{
+  "protocol": "qwen-label-readout-v4",
+  "profile": {
+    "id": "14b",
+    "ollama_model": "qwen3:14b",
+    "expected_digest": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "parameter_size": "14.8B",
+    "quantization": "Q4_K_M",
+    "model_family": "qwen3"
+  },
+  "transport": "direct",
+  "runs": [
+    {
+      "id": "fresh-fact-archive-a",
+      "repeat": 0,
+      "scored": {
+        "check": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.7782881445896812
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            38.60184097290039,
+            37.34612274169922
+          ],
+          "probabilities": [
+            0.7782881445896812,
+            0.2217118554103189
+          ],
+          "label_mass": 0.9999918935560639
+        }
+      },
+      "state_sha256": "fed2b1fde58be23b7509e93921c5e1003ca2f7db7479bb8dc8fc433e9f633875",
+      "metrics": {
+        "latency_ms": 1877.024999994319,
+        "prefill_ms": 725.3702920279466,
+        "branch_ms": 1149.8945410130545,
+        "prefix_tokens": 88,
+        "prefix_cache_hit": false,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-archive-a",
+      "repeat": 1,
+      "scored": {
+        "check": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.7782881445896812
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            38.60184097290039,
+            37.34612274169922
+          ],
+          "probabilities": [
+            0.7782881445896812,
+            0.2217118554103189
+          ],
+          "label_mass": 0.9999918935560639
+        }
+      },
+      "state_sha256": "fed2b1fde58be23b7509e93921c5e1003ca2f7db7479bb8dc8fc433e9f633875",
+      "metrics": {
+        "latency_ms": 1507.678791997023,
+        "prefill_ms": 0.000125030055642128,
+        "branch_ms": 1506.1160830082372,
+        "prefix_tokens": 88,
+        "prefix_cache_hit": true,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-archive-b",
+      "repeat": 0,
+      "scored": {
+        "check": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999992460841409
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            26.949440002441406,
+            41.04742431640625
+          ],
+          "probabilities": [
+            7.539158590924363e-07,
+            0.9999992460841409
+          ],
+          "label_mass": 0.9999999433247784
+        }
+      },
+      "state_sha256": "c6134aa9440140c85132578777d5376a8c353fd08ee577d77a8825f1506097a8",
+      "metrics": {
+        "latency_ms": 2306.680041947402,
+        "prefill_ms": 1198.2164999935776,
+        "branch_ms": 1106.7234170041047,
+        "prefix_tokens": 88,
+        "prefix_cache_hit": false,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-archive-b",
+      "repeat": 1,
+      "scored": {
+        "check": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999992460841409
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            26.949440002441406,
+            41.04742431640625
+          ],
+          "probabilities": [
+            7.539158590924363e-07,
+            0.9999992460841409
+          ],
+          "label_mass": 0.9999999433247784
+        }
+      },
+      "state_sha256": "c6134aa9440140c85132578777d5376a8c353fd08ee577d77a8825f1506097a8",
+      "metrics": {
+        "latency_ms": 1082.9198340070434,
+        "prefill_ms": 8.300412446260452e-05,
+        "branch_ms": 1080.8717909967527,
+        "prefix_tokens": 88,
+        "prefix_cache_hit": true,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-gate-a",
+      "repeat": 0,
+      "scored": {
+        "check": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999675958786161
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            31.194625854492188,
+            41.53181838989258
+          ],
+          "probabilities": [
+            3.2404121383966196e-05,
+            0.9999675958786161
+          ],
+          "label_mass": 0.9999530144815855
+        }
+      },
+      "state_sha256": "914503a6d77561c7a854febd8d078280dc73a3152cf1f3450052abf6f8db6ccb",
+      "metrics": {
+        "latency_ms": 2152.1554999635555,
+        "prefill_ms": 1084.4041660311632,
+        "branch_ms": 1066.207583004143,
+        "prefix_tokens": 87,
+        "prefix_cache_hit": false,
+        "branch_tokens": 72,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-gate-a",
+      "repeat": 1,
+      "scored": {
+        "check": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999675958786161
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            31.194625854492188,
+            41.53181838989258
+          ],
+          "probabilities": [
+            3.2404121383966196e-05,
+            0.9999675958786161
+          ],
+          "label_mass": 0.9999530144815855
+        }
+      },
+      "state_sha256": "914503a6d77561c7a854febd8d078280dc73a3152cf1f3450052abf6f8db6ccb",
+      "metrics": {
+        "latency_ms": 1043.6127919820137,
+        "prefill_ms": 0.00016600824892520905,
+        "branch_ms": 1041.9078749837354,
+        "prefix_tokens": 87,
+        "prefix_cache_hit": true,
+        "branch_tokens": 72,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-gate-b",
+      "repeat": 0,
+      "scored": {
+        "check": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999796960044
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            40.21739196777344,
+            22.50494384765625
+          ],
+          "probabilities": [
+            0.9999999796960044,
+            2.030399564587256e-08
+          ],
+          "label_mass": 0.9999996857492471
+        }
+      },
+      "state_sha256": "96a239d76e6e657d2ed7ecbe06a5ebc20d414bfdd81a3c7791fbfdc5bfee8cb7",
+      "metrics": {
+        "latency_ms": 2030.6241670041345,
+        "prefill_ms": 1019.0941670443863,
+        "branch_ms": 1009.8919590236619,
+        "prefix_tokens": 87,
+        "prefix_cache_hit": false,
+        "branch_tokens": 72,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-gate-b",
+      "repeat": 1,
+      "scored": {
+        "check": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999796960044
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            40.21739196777344,
+            22.50494384765625
+          ],
+          "probabilities": [
+            0.9999999796960044,
+            2.030399564587256e-08
+          ],
+          "label_mass": 0.9999996857492471
+        }
+      },
+      "state_sha256": "96a239d76e6e657d2ed7ecbe06a5ebc20d414bfdd81a3c7791fbfdc5bfee8cb7",
+      "metrics": {
+        "latency_ms": 987.127291969955,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 985.5897919624113,
+        "prefix_tokens": 87,
+        "prefix_cache_hit": true,
+        "branch_tokens": 72,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-delivery-a",
+      "repeat": 0,
+      "scored": {
+        "check": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999999856527515
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.01170349121094,
+            22.951995849609375
+          ],
+          "probabilities": [
+            0.9999999856527515,
+            1.4347248490489593e-08
+          ],
+          "label_mass": 0.9999999491388742
+        }
+      },
+      "state_sha256": "bac878e801fce9922d2cb73b3497247dbe6640a40d47c7852b565ae674646489",
+      "metrics": {
+        "latency_ms": 1962.9697499913163,
+        "prefill_ms": 986.359583970625,
+        "branch_ms": 974.9362909933552,
+        "prefix_tokens": 90,
+        "prefix_cache_hit": false,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-delivery-a",
+      "repeat": 1,
+      "scored": {
+        "check": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999999856527515
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.01170349121094,
+            22.951995849609375
+          ],
+          "probabilities": [
+            0.9999999856527515,
+            1.4347248490489593e-08
+          ],
+          "label_mass": 0.9999999491388742
+        }
+      },
+      "state_sha256": "bac878e801fce9922d2cb73b3497247dbe6640a40d47c7852b565ae674646489",
+      "metrics": {
+        "latency_ms": 955.1822910434566,
+        "prefill_ms": 0.000125030055642128,
+        "branch_ms": 951.8959579872899,
+        "prefix_tokens": 90,
+        "prefix_cache_hit": true,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-delivery-b",
+      "repeat": 0,
+      "scored": {
+        "check": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.999999865340791
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            25.636962890625,
+            41.457481384277344
+          ],
+          "probabilities": [
+            1.3465920894453896e-07,
+            0.999999865340791
+          ],
+          "label_mass": 0.9999999536186925
+        }
+      },
+      "state_sha256": "2d7898afc39c8735e8bee9fe26636d6c02ae6561982fc7eda707aff148315209",
+      "metrics": {
+        "latency_ms": 1916.2584159639664,
+        "prefill_ms": 963.6569159920327,
+        "branch_ms": 950.4220419912599,
+        "prefix_tokens": 90,
+        "prefix_cache_hit": false,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-delivery-b",
+      "repeat": 1,
+      "scored": {
+        "check": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.999999865340791
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            25.636962890625,
+            41.457481384277344
+          ],
+          "probabilities": [
+            1.3465920894453896e-07,
+            0.999999865340791
+          ],
+          "label_mass": 0.9999999536186925
+        }
+      },
+      "state_sha256": "2d7898afc39c8735e8bee9fe26636d6c02ae6561982fc7eda707aff148315209",
+      "metrics": {
+        "latency_ms": 913.6353330104612,
+        "prefill_ms": 0.00029098009690642357,
+        "branch_ms": 911.6873749881051,
+        "prefix_tokens": 90,
+        "prefix_cache_hit": true,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-backup-a",
+      "repeat": 0,
+      "scored": {
+        "check": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999986322266411
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            25.889860153198242,
+            39.39218521118164
+          ],
+          "probabilities": [
+            1.3677733589687666e-06,
+            0.9999986322266411
+          ],
+          "label_mass": 0.9999639403587277
+        }
+      },
+      "state_sha256": "1c7c14faf7a67ee52509336821b12aa31bd3cebdf119ca434ff88a3af044cac0",
+      "metrics": {
+        "latency_ms": 1799.731208011508,
+        "prefill_ms": 898.0826250044629,
+        "branch_ms": 899.3388750241138,
+        "prefix_tokens": 88,
+        "prefix_cache_hit": false,
+        "branch_tokens": 72,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-backup-a",
+      "repeat": 1,
+      "scored": {
+        "check": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999986322266411
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            25.889860153198242,
+            39.39218521118164
+          ],
+          "probabilities": [
+            1.3677733589687666e-06,
+            0.9999986322266411
+          ],
+          "label_mass": 0.9999639403587277
+        }
+      },
+      "state_sha256": "1c7c14faf7a67ee52509336821b12aa31bd3cebdf119ca434ff88a3af044cac0",
+      "metrics": {
+        "latency_ms": 882.3671669815667,
+        "prefill_ms": 0.00012497184798121452,
+        "branch_ms": 880.6590829626657,
+        "prefix_tokens": 88,
+        "prefix_cache_hit": true,
+        "branch_tokens": 72,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-backup-b",
+      "repeat": 0,
+      "scored": {
+        "check": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999803436507
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            38.23814010620117,
+            20.493274688720703
+          ],
+          "probabilities": [
+            0.9999999803436507,
+            1.9656349183896636e-08
+          ],
+          "label_mass": 0.9999976260524535
+        }
+      },
+      "state_sha256": "7bb42755566c54ec9c862c0f77c521c4511090006063105d6afeefa5cd2ed99f",
+      "metrics": {
+        "latency_ms": 1778.0807499657385,
+        "prefill_ms": 893.6275410233065,
+        "branch_ms": 881.2599169905297,
+        "prefix_tokens": 88,
+        "prefix_cache_hit": false,
+        "branch_tokens": 72,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-fact-backup-b",
+      "repeat": 1,
+      "scored": {
+        "check": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999803436507
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "check": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            38.23814010620117,
+            20.493274688720703
+          ],
+          "probabilities": [
+            0.9999999803436507,
+            1.9656349183896636e-08
+          ],
+          "label_mass": 0.9999976260524535
+        }
+      },
+      "state_sha256": "7bb42755566c54ec9c862c0f77c521c4511090006063105d6afeefa5cd2ed99f",
+      "metrics": {
+        "latency_ms": 863.5535829816945,
+        "prefill_ms": 0.00029103830456733704,
+        "branch_ms": 861.4083749707788,
+        "prefix_tokens": 88,
+        "prefix_cache_hit": true,
+        "branch_tokens": 72,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-dispatch-p0",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "amber",
+          "expected": "amber",
+          "correct": true,
+          "top_probability": 0.999999999636223
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "violet",
+            "amber",
+            "teal"
+          ],
+          "logits": [
+            19.608997344970703,
+            42.574378967285156,
+            20.49454689025879
+          ],
+          "probabilities": [
+            1.0623349911006273e-10,
+            0.999999999636223,
+            2.575436031882205e-10
+          ],
+          "label_mass": 0.9999989442792305
+        }
+      },
+      "state_sha256": "1877b034ec8939df2ab76598e619b2386732ae408a8bef38c5068ee1a023e178",
+      "metrics": {
+        "latency_ms": 1742.6545830094256,
+        "prefill_ms": 874.5404159999453,
+        "branch_ms": 865.575333009474,
+        "prefix_tokens": 89,
+        "prefix_cache_hit": false,
+        "branch_tokens": 76,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-dispatch-p0",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "amber",
+          "expected": "amber",
+          "correct": true,
+          "top_probability": 0.999999999636223
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "violet",
+            "amber",
+            "teal"
+          ],
+          "logits": [
+            19.608997344970703,
+            42.574378967285156,
+            20.49454689025879
+          ],
+          "probabilities": [
+            1.0623349911006273e-10,
+            0.999999999636223,
+            2.575436031882205e-10
+          ],
+          "label_mass": 0.9999989442792305
+        }
+      },
+      "state_sha256": "1877b034ec8939df2ab76598e619b2386732ae408a8bef38c5068ee1a023e178",
+      "metrics": {
+        "latency_ms": 867.1200409880839,
+        "prefill_ms": 0.00020797597244381905,
+        "branch_ms": 865.2254160260782,
+        "prefix_tokens": 89,
+        "prefix_cache_hit": true,
+        "branch_tokens": 76,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-dispatch-p1",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "amber",
+          "expected": "amber",
+          "correct": true,
+          "top_probability": 0.9999999998622529
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "amber",
+            "teal",
+            "violet"
+          ],
+          "logits": [
+            45.08086395263672,
+            21.786468505859375,
+            21.565589904785156
+          ],
+          "probabilities": [
+            0.9999999998622529,
+            7.644913892085394e-11,
+            6.129799092524445e-11
+          ],
+          "label_mass": 0.9999994899079531
+        }
+      },
+      "state_sha256": "1877b034ec8939df2ab76598e619b2386732ae408a8bef38c5068ee1a023e178",
+      "metrics": {
+        "latency_ms": 875.2459160168655,
+        "prefill_ms": 0.00012497184798121452,
+        "branch_ms": 873.1643329956569,
+        "prefix_tokens": 89,
+        "prefix_cache_hit": true,
+        "branch_tokens": 76,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-dispatch-p1",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "amber",
+          "expected": "amber",
+          "correct": true,
+          "top_probability": 0.9999999998622529
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "amber",
+            "teal",
+            "violet"
+          ],
+          "logits": [
+            45.08086395263672,
+            21.786468505859375,
+            21.565589904785156
+          ],
+          "probabilities": [
+            0.9999999998622529,
+            7.644913892085394e-11,
+            6.129799092524445e-11
+          ],
+          "label_mass": 0.9999994899079531
+        }
+      },
+      "state_sha256": "1877b034ec8939df2ab76598e619b2386732ae408a8bef38c5068ee1a023e178",
+      "metrics": {
+        "latency_ms": 875.7174999918789,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 873.1827910523862,
+        "prefix_tokens": 89,
+        "prefix_cache_hit": true,
+        "branch_tokens": 76,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-dispatch-p2",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "amber",
+          "expected": "amber",
+          "correct": true,
+          "top_probability": 0.9999999999357276
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "teal",
+            "violet",
+            "amber"
+          ],
+          "logits": [
+            18.90597915649414,
+            21.283653259277344,
+            44.84025573730469
+          ],
+          "probabilities": [
+            5.456156123014252e-12,
+            5.881627708892851e-11,
+            0.9999999999357276
+          ],
+          "label_mass": 0.9999999254667666
+        }
+      },
+      "state_sha256": "1877b034ec8939df2ab76598e619b2386732ae408a8bef38c5068ee1a023e178",
+      "metrics": {
+        "latency_ms": 878.8930409937166,
+        "prefill_ms": 0.00033300602808594704,
+        "branch_ms": 876.4295419678092,
+        "prefix_tokens": 89,
+        "prefix_cache_hit": true,
+        "branch_tokens": 76,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-dispatch-p2",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "amber",
+          "expected": "amber",
+          "correct": true,
+          "top_probability": 0.9999999999357276
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "teal",
+            "violet",
+            "amber"
+          ],
+          "logits": [
+            18.90597915649414,
+            21.283653259277344,
+            44.84025573730469
+          ],
+          "probabilities": [
+            5.456156123014252e-12,
+            5.881627708892851e-11,
+            0.9999999999357276
+          ],
+          "label_mass": 0.9999999254667666
+        }
+      },
+      "state_sha256": "1877b034ec8939df2ab76598e619b2386732ae408a8bef38c5068ee1a023e178",
+      "metrics": {
+        "latency_ms": 885.9009169973433,
+        "prefill_ms": 8.300412446260452e-05,
+        "branch_ms": 883.9118750183843,
+        "prefix_tokens": 89,
+        "prefix_cache_hit": true,
+        "branch_tokens": 76,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-inventory-p0",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "19",
+          "expected": "19",
+          "correct": true,
+          "top_probability": 0.9999999464249099
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "4",
+            "7",
+            "12",
+            "19"
+          ],
+          "logits": [
+            28.835390090942383,
+            22.383453369140625,
+            23.415122985839844,
+            45.58355712890625
+          ],
+          "probabilities": [
+            5.325537536984668e-08,
+            8.400844273879583e-11,
+            2.357063897592189e-10,
+            0.9999999464249099
+          ],
+          "label_mass": 0.9999973261471307
+        }
+      },
+      "state_sha256": "f8fbcb162e9aabf9346dfd18fb852978da587f0192735a51640099840d8bc984",
+      "metrics": {
+        "latency_ms": 2364.408374996856,
+        "prefill_ms": 1182.4371250113472,
+        "branch_ms": 1179.883582983166,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": false,
+        "branch_tokens": 99,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-inventory-p0",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "19",
+          "expected": "19",
+          "correct": true,
+          "top_probability": 0.9999999464249099
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "4",
+            "7",
+            "12",
+            "19"
+          ],
+          "logits": [
+            28.835390090942383,
+            22.383453369140625,
+            23.415122985839844,
+            45.58355712890625
+          ],
+          "probabilities": [
+            5.325537536984668e-08,
+            8.400844273879583e-11,
+            2.357063897592189e-10,
+            0.9999999464249099
+          ],
+          "label_mass": 0.9999973261471307
+        }
+      },
+      "state_sha256": "f8fbcb162e9aabf9346dfd18fb852978da587f0192735a51640099840d8bc984",
+      "metrics": {
+        "latency_ms": 1157.2139580384828,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1154.1873749811202,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 99,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-inventory-p1",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "19",
+          "expected": "19",
+          "correct": true,
+          "top_probability": 0.9999999989572346
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "7",
+            "12",
+            "19",
+            "4"
+          ],
+          "logits": [
+            23.856830596923828,
+            21.758258819580078,
+            44.693809509277344,
+            20.771499633789062
+          ],
+          "probabilities": [
+            8.925140024338781e-10,
+            1.0945028470386046e-10,
+            0.9999999989572346,
+            4.080118966322934e-11
+          ],
+          "label_mass": 0.9999998123469684
+        }
+      },
+      "state_sha256": "f8fbcb162e9aabf9346dfd18fb852978da587f0192735a51640099840d8bc984",
+      "metrics": {
+        "latency_ms": 1102.5518749956973,
+        "prefill_ms": 0.00033300602808594704,
+        "branch_ms": 1098.8014160539024,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 99,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-inventory-p1",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "19",
+          "expected": "19",
+          "correct": true,
+          "top_probability": 0.9999999989572346
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "7",
+            "12",
+            "19",
+            "4"
+          ],
+          "logits": [
+            23.856830596923828,
+            21.758258819580078,
+            44.693809509277344,
+            20.771499633789062
+          ],
+          "probabilities": [
+            8.925140024338781e-10,
+            1.0945028470386046e-10,
+            0.9999999989572346,
+            4.080118966322934e-11
+          ],
+          "label_mass": 0.9999998123469684
+        }
+      },
+      "state_sha256": "f8fbcb162e9aabf9346dfd18fb852978da587f0192735a51640099840d8bc984",
+      "metrics": {
+        "latency_ms": 1142.609958013054,
+        "prefill_ms": 0.000459025613963604,
+        "branch_ms": 1140.154958004132,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 99,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-inventory-p2",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "19",
+          "expected": "19",
+          "correct": true,
+          "top_probability": 0.9999999987961568
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "12",
+            "19",
+            "4",
+            "7"
+          ],
+          "logits": [
+            22.848100662231445,
+            43.88932800292969,
+            21.90984344482422,
+            21.51310920715332
+          ],
+          "probabilities": [
+            7.276307980552997e-10,
+            0.9999999987961568,
+            2.84728631536447e-10,
+            1.9148362942750994e-10
+          ],
+          "label_mass": 0.9999982989522881
+        }
+      },
+      "state_sha256": "f8fbcb162e9aabf9346dfd18fb852978da587f0192735a51640099840d8bc984",
+      "metrics": {
+        "latency_ms": 1145.180999999866,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1143.549542000983,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 99,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-inventory-p2",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "19",
+          "expected": "19",
+          "correct": true,
+          "top_probability": 0.9999999987961568
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "12",
+            "19",
+            "4",
+            "7"
+          ],
+          "logits": [
+            22.848100662231445,
+            43.88932800292969,
+            21.90984344482422,
+            21.51310920715332
+          ],
+          "probabilities": [
+            7.276307980552997e-10,
+            0.9999999987961568,
+            2.84728631536447e-10,
+            1.9148362942750994e-10
+          ],
+          "label_mass": 0.9999982989522881
+        }
+      },
+      "state_sha256": "f8fbcb162e9aabf9346dfd18fb852978da587f0192735a51640099840d8bc984",
+      "metrics": {
+        "latency_ms": 1151.630499982275,
+        "prefill_ms": 0.00012497184798121452,
+        "branch_ms": 1148.9183329977095,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 99,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-inventory-p3",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "19",
+          "expected": "19",
+          "correct": true,
+          "top_probability": 0.9999999996811424
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "19",
+            "4",
+            "7",
+            "12"
+          ],
+          "logits": [
+            44.868896484375,
+            20.913375854492188,
+            21.834171295166016,
+            22.43234634399414
+          ],
+          "probabilities": [
+            0.9999999996811424,
+            3.9468405288393804e-11,
+            9.911650004338539e-11,
+            1.8027274881665453e-10
+          ],
+          "label_mass": 0.9999999962402074
+        }
+      },
+      "state_sha256": "f8fbcb162e9aabf9346dfd18fb852978da587f0192735a51640099840d8bc984",
+      "metrics": {
+        "latency_ms": 1142.085124971345,
+        "prefill_ms": 0.000208965502679348,
+        "branch_ms": 1140.3719580266625,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 99,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-inventory-p3",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "19",
+          "expected": "19",
+          "correct": true,
+          "top_probability": 0.9999999996811424
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "19",
+            "4",
+            "7",
+            "12"
+          ],
+          "logits": [
+            44.868896484375,
+            20.913375854492188,
+            21.834171295166016,
+            22.43234634399414
+          ],
+          "probabilities": [
+            0.9999999996811424,
+            3.9468405288393804e-11,
+            9.911650004338539e-11,
+            1.8027274881665453e-10
+          ],
+          "label_mass": 0.9999999962402074
+        }
+      },
+      "state_sha256": "f8fbcb162e9aabf9346dfd18fb852978da587f0192735a51640099840d8bc984",
+      "metrics": {
+        "latency_ms": 1154.0962909930386,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1151.5769159886986,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 99,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p0",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.9999999990498245
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Mina",
+            "Omar",
+            "Tess",
+            "Ivo",
+            "Lea"
+          ],
+          "logits": [
+            24.012264251708984,
+            21.77146339416504,
+            24.82953643798828,
+            46.830718994140625,
+            25.48275375366211
+          ],
+          "probabilities": [
+            1.2304699708871667e-10,
+            1.308891272536782e-11,
+            2.7861713372485324e-10,
+            0.9999999990498245,
+            5.354223498901212e-10
+          ],
+          "label_mass": 0.9999999903160366
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 2659.3302079709247,
+        "prefill_ms": 1445.703457982745,
+        "branch_ms": 1209.9369579809718,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": false,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p0",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.9999999990498245
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Mina",
+            "Omar",
+            "Tess",
+            "Ivo",
+            "Lea"
+          ],
+          "logits": [
+            24.012264251708984,
+            21.77146339416504,
+            24.82953643798828,
+            46.830718994140625,
+            25.48275375366211
+          ],
+          "probabilities": [
+            1.2304699708871667e-10,
+            1.308891272536782e-11,
+            2.7861713372485324e-10,
+            0.9999999990498245,
+            5.354223498901212e-10
+          ],
+          "label_mass": 0.9999999903160366
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1172.4530839710496,
+        "prefill_ms": 8.300412446260452e-05,
+        "branch_ms": 1170.0848749605939,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p1",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.999999999715433
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Omar",
+            "Tess",
+            "Ivo",
+            "Lea",
+            "Mina"
+          ],
+          "logits": [
+            23.375858306884766,
+            24.118993759155273,
+            49.55458068847656,
+            24.84636878967285,
+            27.455829620361328
+          ],
+          "probabilities": [
+            4.272925553837262e-12,
+            8.983900897023373e-12,
+            0.999999999715433,
+            1.859344718640794e-11,
+            2.5271693984087196e-10
+          ],
+          "label_mass": 0.9999999984917827
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1132.239207974635,
+        "prefill_ms": 0.0004169996827840805,
+        "branch_ms": 1129.5295410091057,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p1",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.999999999715433
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Omar",
+            "Tess",
+            "Ivo",
+            "Lea",
+            "Mina"
+          ],
+          "logits": [
+            23.375858306884766,
+            24.118993759155273,
+            49.55458068847656,
+            24.84636878967285,
+            27.455829620361328
+          ],
+          "probabilities": [
+            4.272925553837262e-12,
+            8.983900897023373e-12,
+            0.999999999715433,
+            1.859344718640794e-11,
+            2.5271693984087196e-10
+          ],
+          "label_mass": 0.9999999984917827
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1127.556292049121,
+        "prefill_ms": 8.300412446260452e-05,
+        "branch_ms": 1125.6452500238083,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p2",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.9999999996493703
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Tess",
+            "Ivo",
+            "Lea",
+            "Mina",
+            "Omar"
+          ],
+          "logits": [
+            22.117050170898438,
+            46.875675201416016,
+            23.697792053222656,
+            23.97492027282715,
+            24.140466690063477
+          ],
+          "probabilities": [
+            1.7679328665148998e-11,
+            0.9999999996493703,
+            8.589606057840941e-11,
+            1.133257241674381e-10,
+            1.3372863092482645e-10
+          ],
+          "label_mass": 0.9999999762284502
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1147.9168750229292,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1144.7769169462845,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p2",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.9999999996493703
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Tess",
+            "Ivo",
+            "Lea",
+            "Mina",
+            "Omar"
+          ],
+          "logits": [
+            22.117050170898438,
+            46.875675201416016,
+            23.697792053222656,
+            23.97492027282715,
+            24.140466690063477
+          ],
+          "probabilities": [
+            1.7679328665148998e-11,
+            0.9999999996493703,
+            8.589606057840941e-11,
+            1.133257241674381e-10,
+            1.3372863092482645e-10
+          ],
+          "label_mass": 0.9999999762284502
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1164.9940829956904,
+        "prefill_ms": 0.0018330174498260021,
+        "branch_ms": 1161.7310839938,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p3",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.9999999820655551
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Ivo",
+            "Lea",
+            "Mina",
+            "Omar",
+            "Tess"
+          ],
+          "logits": [
+            46.71178436279297,
+            21.60422134399414,
+            23.301597595214844,
+            26.679462432861328,
+            28.75221061706543
+          ],
+          "probabilities": [
+            0.9999999820655551,
+            1.247165013337653e-11,
+            6.809027038055471e-11,
+            1.9955982679707795e-09,
+            1.5858284945989868e-08
+          ],
+          "label_mass": 0.9999999982618902
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1180.26979197748,
+        "prefill_ms": 0.0004169996827840805,
+        "branch_ms": 1177.4870840017684,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p3",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.9999999820655551
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Ivo",
+            "Lea",
+            "Mina",
+            "Omar",
+            "Tess"
+          ],
+          "logits": [
+            46.71178436279297,
+            21.60422134399414,
+            23.301597595214844,
+            26.679462432861328,
+            28.75221061706543
+          ],
+          "probabilities": [
+            0.9999999820655551,
+            1.247165013337653e-11,
+            6.809027038055471e-11,
+            1.9955982679707795e-09,
+            1.5858284945989868e-08
+          ],
+          "label_mass": 0.9999999982618902
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1175.280500028748,
+        "prefill_ms": 0.00033294782042503357,
+        "branch_ms": 1173.1618749909103,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p4",
+      "repeat": 0,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.9999999993689546
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Lea",
+            "Mina",
+            "Omar",
+            "Tess",
+            "Ivo"
+          ],
+          "logits": [
+            25.095958709716797,
+            21.493507385253906,
+            22.986204147338867,
+            26.4022216796875,
+            47.85669708251953
+          ],
+          "probabilities": [
+            1.303577693672569e-10,
+            3.5531389285441896e-12,
+            1.5808190315417464e-11,
+            4.813264414983695e-10,
+            0.9999999993689546
+          ],
+          "label_mass": 0.9999999988583906
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1168.5109580284916,
+        "prefill_ms": 0.0004169996827840805,
+        "branch_ms": 1166.4067499805242,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-lookup-roster-p4",
+      "repeat": 1,
+      "scored": {
+        "lookup": {
+          "chosen": "Ivo",
+          "expected": "Ivo",
+          "correct": true,
+          "top_probability": 0.9999999993689546
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "lookup": {
+          "outcomes": [
+            "Lea",
+            "Mina",
+            "Omar",
+            "Tess",
+            "Ivo"
+          ],
+          "logits": [
+            25.095958709716797,
+            21.493507385253906,
+            22.986204147338867,
+            26.4022216796875,
+            47.85669708251953
+          ],
+          "probabilities": [
+            1.303577693672569e-10,
+            3.5531389285441896e-12,
+            1.5808190315417464e-11,
+            4.813264414983695e-10,
+            0.9999999993689546
+          ],
+          "label_mass": 0.9999999988583906
+        }
+      },
+      "state_sha256": "565d172c804dd2c5b48376367395f3401384ac9831673a661a466391467f75f2",
+      "metrics": {
+        "latency_ms": 1144.669665955007,
+        "prefill_ms": 0.00016600824892520905,
+        "branch_ms": 1142.5699170213193,
+        "prefix_tokens": 156,
+        "prefix_cache_hit": true,
+        "branch_tokens": 103,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-code-area-0",
+      "repeat": 0,
+      "scored": {
+        "function_doc": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999950340838561
+        },
+        "return_statement": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999966369386
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "function_doc": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            27.0441951751709,
+            39.257102966308594
+          ],
+          "probabilities": [
+            4.965916143899044e-06,
+            0.9999950340838561
+          ],
+          "label_mass": 0.9999986935614793
+        },
+        "return_statement": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            40.707374572753906,
+            21.19696044921875
+          ],
+          "probabilities": [
+            0.9999999966369386,
+            3.3630614670881996e-09
+          ],
+          "label_mass": 0.9999997130770852
+        }
+      },
+      "state_sha256": "7c9ea1b3463f4d0697e6bbed39531026a53fa47e7bfc3bece4ad861016742cca",
+      "metrics": {
+        "latency_ms": 2895.70920803817,
+        "prefill_ms": 1174.480665998999,
+        "branch_ms": 1718.0551249766722,
+        "prefix_tokens": 123,
+        "prefix_cache_hit": false,
+        "branch_tokens": 169,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-area-0",
+      "repeat": 1,
+      "scored": {
+        "return_statement": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.999999996616104
+        },
+        "function_doc": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999951023837323
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "return_statement": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            40.72163391113281,
+            21.217395782470703
+          ],
+          "probabilities": [
+            0.999999996616104,
+            3.383895988119862e-09
+          ],
+          "label_mass": 0.999999719749756
+        },
+        "function_doc": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            27.034053802490234,
+            39.26081085205078
+          ],
+          "probabilities": [
+            4.897616267730888e-06,
+            0.9999951023837323
+          ],
+          "label_mass": 0.999998694087
+        }
+      },
+      "state_sha256": "7c9ea1b3463f4d0697e6bbed39531026a53fa47e7bfc3bece4ad861016742cca",
+      "metrics": {
+        "latency_ms": 1723.1954579474404,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1719.8559580137953,
+        "prefix_tokens": 123,
+        "prefix_cache_hit": true,
+        "branch_tokens": 169,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-area-1",
+      "repeat": 0,
+      "scored": {
+        "function_doc": {
+          "chosen": "yes",
+          "expected": "no",
+          "correct": false,
+          "top_probability": 0.9993669491000644
+        },
+        "return_statement": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999943576205
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "function_doc": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            31.384864807128906,
+            38.74919128417969
+          ],
+          "probabilities": [
+            0.0006330508999356369,
+            0.9993669491000644
+          ],
+          "label_mass": 0.9999928856582537
+        },
+        "return_statement": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            40.6332893371582,
+            21.640329360961914
+          ],
+          "probabilities": [
+            0.9999999943576205,
+            5.6423793950982265e-09
+          ],
+          "label_mass": 0.9999996607740755
+        }
+      },
+      "state_sha256": "8333f866c27cfd0acaf64d7cf5a57ec8861d45355f7233d616cfacca38a1f03b",
+      "metrics": {
+        "latency_ms": 2886.9268329581246,
+        "prefill_ms": 1165.3605409665033,
+        "branch_ms": 1717.5695420010015,
+        "prefix_tokens": 123,
+        "prefix_cache_hit": false,
+        "branch_tokens": 169,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-area-1",
+      "repeat": 1,
+      "scored": {
+        "return_statement": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999945224181
+        },
+        "function_doc": {
+          "chosen": "yes",
+          "expected": "no",
+          "correct": false,
+          "top_probability": 0.999363709342637
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "return_statement": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            40.66017150878906,
+            21.637569427490234
+          ],
+          "probabilities": [
+            0.9999999945224181,
+            5.477581931318734e-09
+          ],
+          "label_mass": 0.9999996737301986
+        },
+        "function_doc": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            31.386249542236328,
+            38.74546813964844
+          ],
+          "probabilities": [
+            0.0006362906573630162,
+            0.999363709342637
+          ],
+          "label_mass": 0.99999293735406
+        }
+      },
+      "state_sha256": "8333f866c27cfd0acaf64d7cf5a57ec8861d45355f7233d616cfacca38a1f03b",
+      "metrics": {
+        "latency_ms": 1714.16491700802,
+        "prefill_ms": 0.00020902371034026146,
+        "branch_ms": 1709.6723330323584,
+        "prefix_tokens": 123,
+        "prefix_cache_hit": true,
+        "branch_tokens": 169,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-area-2",
+      "repeat": 0,
+      "scored": {
+        "function_doc": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9944061030968887
+        },
+        "return_statement": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999864120566249
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "function_doc": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            32.601593017578125,
+            37.78206253051758
+          ],
+          "probabilities": [
+            0.0055938969031113246,
+            0.9944061030968887
+          ],
+          "label_mass": 0.9999639312520816
+        },
+        "return_statement": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            28.384300231933594,
+            39.590614318847656
+          ],
+          "probabilities": [
+            1.3587943375065467e-05,
+            0.9999864120566249
+          ],
+          "label_mass": 0.9999826676845389
+        }
+      },
+      "state_sha256": "cabcc60f3c847b7b6ed77ad368c93bddceff9ba72efd2ac3b549a9af161921ed",
+      "metrics": {
+        "latency_ms": 2859.7950839903206,
+        "prefill_ms": 1169.0768750268035,
+        "branch_ms": 1683.2065409980714,
+        "prefix_tokens": 120,
+        "prefix_cache_hit": false,
+        "branch_tokens": 169,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-area-2",
+      "repeat": 1,
+      "scored": {
+        "return_statement": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999863109967039
+        },
+        "function_doc": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.994355223075115
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "return_statement": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            28.39012336730957,
+            39.589027404785156
+          ],
+          "probabilities": [
+            1.3689003296014842e-05,
+            0.9999863109967039
+          ],
+          "label_mass": 0.9999828532482897
+        },
+        "function_doc": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            32.61186981201172,
+            37.783233642578125
+          ],
+          "probabilities": [
+            0.0056447769248848655,
+            0.994355223075115
+          ],
+          "label_mass": 0.9999631381844676
+        }
+      },
+      "state_sha256": "cabcc60f3c847b7b6ed77ad368c93bddceff9ba72efd2ac3b549a9af161921ed",
+      "metrics": {
+        "latency_ms": 1721.6720830183476,
+        "prefill_ms": 0.000292027834802866,
+        "branch_ms": 1716.4713749662042,
+        "prefix_tokens": 120,
+        "prefix_cache_hit": true,
+        "branch_tokens": 169,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-area-3",
+      "repeat": 0,
+      "scored": {
+        "function_doc": {
+          "chosen": "yes",
+          "expected": "no",
+          "correct": false,
+          "top_probability": 0.9655977458056223
+        },
+        "return_statement": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999771187785724
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "function_doc": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            34.90809631347656,
+            38.24272155761719
+          ],
+          "probabilities": [
+            0.03440225419437756,
+            0.9655977458056223
+          ],
+          "label_mass": 0.9999371470700982
+        },
+        "return_statement": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            29.134920120239258,
+            39.820091247558594
+          ],
+          "probabilities": [
+            2.2881221427636304e-05,
+            0.9999771187785724
+          ],
+          "label_mass": 0.9999834880907993
+        }
+      },
+      "state_sha256": "958dadfa99ee55c6e04e1c063646183205cf1998815f0a32471acbd235f64743",
+      "metrics": {
+        "latency_ms": 2859.957584005315,
+        "prefill_ms": 1159.4178330269642,
+        "branch_ms": 1696.2034580064937,
+        "prefix_tokens": 120,
+        "prefix_cache_hit": false,
+        "branch_tokens": 169,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-area-3",
+      "repeat": 1,
+      "scored": {
+        "return_statement": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999771997644045
+        },
+        "function_doc": {
+          "chosen": "yes",
+          "expected": "no",
+          "correct": false,
+          "top_probability": 0.965777738600486
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "return_statement": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            29.135944366455078,
+            39.82466125488281
+          ],
+          "probabilities": [
+            2.2800235595455344e-05,
+            0.9999771997644045
+          ],
+          "label_mass": 0.9999832249178172
+        },
+        "function_doc": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            34.89417266845703,
+            38.234230041503906
+          ],
+          "probabilities": [
+            0.034222261399513905,
+            0.965777738600486
+          ],
+          "label_mass": 0.9999368561253286
+        }
+      },
+      "state_sha256": "958dadfa99ee55c6e04e1c063646183205cf1998815f0a32471acbd235f64743",
+      "metrics": {
+        "latency_ms": 1712.8329169936478,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 1706.6347500076517,
+        "prefix_tokens": 120,
+        "prefix_cache_hit": true,
+        "branch_tokens": 169,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-identity-0",
+      "repeat": 0,
+      "scored": {
+        "required_doc": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999908108410932
+        },
+        "return_statement": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999959156722
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "required_doc": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            38.08673858642578,
+            26.489261627197266
+          ],
+          "probabilities": [
+            0.9999908108410932,
+            9.189158906896937e-06
+          ],
+          "label_mass": 0.9999976040646787
+        },
+        "return_statement": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            21.93730926513672,
+            41.25341796875
+          ],
+          "probabilities": [
+            4.084327668161088e-09,
+            0.9999999959156722
+          ],
+          "label_mass": 0.9999998798981056
+        }
+      },
+      "state_sha256": "9b56d1b40cf3cc129f67a0a33bcd480c72a9a5154e8a5ba27cad3bb2951a6608",
+      "metrics": {
+        "latency_ms": 2848.522249958478,
+        "prefill_ms": 1155.3178749745712,
+        "branch_ms": 1690.261040988844,
+        "prefix_tokens": 112,
+        "prefix_cache_hit": false,
+        "branch_tokens": 166,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-identity-0",
+      "repeat": 1,
+      "scored": {
+        "return_statement": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999959091546
+        },
+        "required_doc": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999909851357027
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "return_statement": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            21.93816375732422,
+            41.25267791748047
+          ],
+          "probabilities": [
+            4.090845501197092e-09,
+            0.9999999959091546
+          ],
+          "label_mass": 0.9999998812960365
+        },
+        "required_doc": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            38.097023010253906,
+            26.480396270751953
+          ],
+          "probabilities": [
+            0.9999909851357027,
+            9.014864297343888e-06
+          ],
+          "label_mass": 0.9999976415262157
+        }
+      },
+      "state_sha256": "9b56d1b40cf3cc129f67a0a33bcd480c72a9a5154e8a5ba27cad3bb2951a6608",
+      "metrics": {
+        "latency_ms": 1709.5939579885453,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1706.2223330140114,
+        "prefix_tokens": 112,
+        "prefix_cache_hit": true,
+        "branch_tokens": 166,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-identity-1",
+      "repeat": 0,
+      "scored": {
+        "required_doc": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999176719616101
+        },
+        "return_statement": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999965557014
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "required_doc": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            31.14702606201172,
+            40.55174255371094
+          ],
+          "probabilities": [
+            8.23280383898629e-05,
+            0.9999176719616101
+          ],
+          "label_mass": 0.9999513372936225
+        },
+        "return_statement": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            22.710689544677734,
+            42.197235107421875
+          ],
+          "probabilities": [
+            3.444298553298666e-09,
+            0.9999999965557014
+          ],
+          "label_mass": 0.9999999724836143
+        }
+      },
+      "state_sha256": "4490ba32ba77f472da25ddaea6eeea1d3993345524b0278d6a590f64fdea484e",
+      "metrics": {
+        "latency_ms": 2879.537916975096,
+        "prefill_ms": 1160.1624590111896,
+        "branch_ms": 1715.8544590347447,
+        "prefix_tokens": 106,
+        "prefix_cache_hit": false,
+        "branch_tokens": 166,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-identity-1",
+      "repeat": 1,
+      "scored": {
+        "return_statement": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999965712949
+        },
+        "required_doc": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999180523136165
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "return_statement": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            22.69501304626465,
+            42.18609619140625
+          ],
+          "probabilities": [
+            3.428705169751743e-09,
+            0.9999999965712949
+          ],
+          "label_mass": 0.999999971919894
+        },
+        "required_doc": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            31.159244537353516,
+            40.5685920715332
+          ],
+          "probabilities": [
+            8.194768638342065e-05,
+            0.9999180523136165
+          ],
+          "label_mass": 0.999950618639332
+        }
+      },
+      "state_sha256": "4490ba32ba77f472da25ddaea6eeea1d3993345524b0278d6a590f64fdea484e",
+      "metrics": {
+        "latency_ms": 1724.1580830304883,
+        "prefill_ms": 0.00016600824892520905,
+        "branch_ms": 1719.7152499575168,
+        "prefix_tokens": 106,
+        "prefix_cache_hit": true,
+        "branch_tokens": 166,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-identity-2",
+      "repeat": 0,
+      "scored": {
+        "required_doc": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9988562677475387
+        },
+        "return_statement": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999990171829578
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "required_doc": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            36.45990753173828,
+            29.687593460083008
+          ],
+          "probabilities": [
+            0.9988562677475387,
+            0.0011437322524613565
+          ],
+          "label_mass": 0.9999618654911063
+        },
+        "return_statement": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            40.154327392578125,
+            26.32148551940918
+          ],
+          "probabilities": [
+            0.9999990171829578,
+            9.828170422072926e-07
+          ],
+          "label_mass": 0.9999996624128189
+        }
+      },
+      "state_sha256": "9adffdccc49c7eeb2265658508e17f1432ce184b725725f183dab3512dee4b39",
+      "metrics": {
+        "latency_ms": 2891.997500031721,
+        "prefill_ms": 1166.225790977478,
+        "branch_ms": 1720.7665410242043,
+        "prefix_tokens": 112,
+        "prefix_cache_hit": false,
+        "branch_tokens": 166,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-identity-2",
+      "repeat": 1,
+      "scored": {
+        "return_statement": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999990225091315
+        },
+        "required_doc": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.998867823121305
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "return_statement": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            40.15869903564453,
+            26.320423126220703
+          ],
+          "probabilities": [
+            0.9999990225091315,
+            9.774908684055055e-07
+          ],
+          "label_mass": 0.9999996658577132
+        },
+        "required_doc": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            36.4788932800293,
+            29.696413040161133
+          ],
+          "probabilities": [
+            0.998867823121305,
+            0.0011321768786950208
+          ],
+          "label_mass": 0.9999625070050657
+        }
+      },
+      "state_sha256": "9adffdccc49c7eeb2265658508e17f1432ce184b725725f183dab3512dee4b39",
+      "metrics": {
+        "latency_ms": 1712.433125008829,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1709.0524999657646,
+        "prefix_tokens": 112,
+        "prefix_cache_hit": true,
+        "branch_tokens": 166,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-identity-3",
+      "repeat": 0,
+      "scored": {
+        "required_doc": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999241270082824
+        },
+        "return_statement": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999996769139547
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "required_doc": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            30.57532501220703,
+            40.06169891357422
+          ],
+          "probabilities": [
+            7.587299171754762e-05,
+            0.9999241270082824
+          ],
+          "label_mass": 0.9998806755281352
+        },
+        "return_statement": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.72294616699219,
+            26.777599334716797
+          ],
+          "probabilities": [
+            0.9999996769139547,
+            3.23086045209934e-07
+          ],
+          "label_mass": 0.9999999374071119
+        }
+      },
+      "state_sha256": "acfa5d29c1f5c646dfad10ed5a27cf0795a5d6bbc9c0237ab82050498ae3a6e8",
+      "metrics": {
+        "latency_ms": 2867.3012499930337,
+        "prefill_ms": 1148.522834002506,
+        "branch_ms": 1715.1774159865454,
+        "prefix_tokens": 106,
+        "prefix_cache_hit": false,
+        "branch_tokens": 166,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-code-identity-3",
+      "repeat": 1,
+      "scored": {
+        "return_statement": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999996791223628
+        },
+        "required_doc": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.999923333813318
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "return_statement": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.72126770019531,
+            26.769062042236328
+          ],
+          "probabilities": [
+            0.9999996791223628,
+            3.208776372562901e-07
+          ],
+          "label_mass": 0.9999999381849651
+        },
+        "required_doc": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            30.58449363708496,
+            40.06046676635742
+          ],
+          "probabilities": [
+            7.666618668201583e-05,
+            0.999923333813318
+          ],
+          "label_mass": 0.9998821270859897
+        }
+      },
+      "state_sha256": "acfa5d29c1f5c646dfad10ed5a27cf0795a5d6bbc9c0237ab82050498ae3a6e8",
+      "metrics": {
+        "latency_ms": 1718.3841250371188,
+        "prefill_ms": 0.000125030055642128,
+        "branch_ms": 1714.5617079804651,
+        "prefix_tokens": 106,
+        "prefix_cache_hit": true,
+        "branch_tokens": 166,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "fresh-count-jobs-0",
+      "repeat": 0,
+      "scored": {
+        "completed_count": {
+          "chosen": "0",
+          "expected": "0",
+          "correct": true,
+          "top_probability": 0.999999999838737
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            46.46965026855469,
+            21.384571075439453,
+            20.597562789916992,
+            22.050273895263672,
+            23.60831069946289
+          ],
+          "probabilities": [
+            0.999999999838737,
+            1.2755236876047825e-11,
+            5.806242530552044e-12,
+            2.4819874974524143e-11,
+            1.178816961646535e-10
+          ],
+          "label_mass": 0.9999999850259071
+        }
+      },
+      "state_sha256": "3616fb331214ba2058e5f6f014074a16bd41c7b1ff04349cca15506544f1cb8b",
+      "metrics": {
+        "latency_ms": 2576.5052500064485,
+        "prefill_ms": 1438.9119580155239,
+        "branch_ms": 1135.1509579690173,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": false,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-0",
+      "repeat": 1,
+      "scored": {
+        "completed_count": {
+          "chosen": "0",
+          "expected": "0",
+          "correct": true,
+          "top_probability": 0.999999999838737
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            46.46965026855469,
+            21.384571075439453,
+            20.597562789916992,
+            22.050273895263672,
+            23.60831069946289
+          ],
+          "probabilities": [
+            0.999999999838737,
+            1.2755236876047825e-11,
+            5.806242530552044e-12,
+            2.4819874974524143e-11,
+            1.178816961646535e-10
+          ],
+          "label_mass": 0.9999999850259071
+        }
+      },
+      "state_sha256": "3616fb331214ba2058e5f6f014074a16bd41c7b1ff04349cca15506544f1cb8b",
+      "metrics": {
+        "latency_ms": 1169.2775409901515,
+        "prefill_ms": 0.000292027834802866,
+        "branch_ms": 1164.088791992981,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": true,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-1",
+      "repeat": 0,
+      "scored": {
+        "completed_count": {
+          "chosen": "1",
+          "expected": "1",
+          "correct": true,
+          "top_probability": 0.9999999997148199
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            25.934900283813477,
+            51.088191986083984,
+            28.54974365234375,
+            27.84050941467285,
+            26.870052337646484
+          ],
+          "probabilities": [
+            1.1914181501240573e-11,
+            0.9999999997148199,
+            1.6280819365907305e-10,
+            8.010502163905155e-11,
+            3.03525783329187e-11
+          ],
+          "label_mass": 0.9999998143654732
+        }
+      },
+      "state_sha256": "3d7bb250ecc2bb45340c60083da03bfa6d4430384187ca9a6251bdb546490bfa",
+      "metrics": {
+        "latency_ms": 2603.5347909783013,
+        "prefill_ms": 1422.7312910370529,
+        "branch_ms": 1175.6416659918614,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": false,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-1",
+      "repeat": 1,
+      "scored": {
+        "completed_count": {
+          "chosen": "1",
+          "expected": "1",
+          "correct": true,
+          "top_probability": 0.9999999997148199
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            25.934900283813477,
+            51.088191986083984,
+            28.54974365234375,
+            27.84050941467285,
+            26.870052337646484
+          ],
+          "probabilities": [
+            1.1914181501240573e-11,
+            0.9999999997148199,
+            1.6280819365907305e-10,
+            8.010502163905155e-11,
+            3.03525783329187e-11
+          ],
+          "label_mass": 0.9999998143654732
+        }
+      },
+      "state_sha256": "3d7bb250ecc2bb45340c60083da03bfa6d4430384187ca9a6251bdb546490bfa",
+      "metrics": {
+        "latency_ms": 1159.5799999777228,
+        "prefill_ms": 0.0003750319592654705,
+        "branch_ms": 1156.9003330077976,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": true,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-2",
+      "repeat": 0,
+      "scored": {
+        "completed_count": {
+          "chosen": "2",
+          "expected": "2",
+          "correct": true,
+          "top_probability": 0.9999999998716604
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            22.857158660888672,
+            27.98265838623047,
+            50.77793502807617,
+            23.490158081054688,
+            21.758188247680664
+          ],
+          "probabilities": [
+            7.484467264616974e-13,
+            1.2593230163567835e-10,
+            0.9999999998716604,
+            1.409512878951674e-12,
+            2.4939291243725163e-13
+          ],
+          "label_mass": 0.9999838425798303
+        }
+      },
+      "state_sha256": "043ec96689dbef4f0438f2be82c03d625110e3d80bd4885ae057fe7d3b67bb01",
+      "metrics": {
+        "latency_ms": 2606.106874998659,
+        "prefill_ms": 1431.612459011376,
+        "branch_ms": 1172.0916249905713,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": false,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-2",
+      "repeat": 1,
+      "scored": {
+        "completed_count": {
+          "chosen": "2",
+          "expected": "2",
+          "correct": true,
+          "top_probability": 0.9999999998716604
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            22.857158660888672,
+            27.98265838623047,
+            50.77793502807617,
+            23.490158081054688,
+            21.758188247680664
+          ],
+          "probabilities": [
+            7.484467264616974e-13,
+            1.2593230163567835e-10,
+            0.9999999998716604,
+            1.409512878951674e-12,
+            2.4939291243725163e-13
+          ],
+          "label_mass": 0.9999838425798303
+        }
+      },
+      "state_sha256": "043ec96689dbef4f0438f2be82c03d625110e3d80bd4885ae057fe7d3b67bb01",
+      "metrics": {
+        "latency_ms": 1180.637416022364,
+        "prefill_ms": 0.00041601015254855156,
+        "branch_ms": 1177.672750025522,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": true,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-3",
+      "repeat": 0,
+      "scored": {
+        "completed_count": {
+          "chosen": "3",
+          "expected": "3",
+          "correct": true,
+          "top_probability": 0.9999999990424924
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            25.62568473815918,
+            29.72265625,
+            32.88176727294922,
+            53.90624237060547,
+            31.499046325683594
+          ],
+          "probabilities": [
+            5.22287791936235e-13,
+            3.141969716098645e-11,
+            7.39922919041054e-10,
+            0.9999999990424924,
+            1.856429249067699e-10
+          ],
+          "label_mass": 0.9999957828807503
+        }
+      },
+      "state_sha256": "fa94e3e36309483bdc11fa38e9393d1742ebe10c62d1b1d48700854f24263a9b",
+      "metrics": {
+        "latency_ms": 2615.9551249584183,
+        "prefill_ms": 1418.5947920195758,
+        "branch_ms": 1193.75645800028,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": false,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-3",
+      "repeat": 1,
+      "scored": {
+        "completed_count": {
+          "chosen": "3",
+          "expected": "3",
+          "correct": true,
+          "top_probability": 0.9999999990424924
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            25.62568473815918,
+            29.72265625,
+            32.88176727294922,
+            53.90624237060547,
+            31.499046325683594
+          ],
+          "probabilities": [
+            5.22287791936235e-13,
+            3.141969716098645e-11,
+            7.39922919041054e-10,
+            0.9999999990424924,
+            1.856429249067699e-10
+          ],
+          "label_mass": 0.9999957828807503
+        }
+      },
+      "state_sha256": "fa94e3e36309483bdc11fa38e9393d1742ebe10c62d1b1d48700854f24263a9b",
+      "metrics": {
+        "latency_ms": 1195.8310839836486,
+        "prefill_ms": 0.00012497184798121452,
+        "branch_ms": 1191.5264169801958,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": true,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-4",
+      "repeat": 0,
+      "scored": {
+        "completed_count": {
+          "chosen": "4",
+          "expected": "4",
+          "correct": true,
+          "top_probability": 0.9999999999937756
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            24.611957550048828,
+            23.02596092224121,
+            23.6666316986084,
+            23.17770767211914,
+            51.01968765258789
+          ],
+          "probabilities": [
+            3.398353376847239e-12,
+            6.957912342554462e-13,
+            1.3204401948367884e-12,
+            8.098073779899389e-13,
+            0.9999999999937756
+          ],
+          "label_mass": 0.9999974298152654
+        }
+      },
+      "state_sha256": "331017951286f00fd7c3efb927b3162dca55d2cd73b9ae51f3900707d08253f6",
+      "metrics": {
+        "latency_ms": 2595.8913330105133,
+        "prefill_ms": 1410.75283405371,
+        "branch_ms": 1181.5256249974482,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": false,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-count-jobs-4",
+      "repeat": 1,
+      "scored": {
+        "completed_count": {
+          "chosen": "4",
+          "expected": "4",
+          "correct": true,
+          "top_probability": 0.9999999999937756
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "completed_count": {
+          "outcomes": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "logits": [
+            24.611957550048828,
+            23.02596092224121,
+            23.6666316986084,
+            23.17770767211914,
+            51.01968765258789
+          ],
+          "probabilities": [
+            3.398353376847239e-12,
+            6.957912342554462e-13,
+            1.3204401948367884e-12,
+            8.098073779899389e-13,
+            0.9999999999937756
+          ],
+          "label_mass": 0.9999974298152654
+        }
+      },
+      "state_sha256": "331017951286f00fd7c3efb927b3162dca55d2cd73b9ae51f3900707d08253f6",
+      "metrics": {
+        "latency_ms": 1180.341875005979,
+        "prefill_ms": 0.00029103830456733704,
+        "branch_ms": 1178.1745420303196,
+        "prefix_tokens": 133,
+        "prefix_cache_hit": true,
+        "branch_tokens": 127,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-door-a",
+      "repeat": 0,
+      "scored": {
+        "enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999997747487909
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            42.3487434387207,
+            27.042694091796875
+          ],
+          "probabilities": [
+            0.9999997747487909,
+            2.2525120920896917e-07
+          ],
+          "label_mass": 0.9999999899014114
+        }
+      },
+      "state_sha256": "9bb9552a4575e4a32caaaae57d2b492b06e906f3da2c989d227964ebdc83df30",
+      "metrics": {
+        "latency_ms": 2038.6409579659812,
+        "prefill_ms": 1162.8688750206493,
+        "branch_ms": 873.0151249910705,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": false,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-door-a",
+      "repeat": 1,
+      "scored": {
+        "enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999997747487909
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            42.3487434387207,
+            27.042694091796875
+          ],
+          "probabilities": [
+            0.9999997747487909,
+            2.2525120920896917e-07
+          ],
+          "label_mass": 0.9999999899014114
+        }
+      },
+      "state_sha256": "9bb9552a4575e4a32caaaae57d2b492b06e906f3da2c989d227964ebdc83df30",
+      "metrics": {
+        "latency_ms": 885.9408749849536,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 882.206792011857,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": true,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-door-b",
+      "repeat": 0,
+      "scored": {
+        "enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999935800192568
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            30.853984832763672,
+            42.81007385253906
+          ],
+          "probabilities": [
+            6.419980743146833e-06,
+            0.9999935800192568
+          ],
+          "label_mass": 0.9999998966727132
+        }
+      },
+      "state_sha256": "b8e073436389509f2a27888f937da3d320c8e8278dc173c49814d5482adfad4b",
+      "metrics": {
+        "latency_ms": 2029.6171249938197,
+        "prefill_ms": 1149.081333016511,
+        "branch_ms": 877.7727500419132,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": false,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-door-b",
+      "repeat": 1,
+      "scored": {
+        "enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999935800192568
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            30.853984832763672,
+            42.81007385253906
+          ],
+          "probabilities": [
+            6.419980743146833e-06,
+            0.9999935800192568
+          ],
+          "label_mass": 0.9999998966727132
+        }
+      },
+      "state_sha256": "b8e073436389509f2a27888f937da3d320c8e8278dc173c49814d5482adfad4b",
+      "metrics": {
+        "latency_ms": 885.0702920462936,
+        "prefill_ms": 0.00029098009690642357,
+        "branch_ms": 882.3058750131167,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": true,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-badge-a",
+      "repeat": 0,
+      "scored": {
+        "enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999959936029766
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            28.61073112487793,
+            41.03834533691406
+          ],
+          "probabilities": [
+            4.006397023404177e-06,
+            0.9999959936029766
+          ],
+          "label_mass": 0.9999967932659185
+        }
+      },
+      "state_sha256": "3d1dcb6def259a7ba82a994e7fad37bc8a3f4fc50cf2df7005541f7cd80c33e5",
+      "metrics": {
+        "latency_ms": 2005.8845419553109,
+        "prefill_ms": 1148.2762499945238,
+        "branch_ms": 855.1757920067757,
+        "prefix_tokens": 109,
+        "prefix_cache_hit": false,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-badge-a",
+      "repeat": 1,
+      "scored": {
+        "enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999959936029766
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            28.61073112487793,
+            41.03834533691406
+          ],
+          "probabilities": [
+            4.006397023404177e-06,
+            0.9999959936029766
+          ],
+          "label_mass": 0.9999967932659185
+        }
+      },
+      "state_sha256": "3d1dcb6def259a7ba82a994e7fad37bc8a3f4fc50cf2df7005541f7cd80c33e5",
+      "metrics": {
+        "latency_ms": 850.1776669872925,
+        "prefill_ms": 0.000292027834802866,
+        "branch_ms": 845.2024579746649,
+        "prefix_tokens": 109,
+        "prefix_cache_hit": true,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-badge-b",
+      "repeat": 0,
+      "scored": {
+        "enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999822582355176
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            38.45940399169922,
+            27.519832611083984
+          ],
+          "probabilities": [
+            0.9999822582355176,
+            1.7741764482346342e-05
+          ],
+          "label_mass": 0.999996981491731
+        }
+      },
+      "state_sha256": "3b6b652493f66fed8f32c8e4010693fbecb4ca096e882d109ff74b3844c4fe02",
+      "metrics": {
+        "latency_ms": 1998.254458012525,
+        "prefill_ms": 1138.8856249977835,
+        "branch_ms": 856.8776670144871,
+        "prefix_tokens": 109,
+        "prefix_cache_hit": false,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-badge-b",
+      "repeat": 1,
+      "scored": {
+        "enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999822582355176
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            38.45940399169922,
+            27.519832611083984
+          ],
+          "probabilities": [
+            0.9999822582355176,
+            1.7741764482346342e-05
+          ],
+          "label_mass": 0.999996981491731
+        }
+      },
+      "state_sha256": "3b6b652493f66fed8f32c8e4010693fbecb4ca096e882d109ff74b3844c4fe02",
+      "metrics": {
+        "latency_ms": 860.7714159879833,
+        "prefill_ms": 0.0004169996827840805,
+        "branch_ms": 857.6471249689348,
+        "prefix_tokens": 109,
+        "prefix_cache_hit": true,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-sensor-a",
+      "repeat": 0,
+      "scored": {
+        "enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999996193145305
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.80726623535156,
+            27.02597427368164
+          ],
+          "probabilities": [
+            0.9999996193145305,
+            3.8068546941609935e-07
+          ],
+          "label_mass": 0.9999999064674131
+        }
+      },
+      "state_sha256": "61d001ae667e21b22938261350cd804f613fcd0cb5dbc0f705d0cdc9a732f444",
+      "metrics": {
+        "latency_ms": 2029.7525829519145,
+        "prefill_ms": 1164.127541007474,
+        "branch_ms": 861.7644170299172,
+        "prefix_tokens": 125,
+        "prefix_cache_hit": false,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-sensor-a",
+      "repeat": 1,
+      "scored": {
+        "enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999996193145305
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.80726623535156,
+            27.02597427368164
+          ],
+          "probabilities": [
+            0.9999996193145305,
+            3.8068546941609935e-07
+          ],
+          "label_mass": 0.9999999064674131
+        }
+      },
+      "state_sha256": "61d001ae667e21b22938261350cd804f613fcd0cb5dbc0f705d0cdc9a732f444",
+      "metrics": {
+        "latency_ms": 843.5519579797983,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 840.7087079831399,
+        "prefix_tokens": 125,
+        "prefix_cache_hit": true,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-sensor-b",
+      "repeat": 0,
+      "scored": {
+        "enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999161142629706
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            32.787811279296875,
+            42.17378234863281
+          ],
+          "probabilities": [
+            8.388573702945894e-05,
+            0.9999161142629706
+          ],
+          "label_mass": 0.9999980276558614
+        }
+      },
+      "state_sha256": "ec02f24ab1e232bcb95af6b259f1da972283fada5a54a15ea104cc718231be64",
+      "metrics": {
+        "latency_ms": 2021.6137089882977,
+        "prefill_ms": 1127.943207975477,
+        "branch_ms": 891.1685000057332,
+        "prefix_tokens": 125,
+        "prefix_cache_hit": false,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "fresh-injection-sensor-b",
+      "repeat": 1,
+      "scored": {
+        "enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999161142629706
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            32.787811279296875,
+            42.17378234863281
+          ],
+          "probabilities": [
+            8.388573702945894e-05,
+            0.9999161142629706
+          ],
+          "label_mass": 0.9999980276558614
+        }
+      },
+      "state_sha256": "ec02f24ab1e232bcb95af6b259f1da972283fada5a54a15ea104cc718231be64",
+      "metrics": {
+        "latency_ms": 885.0944999721833,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 882.4389579822309,
+        "prefix_tokens": 125,
+        "prefix_cache_hit": true,
+        "branch_tokens": 84,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    }
+  ],
+  "summary": {
+    "correct": 90,
+    "total": 94,
+    "errors": 0,
+    "confident_wrong": 4,
+    "generated_tokens": 0
+  }
+}

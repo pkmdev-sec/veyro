@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "baseline": {
+    "schema_version": 1,
+    "timestamp": "2026-09-20T04:00:59.103383+00:00",
+    "platform": "Darwin",
+    "python": "3.12.12",
+    "result": {
+      "kind": "synthetic_completion_decisions",
+      "samples": 30,
+      "measurement": "cold Python hook process + real Python verifier + state/journal IO",
+      "p50_ms": 91.1362090264447,
+      "p95_ms": 129.17983304942027,
+      "max_ms": 133.45174997812137,
+      "subsecond_p95": true,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "false_completions": 0,
+      "cases": [
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 88.236165989656
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 86.57966699684039
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 89.1837080125697
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 110.59104203013703
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 100.29966698493809
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 103.08533301576972
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 83.71204196009785
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 80.85374999791384
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 81.34716603672132
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 81.54733298579231
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 80.68224997259676
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 120.56916597066447
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 84.7494580084458
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 128.29979095840827
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 93.71420898241922
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 85.72100003948435
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 118.72612498700619
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 125.2404170227237
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 127.6685000048019
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 133.45174997812137
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 85.47262503998354
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 86.04362502228469
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 117.39425000268966
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 123.70862503303215
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 129.17983304942027
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 91.1362090264447
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 88.81474996451288
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 122.35983298160136
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 122.31399997835979
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 88.56195799307898
+        }
+      ],
+      "limits": "Synthetic exit-code labels, not general coding-task or semantic-judge accuracy."
+    }
+  },
+  "live_attempts": [
+    {
+      "schema_version": 1,
+      "timestamp": "2026-09-20T03:51:40.441531+00:00",
+      "platform": "Darwin",
+      "python": "3.12.12",
+      "result": {
+        "kind": "live_native_tui",
+        "agent": "prime-agent",
+        "version": null,
+        "model": "litellm/claude-haiku-4-5",
+        "phase": "completed",
+        "elapsed_seconds": 53.494855124969035,
+        "assertions_passed": 8,
+        "assertions_total": 8,
+        "accuracy": 1.0,
+        "verifier_unchanged": true,
+        "transitions": [
+          "plan_ready",
+          "checks_passed"
+        ],
+        "checkpoint_latency_ms": [
+          0.40075002470985055,
+          76.59050001529977
+        ],
+        "human_task_inputs": 0,
+        "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout.",
+        "version_note": "Initial benchmark read stdout only; corrected to read stderr too."
+      }
+    },
+    {
+      "schema_version": 1,
+      "timestamp": "2026-09-20T03:51:30.453449+00:00",
+      "platform": "Darwin",
+      "python": "3.12.12",
+      "result": {
+        "kind": "live_native_tui",
+        "agent": "opencode",
+        "version": "1.18.30",
+        "model": "litellm/claude-haiku-4-5",
+        "phase": "completed",
+        "elapsed_seconds": 56.70506474998547,
+        "assertions_passed": 8,
+        "assertions_total": 8,
+        "accuracy": 1.0,
+        "verifier_unchanged": true,
+        "transitions": [
+          "plan_ready",
+          "checks_passed"
+        ],
+        "checkpoint_latency_ms": [
+          0.547291012480855,
+          82.58841698989272
+        ],
+        "human_task_inputs": 0,
+        "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout."
+      }
+    },
+    {
+      "schema_version": 1,
+      "timestamp": "2026-09-20T03:57:15.981147+00:00",
+      "platform": "Darwin",
+      "python": "3.12.12",
+      "result": {
+        "kind": "live_native_tui",
+        "agent": "prime-agent",
+        "version": "0.9.5",
+        "model": "litellm/claude-haiku-4-5",
+        "phase": "planning",
+        "elapsed_seconds": 17.1277314160252,
+        "assertions_passed": 2,
+        "assertions_total": 8,
+        "accuracy": 0.25,
+        "verifier_unchanged": true,
+        "transitions": [],
+        "checkpoint_latency_ms": [],
+        "human_task_inputs": 0,
+        "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout.",
+        "adapter_error": {
+          "reason": "native_error"
+        },
+        "provider_error": "HTTP 503: authentication database temporarily unreachable"
+      }
+    },
+    {
+      "schema_version": 1,
+      "timestamp": "2026-09-20T03:57:15.966065+00:00",
+      "platform": "Darwin",
+      "python": "3.12.12",
+      "result": {
+        "kind": "live_native_tui",
+        "agent": "opencode",
+        "version": "1.18.31",
+        "model": "litellm/claude-haiku-4-5",
+        "phase": "completed",
+        "elapsed_seconds": 59.92357537499629,
+        "assertions_passed": 8,
+        "assertions_total": 8,
+        "accuracy": 1.0,
+        "verifier_unchanged": true,
+        "transitions": [
+          "plan_ready",
+          "checks_passed"
+        ],
+        "checkpoint_latency_ms": [
+          0.7714590174145997,
+          42.87483298685402
+        ],
+        "human_task_inputs": 0,
+        "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout."
+      }
+    },
+    {
+      "schema_version": 1,
+      "timestamp": "2026-09-20T03:59:49.203896+00:00",
+      "platform": "Darwin",
+      "python": "3.12.12",
+      "result": {
+        "kind": "live_native_tui",
+        "agent": "prime-agent",
+        "version": "0.9.5",
+        "model": "litellm/claude-haiku-4-5",
+        "phase": "completed",
+        "adapter_error": null,
+        "elapsed_seconds": 69.81580008298624,
+        "assertions_passed": 8,
+        "assertions_total": 8,
+        "accuracy": 1.0,
+        "verifier_unchanged": true,
+        "transitions": [
+          "plan_ready",
+          "checks_passed"
+        ],
+        "checkpoint_latency_ms": [
+          0.5216659628786147,
+          79.12179199047387
+        ],
+        "human_task_inputs": 0,
+        "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout."
+      }
+    }
+  ],
+  "live_summary": {
+    "tasks_completed": 4,
+    "attempts": 5,
+    "provider_error_attempts": 1,
+    "latest_successful_fixture_accuracy": {
+      "prime-agent": "8/8",
+      "opencode": "8/8"
+    },
+    "limits": "One task template, not general software-task accuracy. Failed attempts retained."
+  },
+  "model_selection_probes": [
+    {
+      "provider": "openai-codex",
+      "model": "gpt-5.4-mini",
+      "result": "Rejected by provider: not supported with ChatGPT account"
+    },
+    {
+      "provider": "openai-codex",
+      "model": "gpt-5.4",
+      "result": "Rejected by provider: not supported with ChatGPT account"
+    }
+  ],
+  "verification": {
+    "full_suite_passed": 558,
+    "full_suite_failed": 1,
+    "preexisting_failure": "tests/test_integration.py::test_noisy_events_are_coalesced",
+    "build": "uv build --offline succeeded; native .mjs files verified in wheel"
+  },
+  "privacy": "Raw terminal output, task paths, session IDs, and credentials omitted."
+}

@@ -1,8 +1,12 @@
-# Release scope and checks
+# Qualified-supervision release scope and checks
+
+> Historical record: this page describes commit `c1a21d4`, the qualified-supervision
+> subset merged in PR #1. The current tree also contains the autonomous task and local
+> evaluation implementation. Those additions remain unqualified while G4 and G6 are open.
 
 ## Included interfaces
 
-This release candidate covers the existing-session control plane and its documentation:
+That release candidate covered the existing-session control plane and its documentation:
 
 - `sessions` and `attach` read native session metadata. They do not call a model or deliver controls.
 - `supervise` reviews one operator proposal. Observe-only is the default. Supported controls
@@ -17,13 +21,13 @@ See the [factory reference](runtime.md) and [capability matrix](supervision-refe
 
 ## Model scope
 
-**Qwen3 14B** is the released localjev assessor. **Qwen3 4B Instruct** is an unmerged,
-lower-memory development profile, not an alternate assessor in this release. The
+In the scoped release, **Qwen3 14B** was the localjev assessor. **Qwen3 4B Instruct**
+was not included and was not an alternate assessor in that release. The
 [model comparison](qwen-models.md) explains their roles and the separate readout path.
 
 ## Excluded additions
 
-The following development additions are not in this release tree or its packages:
+The following development additions were not in that release tree or its packages:
 
 | Addition | Reason for exclusion |
 | --- | --- |
@@ -37,8 +41,7 @@ preserved separately. No unattended completion or calibrated-accuracy claim is m
 
 ## Verification
 
-Run the checks from a checkout of this release branch, not a directory containing the
-excluded additions:
+To reproduce that release, check out commit `c1a21d4` and run:
 
 ```sh
 .venv/bin/python -m pytest -q

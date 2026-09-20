@@ -1,7 +1,8 @@
 # Veyro documentation
 
-Veyro combines localjev and Qwen3-14B with version-pinned native-agent adapters.
-Start with a synthetic assessment, then connect to a session you own.
+Veyro supports existing-session review, checked native tasks, and experimental local
+evaluation. Start with a synthetic assessment, then choose the interface you need.
+Read the [release gates](../GATES.md) before treating a workflow as production-qualified.
 
 ## Release scope
 
@@ -16,9 +17,13 @@ evaluator/calibration additions are excluded. See [scope and checks](release-sco
 - [Operate existing sessions](supervision-operator-guide.md): discovery, read-only observation, exact approval, and recovery.
 - [Upgrade an installation](upgrading.md): package, configuration, journals, and no-retry ledgers.
 
-## Model variants
+## Native tasks and local evaluation
 
-- [Qwen3 4B Instruct and Qwen3 14B](qwen-models.md): sizes, memory tradeoffs, use cases, and release status.
+- [Native autonomous tasks](native-autonomy.md): plan, build, check, and repair with bounded retries.
+- [Typed completion evaluation](native-judge.md): explicit evidence and rubric checks after executable checks pass.
+- [Qwen3 model roles](qwen-models.md): 4B coding, authoritative checks, and 14B typed evaluation.
+- [Local Qwen harness](local-harness.md): model setup, typed evaluators, corrections, and calibration.
+- [Release gates](../GATES.md): G4 native-task qualification and G6 calibration remain open.
 
 ## Reference
 

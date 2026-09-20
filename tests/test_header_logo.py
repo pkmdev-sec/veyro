@@ -57,9 +57,9 @@ def test_wordmark_has_five_filled_level_outlines_with_open_counters():
             if command in {"M", "L"}:
                 x, y = coordinates
             elif command == "H":
-                x, = coordinates
+                (x,) = coordinates
             elif command == "V":
-                y, = coordinates
+                (y,) = coordinates
             else:
                 continue
             points.append((x, y))

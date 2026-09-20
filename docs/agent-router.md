@@ -86,6 +86,14 @@ persisted-data migration.
 For the version-pinned Codex hook listener, see [Codex hooks bridge](codex-hooks-bridge.md).
 The factory defaults to `exec`; App Server controls require `VEYRO_CODEX_BACKEND=app-server`.
 
+## Native autonomous tasks
+
+`veyro agent prime-agent --autonomous --prompt JOB --check COMMAND` and the same
+command with `opencode` load launch-scoped native hooks. The shared checker drives
+plan, build, verification, and bounded repair without Veyro approval prompts.
+This is different from the observation-only launcher described above.
+See [native autonomy](native-autonomy.md) for the architecture and live benchmarks.
+
 ## Existing-session supervision
 
 The launcher sidecar, legacy `veyro run` workers, and existing-session control

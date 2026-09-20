@@ -1,0 +1,11 @@
+{
+  "rubric_version": "local-native-canary-v1",
+  "criteria": {
+    "docstring_present": "The slug function has a Python docstring.",
+    "implementation_present": "The slug function contains executable normalization logic, not a placeholder or unconditional fixed return."
+  },
+  "evidence_files": [
+    "slug.py"
+  ],
+  "pass_threshold": 0.9
+}

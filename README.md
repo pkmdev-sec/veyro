@@ -3,8 +3,8 @@
 </p>
 
 <h1 align="center">Veyro</h1>
-<p align="center"><strong>Local agent supervision with localjev and Qwen3-14B.</strong></p>
-<p align="center">Keep your coding agent. Run its semantic assessor on your own machine.</p>
+<p align="center"><strong>Native coding agents. Local assessment. Explicit checks.</strong></p>
+<p align="center">Keep your terminal and permissions. Choose observation, checked tasks, or typed evaluation.</p>
 <p align="center">
   <a href="docs/localjev.md">localjev setup</a> ·
   <a href="examples/README.md">Run an assessment</a> ·
@@ -20,37 +20,37 @@ Deterministic policy decides what can happen next. Model scores cannot grant per
 Your agent keeps its native terminal, tools, and permission system. Veyro uses
 structured events, not terminal scraping.
 
-## Release scope
+## Current status
 
-This release covers existing-session observation and explicitly approved controls.
-**Observe-only is the default. No native adapter qualifies for automatic delivery.**
-Model scores do not prove task completion or grant permission.
-
-The native autonomous-task, local GGUF readout, and evaluator/calibration additions
-are not included in this release. Their task-reliability and independent-calibration
-qualification is incomplete. See [release scope and checks](docs/release-scope.md).
+> **Production qualification is incomplete.** [GATES.md](GATES.md) is the release ledger.
+> G4 remains open: native task runs do not pass across both CLIs and both local profiles.
+> G6 remains open: calibration lacks an independent workflow-labelled holdout.
+> Passing unit tests and building a package do not close these gates.
 
 ## How it works
 
-Choose the interface that matches your task:
+Choose the interface that matches your task. Each has a different control and privacy boundary.
 
-| Goal | Commands | What Veyro does |
+| Goal | Commands | Boundary |
 | --- | --- | --- |
-| Open a native terminal | `agents`, `agent` | Lists installed agents or launches one with a lifecycle sidecar |
-| Inspect an existing session | `sessions`, `attach` | Reads metadata without a model call or control |
-| Review one proposed action | `supervise` | Checks policy, gets local assessment, and requires exact approval for supported controls |
-| Run separate worker orchestration | `run`, `demo`, `runs`, `inspect` | Uses the factory runtime and its own content-bearing logs |
+| Keep a native terminal | `agents`, `agent` | Launch an installed agent with lifecycle observation |
+| Inspect an existing session | `sessions`, `attach` | Read-only metadata; no model call or control |
+| Review one proposed action | `supervise` | Policy, localjev assessment, then exact approval for supported controls |
+| Run a checked task | `agent --autonomous` | Prime Agent or OpenCode; bounded repair loop; native permissions remain |
+| Score typed questions locally | `local`, `evaluator` | Experimental GGUF readout, corrections, and temperature calibration |
+| Run the separate worker harness | `run`, `demo`, `runs`, `inspect` | Factory state, worker events, and its own content-bearing logs |
 
-The diagram shows the existing-session review path. The factory runtime is separate.
+### Existing-session review
+
+The diagram shows `supervise`, not the autonomous task loop. Observation is read-only.
+For an approved control, Veyro checks policy, requests local assessment, binds human
+approval to the exact request, records a dispatch claim, and rechecks freshness.
 
 <p align="center">
-  <img src="docs/assets/veyro-supervision.gif" width="1120" alt="Existing-session supervision uses Qwen3 14B through localjev, policy checks, and exact human approval. The model key also shows Qwen3 4B Instruct as experimental and not shipped; it is not connected to the active control path.">
+  <img src="docs/assets/veyro-supervision.gif" width="1120" alt="Existing-session supervision uses Qwen3 14B through localjev, policy checks, and exact human approval. The model key also shows the separate Qwen3 4B coding and Qwen3 14B typed-evaluation task path.">
 </p>
 
 [Open the still diagram](docs/assets/veyro-supervision.png) if you prefer no animation.
-
-Observation is read-only. An approved control passes policy and local assessment, then
-requires human approval for the exact request, a durable dispatch claim, and a freshness check.
 
 ## Qwen3-14B is the assessor
 
@@ -73,13 +73,13 @@ records configuration; it does not attest the weights used for each response.
 
 | Variant | Size and format | Role | Availability |
 | --- | --- | --- | --- |
-| **Qwen3 14B** (`qwen3:14b`) | 14.8B parameters, Q4_K_M | Current localjev assessor for existing-session review; higher weight-memory needs | Included in `main` |
-| **Qwen3 4B Instruct** (`qwen3:4b-instruct-2507-q4_K_M`) | 4.0B parameters, Q4_K_M | Lower-memory local coding and evaluator experiments | Unmerged development work; not shipped |
+| **Qwen3 14B** (`qwen3:14b`) | 14.8B parameters, Q4_K_M | Existing-session localjev assessment and typed evaluation after checks | Included; G6 calibration remains open |
+| **Qwen3 4B Instruct** (`qwen3:4b-instruct-2507-q4_K_M`) | 4.0B parameters, Q4_K_M | Lower-memory local coding through Prime Agent or OpenCode | Included; G4 native-task qualification remains open |
 
-The sizes are not interchangeable settings in this release. Existing-session supervision
-stays pinned to **14B**. The experimental **4B** profile is intended for smaller-memory
-setups, not as a proven quality upgrade. Neither size establishes reliable autonomous
-completion or calibrated probabilities. See [model variants and limits](docs/qwen-models.md).
+The sizes have distinct roles. Existing-session supervision stays pinned to **14B**.
+The autonomous task path uses **4B** for coding and **14B** for typed evaluation.
+This split does not establish reliable autonomous completion or calibrated probabilities.
+See [model roles and limits](docs/qwen-models.md).
 
 For existing-session supervision, there is one authoritative assessor. No cloud fallback, alternate-model routing,
 or shadow voting participates in the existing-session control plane. Native coding
@@ -111,16 +111,103 @@ The response includes seven named scores, configured model provenance, and
 `controls_enabled: false`. A failed test does not become a completion claim just
 because the native agent stopped talking. See the [example walkthrough](examples/README.md).
 
-## Keep your native terminal
+## Native autonomous work
+
+Use an explicit task and completion checks to plan, build, verify, and repair
+inside the native Prime Agent or OpenCode terminal without Veyro approval prompts:
 
 ```sh
-veyro agents --json
-veyro agent prime-agent --repo . --prompt "Inspect the failing tests"
+veyro agent prime-agent --repo . --autonomous \
+  --prompt "Fix the failing tests" --check '.venv/bin/python -m pytest -q'
+# Replace prime-agent with opencode for the same workflow.
 ```
 
-The agent must already be installed and configured. Veyro keeps its native terminal,
-tools, and permission system. The launch sidecar records lifecycle observations; it
-does not add an autonomous completion loop. See the [native launcher guide](docs/agent-router.md).
+This opt-in path keeps native permission denials and does not change global agent
+configuration. See [native autonomy](docs/native-autonomy.md) for the shared
+architecture, limits, privacy, and repeatable latency/accuracy benchmarks.
+Add `--evaluator rubric.json` for a [typed completion evaluation](docs/native-judge.md)
+after executable checks pass. Model errors never count as completion. For the local
+pair, Qwen3 4B codes and Qwen3 14B evaluates typed criteria; see the
+[model-role guide](docs/qwen-models.md).
+Existing-session supervision below retains its separate approval policy.
+
+<p align="center">
+  <img src="docs/assets/veyro-task-readout.png" width="1120" alt="Qwen3 4B plans and edits through a native agent. Executable checks run before Qwen3 14B typed evaluation. Failed checks or criteria return to the 4B model for bounded repair. Errors and limits do not count as completion.">
+</p>
+
+The local task loop is **4B plan/build → executable checks → 14B typed evaluation → completed**.
+Failed checks or rejected criteria return to the 4B coding model while the repair budget
+permits. The 14B evaluator runs only after checks pass. Exhausted budgets and evaluator
+errors do not count as completion. A successful check
+only proves what that check actually tests.
+
+Checks run as shell commands with your account's permissions. They are not sandboxed.
+Use a disposable checkout for untrusted work. Autonomy logs can contain plans, source
+text, and check output; they are not metadata-only supervision logs.
+
+
+## Experimental local Qwen readout
+
+This path runs inside Veyro. It does **not** use the separate localjev service.
+Install the optional `[local]` runtime using the [local harness guide](docs/local-harness.md).
+It requires compatible GGUF weights and may require a C/C++ build toolchain.
+
+| Path | Model access | Default loopback port | Output |
+| --- | --- | --- | --- |
+| Existing-session assessor | localjev → Ollama → Qwen3-14B | localjev `8080`; Ollama `11434` | Model-generated estimates |
+| `small` readout worker | `llama-cpp-python` → installed GGUF | `8081` | Finite-label token scores |
+| `14b` readout worker | `llama-cpp-python` → installed GGUF | `8082` | Finite-label token scores |
+
+The pinned profiles select `qwen3:4b-instruct-2507-q4_K_M` for coding and `qwen3:14b`
+for typed evaluation. [Their roles are separate](docs/qwen-models.md). Veyro checks model
+manifests and reuses installed weights; it does not download them.
+Ollama supplies inventory and local coding. Each readout worker loads GGUF weights
+separately, so running coding and both readout profiles can use substantial memory.
+
+```sh
+veyro local models
+veyro local start small
+veyro local status small
+# Wait for ready before evaluating. Loading is not ready.
+veyro evaluator preview examples/evaluator-definition.json examples/evaluator-case.json
+veyro evaluator run examples/evaluator-definition.json examples/evaluator-case.json --profile small
+veyro local stop small
+```
+
+Start the `14b` readout worker, then pass `--coding-profile small` and
+`--evaluation-profile 14b` to `agent --autonomous`. The two flags must be supplied
+together with `--evaluator rubric.json`. Matching calibration artifacts are required
+unless you explicitly choose `--allow-uncalibrated-evaluator`. That flag enables a
+raw-score experiment; it does not establish accuracy.
+
+```sh
+veyro local start 14b
+veyro local warm small
+veyro agent prime-agent --repo . --autonomous \
+  --coding-profile small --evaluation-profile 14b \
+  --prompt 'Implement the requested change' \
+  --check '.venv/bin/python -m pytest -q' --evaluator rubric.json
+```
+
+### Typed evaluators and calibration
+
+Evaluators map input, output, and optional reference data into named questions:
+
+| Question | Result |
+| --- | --- |
+| Noul | Boolean feedback and P(yes) |
+| Choice | A selected label from a fixed set |
+| Score | Expected value over ordered outcomes |
+
+Use `evaluator correct` to record reviewed examples. `preview` shows the rendered
+questions without inference. `run` scores them through the selected readout worker.
+`calibrate` fits a scalar temperature using training predictions; `validate-calibration`
+measures separate held-out predictions. Neither command trains new model weights.
+
+Choice confidence is not a probability of correctness. Score confidence is unavailable.
+The recorded 14B development calibration made one criterion worse. Do not present
+these scores as validated production probabilities. See the [workflow and limits](docs/local-harness.md)
+and [G6 evidence](GATES.md).
 
 ## From observation to an approved action
 
@@ -163,10 +250,14 @@ promise that any installed release will work.
 | [`config/baselines/localjev-qwen3-14b.json`](config/baselines/localjev-qwen3-14b.json) | Exact model identity and recorded deployment settings |
 | [`src/veyro/bridges/`](src/veyro/bridges/) | Native provider adapters |
 | [`src/veyro/supervision/`](src/veyro/supervision/) | State reduction, checkpoints, authorization, delivery |
-| [`src/veyro/native_session.py`](src/veyro/native_session.py) | Native launch and lifecycle sidecar |
+| [`src/veyro/autonomy_check.py`](src/veyro/autonomy_check.py) | Native task state machine, executable checks, and repair limits |
+| [`src/veyro/native_judge.py`](src/veyro/native_judge.py) | Optional rubric and evidence checks after executable verification |
+| [`src/veyro/readout.py`](src/veyro/readout.py), [`local_server.py`](src/veyro/local_server.py) | Numeric scoring engine and persistent loopback service |
+| [`src/veyro/evaluators.py`](src/veyro/evaluators.py), [`local_evaluation.py`](src/veyro/local_evaluation.py) | Typed questions, correction examples, and calibration |
+| [`config/model-profiles.json`](config/model-profiles.json) | Exact small and 14B profile identities |
 | [`src/veyro/runtime.py`](src/veyro/runtime.py) | Separate factory worker lifecycle |
+| [`GATES.md`](GATES.md) | Qualification status and recorded limits |
 | [`docs/`](docs/README.md) | Deployment, operation, architecture, and verification |
-| [`docs/release-scope.md`](docs/release-scope.md) | Included interfaces and excluded experimental additions |
 | [`tests/`](tests/) | Contract, privacy, replay, approval, and packaging checks |
 
 The CLI/import package is `veyro`; the distribution is `veyro-factory`.
@@ -191,8 +282,9 @@ uv build --offline --out-dir dist
 [Verification procedures and evidence](docs/supervision-verification.md) cover
 native observation, one approved disposable Prime stop, and Codex hook delivery.
 They do not establish general task accuracy or automatic control safety.
-The build command needs cached build dependencies with `--offline`; omit that flag if
-they need to be downloaded. Use your build's artifact filenames for a different version.
-Read the [release scope](docs/release-scope.md) before enabling controls.
+Timing-sensitive historical failures are recorded in that guide; use the current test run
+as the result for your checkout. The build command needs cached build dependencies with
+`--offline`; omit that flag if they need to be downloaded. Use the artifact filenames
+from your build when checking a different version.
 
 [MIT license](LICENSE) · [Architecture](docs/theory.md) · [Evidence limits](docs/what-veyro-proves.md)

@@ -197,7 +197,7 @@ def test_agents_json_is_a_language_neutral_discovery_document(monkeypatch) -> No
 def test_agent_command_passes_native_arguments_to_launcher(monkeypatch, tmp_path) -> None:
     calls = {}
 
-    def launch(provider, repository, prompt, native_args, *, on_started):
+    def launch(provider, repository, prompt, native_args, *, on_started, autonomy):
         calls.update(
             provider=provider,
             repository=repository,
@@ -214,6 +214,7 @@ def test_agent_command_passes_native_arguments_to_launcher(monkeypatch, tmp_path
             session_id = "session-1"
             record_path = tmp_path / ".veyro/native-sessions/session-1/session.json"
             exit_code = 0
+            autonomy_directory = None
 
         return Result()
 

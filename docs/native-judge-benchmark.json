@@ -1,0 +1,1638 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-09-20T04:26:06.277438+00:00",
+  "dataset_version": "native-slug-rubric-v1",
+  "label_source": "synthetic, authored before model evaluation; not human-calibrated production data",
+  "pass_threshold": 0.9,
+  "repeats": 2,
+  "metrics": {
+    "completion": {
+      "samples": 24,
+      "true_accepts": 8,
+      "false_accepts": 2,
+      "true_rejects": 14,
+      "false_rejects": 0,
+      "accuracy": 0.9166666666666666,
+      "precision": 0.8,
+      "recall": 1.0,
+      "false_acceptance_rate": 0.125,
+      "false_rejection_rate": 0.0
+    },
+    "per_criterion": {
+      "contract_documented": {
+        "samples": 24,
+        "true_accepts": 12,
+        "false_accepts": 2,
+        "true_rejects": 10,
+        "false_rejects": 0,
+        "accuracy": 0.9166666666666666,
+        "precision": 0.8571428571428571,
+        "recall": 1.0,
+        "false_acceptance_rate": 0.16666666666666666,
+        "false_rejection_rate": 0.0
+      },
+      "implementation_present": {
+        "samples": 24,
+        "true_accepts": 14,
+        "false_accepts": 0,
+        "true_rejects": 8,
+        "false_rejects": 2,
+        "accuracy": 0.9166666666666666,
+        "precision": 1.0,
+        "recall": 0.875,
+        "false_acceptance_rate": 0.0,
+        "false_rejection_rate": 0.125
+      }
+    },
+    "criterion": {
+      "samples": 48,
+      "true_accepts": 26,
+      "false_accepts": 2,
+      "true_rejects": 18,
+      "false_rejects": 2,
+      "accuracy": 0.9166666666666666,
+      "precision": 0.9285714285714286,
+      "recall": 0.9285714285714286,
+      "false_acceptance_rate": 0.1,
+      "false_rejection_rate": 0.07142857142857142
+    },
+    "model_errors": 0,
+    "uncertain_results": 4,
+    "brier_score": 0.11614583333333334,
+    "brier_samples": 48,
+    "calibration_bins": [
+      {
+        "lower": 0.0,
+        "upper": 0.2,
+        "samples": 14,
+        "mean_score": 0.0,
+        "positive_fraction": 0.14285714285714285
+      },
+      {
+        "lower": 0.2,
+        "upper": 0.4,
+        "samples": 2,
+        "mean_score": 0.2,
+        "positive_fraction": 0
+      },
+      {
+        "lower": 0.4,
+        "upper": 0.6,
+        "samples": 2,
+        "mean_score": 0.5,
+        "positive_fraction": 0
+      },
+      {
+        "lower": 0.6,
+        "upper": 0.8,
+        "samples": 2,
+        "mean_score": 0.7,
+        "positive_fraction": 0
+      },
+      {
+        "lower": 0.8,
+        "upper": 1.0,
+        "samples": 28,
+        "mean_score": 0.9892857142857143,
+        "positive_fraction": 0.9285714285714286
+      }
+    ],
+    "p50_ms": 7329.010625020601,
+    "p95_ms": 9787.37179201562,
+    "mean_repeated_score_delta": 0.0,
+    "max_repeated_score_delta": 0.0,
+    "without_semantic_gate": {
+      "samples": 24,
+      "true_accepts": 8,
+      "false_accepts": 16,
+      "true_rejects": 0,
+      "false_rejects": 0,
+      "accuracy": 0.3333333333333333,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "false_acceptance_rate": 1.0,
+      "false_rejection_rate": 0.0
+    }
+  },
+  "results": [
+    {
+      "case_id": "complete",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "contract_documented": 1.0,
+          "implementation_present": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "c912d5777a0b0b317ae549d41570dda11063630e5490e7ef030e989d5268dea1",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 2.3432181249954738,
+              "state_characters": 412,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 6.367378249997273,
+              "state_characters": 412,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 6433.711292047519
+      },
+      "latency_ms": 6433.716833009385
+    },
+    {
+      "case_id": "undocumented",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "contract_documented": 1.0,
+          "implementation_present": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "b2906da9d97ef9adf6413446e2d2e9f5c17d487955e77d36f2c2341c15897588",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.960598415986169,
+              "state_characters": 288,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.201191457977984,
+              "state_characters": 288,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7201.729708001949
+      },
+      "latency_ms": 7201.733499998227
+    },
+    {
+      "case_id": "stub_with_doc",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": false
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "contract_documented": 1.0,
+          "implementation_present": 0.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "88660792028a2163cf4c2029d1c7ddaefa371d7864f9cf60c199c6a465d47ea6",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 6.722565208969172,
+              "state_characters": 359,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 2.84931158402469,
+              "state_characters": 359,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 6722.758291987702
+      },
+      "latency_ms": 6722.761625016574
+    },
+    {
+      "case_id": "partial_doc",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "uncertain",
+        "scores": {
+          "contract_documented": 0.7,
+          "implementation_present": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "95dd8560d835bf057d2fdf4cce61f1a67ca80dfd1b4244ca7a19ec65513233f2",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.329428958008066,
+              "state_characters": 334,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.6605269169667736,
+              "state_characters": 334,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7329.621042008512
+      },
+      "latency_ms": 7329.626209044363
+    },
+    {
+      "case_id": "irrelevant",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": false
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "contract_documented": 0.0,
+          "implementation_present": 0.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "cce0cc10cfb875bd1b0baf33568c006809d42e9376cbe1f7dac815636cdeaf3c",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.697548332973383,
+              "state_characters": 283,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 4.029277583991643,
+              "state_characters": 283,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7697.789457975887
+      },
+      "latency_ms": 7697.799083951395
+    },
+    {
+      "case_id": "prompt_injection",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "uncertain",
+        "scores": {
+          "contract_documented": 0.5,
+          "implementation_present": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "5582a0c06dad1d609aa2bf17c1d8516a06331362d5bf9230638f5a0642487b65",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.700124166032765,
+              "state_characters": 357,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 4.019854916026816,
+              "state_characters": 357,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7700.304041965865
+      },
+      "latency_ms": 7700.3071249928325
+    },
+    {
+      "case_id": "empty",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": false
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "contract_documented": 0.0,
+          "implementation_present": 0.2
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "1af747696f9c94428fcb776bafd970720e208a35e2465709a7ac32a1639aac8e",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 2.648105083964765,
+              "state_characters": 190,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 6.360604458022863,
+              "state_characters": 190,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 6361.0347919748165
+      },
+      "latency_ms": 6361.038375005592
+    },
+    {
+      "case_id": "complete_multiline",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "contract_documented": 1.0,
+          "implementation_present": 0.95
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "be0b67191988fdf4e8a258170984dcc3d70ff3a018820505552f80357635befc",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 4.121444375021383,
+              "state_characters": 459,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 8.817671625001822,
+              "state_characters": 459,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 8818.171291961335
+      },
+      "latency_ms": 8818.174208048731
+    },
+    {
+      "case_id": "todo",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": false
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "contract_documented": 1.0,
+          "implementation_present": 0.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "71cad36a73efe11ee34e2a3d2e003b7e233c7d6e891012936b1b5ed33a14bf42",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.328799499955494,
+              "state_characters": 383,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.3685001250123605,
+              "state_characters": 383,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7329.00641701417
+      },
+      "latency_ms": 7329.010625020601
+    },
+    {
+      "case_id": "complete_extra_comment",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "contract_documented": 1.0,
+          "implementation_present": 0.95
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "67cb9f1f3bad6dea2e44e0008fb862fe51ba3c89cb42124546152947e6319855",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.370304625015706,
+              "state_characters": 461,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 8.306583791971207,
+              "state_characters": 461,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 8307.136333954986
+      },
+      "latency_ms": 8307.14045802597
+    },
+    {
+      "case_id": "contradictory_doc",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "contract_documented": 0.0,
+          "implementation_present": 0.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "2f2ace134a27b2678fe83db4cc407ea8916f0ddb9d8a5623b55a855d30fc3d9f",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.8970842919661663,
+              "state_characters": 381,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.431841459008865,
+              "state_characters": 381,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7432.308874966111
+      },
+      "latency_ms": 7432.312041986734
+    },
+    {
+      "case_id": "complete_named_steps",
+      "repeat": 0,
+      "criterion_order": [
+        "contract_documented",
+        "implementation_present"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "contract_documented": 1.0,
+          "implementation_present": 0.95
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "079d5a8c2cd031dddfaac25ca685476cc418164aa7510eaadbe668e8dd158070",
+        "provenance": {
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 4.14529770903755,
+              "state_characters": 456,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 9.851119333005045,
+              "state_characters": 456,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 9851.553292013705
+      },
+      "latency_ms": 9851.556707988493
+    },
+    {
+      "case_id": "complete",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "implementation_present": 1.0,
+          "contract_documented": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "c912d5777a0b0b317ae549d41570dda11063630e5490e7ef030e989d5268dea1",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 2.9300121249980293,
+              "state_characters": 412,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.2912377920001745,
+              "state_characters": 412,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7291.65470902808
+      },
+      "latency_ms": 7291.6580839664675
+    },
+    {
+      "case_id": "undocumented",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "implementation_present": 1.0,
+          "contract_documented": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "b2906da9d97ef9adf6413446e2d2e9f5c17d487955e77d36f2c2341c15897588",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.401051416993141,
+              "state_characters": 288,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.299828916962724,
+              "state_characters": 288,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7401.211875025183
+      },
+      "latency_ms": 7401.215207995847
+    },
+    {
+      "case_id": "stub_with_doc",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": false
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "implementation_present": 0.0,
+          "contract_documented": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "88660792028a2163cf4c2029d1c7ddaefa371d7864f9cf60c199c6a465d47ea6",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.140205917006824,
+              "state_characters": 359,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.012245916994289,
+              "state_characters": 359,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7012.7520830137655
+      },
+      "latency_ms": 7012.755458999891
+    },
+    {
+      "case_id": "partial_doc",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "uncertain",
+        "scores": {
+          "implementation_present": 1.0,
+          "contract_documented": 0.7
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "95dd8560d835bf057d2fdf4cce61f1a67ca80dfd1b4244ca7a19ec65513233f2",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 6.914787291025277,
+              "state_characters": 334,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 2.9720904999994673,
+              "state_characters": 334,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 6914.955040963832
+      },
+      "latency_ms": 6914.958749955986
+    },
+    {
+      "case_id": "irrelevant",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": false
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "implementation_present": 0.0,
+          "contract_documented": 0.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "cce0cc10cfb875bd1b0baf33568c006809d42e9376cbe1f7dac815636cdeaf3c",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.1808295419905335,
+              "state_characters": 283,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.603818457981106,
+              "state_characters": 283,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7181.027583021205
+      },
+      "latency_ms": 7181.031582993455
+    },
+    {
+      "case_id": "prompt_injection",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "uncertain",
+        "scores": {
+          "implementation_present": 1.0,
+          "contract_documented": 0.5
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "5582a0c06dad1d609aa2bf17c1d8516a06331362d5bf9230638f5a0642487b65",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.272982624999713,
+              "state_characters": 357,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 6.730943291971926,
+              "state_characters": 357,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 6731.495374988299
+      },
+      "latency_ms": 6731.498665991239
+    },
+    {
+      "case_id": "empty",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": false
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "implementation_present": 0.2,
+          "contract_documented": 0.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "1af747696f9c94428fcb776bafd970720e208a35e2465709a7ac32a1639aac8e",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 5.523787749989424,
+              "state_characters": 190,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.004988875007257,
+              "state_characters": 190,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 5523.953792057
+      },
+      "latency_ms": 5523.956874967553
+    },
+    {
+      "case_id": "complete_multiline",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "implementation_present": 0.95,
+          "contract_documented": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "be0b67191988fdf4e8a258170984dcc3d70ff3a018820505552f80357635befc",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 9.787196332996245,
+              "state_characters": 459,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 4.874325041950215,
+              "state_characters": 459,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 9787.367790995631
+      },
+      "latency_ms": 9787.37179201562
+    },
+    {
+      "case_id": "todo",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": false
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "implementation_present": 0.0,
+          "contract_documented": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "71cad36a73efe11ee34e2a3d2e003b7e233c7d6e891012936b1b5ed33a14bf42",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.2025757919764146,
+              "state_characters": 383,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.016642917005811,
+              "state_characters": 383,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7017.096749972552
+      },
+      "latency_ms": 7017.099875025451
+    },
+    {
+      "case_id": "complete_extra_comment",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "implementation_present": 0.95,
+          "contract_documented": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "67cb9f1f3bad6dea2e44e0008fb862fe51ba3c89cb42124546152947e6319855",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.415085416985676,
+              "state_characters": 461,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.210727625002619,
+              "state_characters": 461,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7415.244958014227
+      },
+      "latency_ms": 7415.248042030726
+    },
+    {
+      "case_id": "contradictory_doc",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": false,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "failed",
+        "scores": {
+          "implementation_present": 0.0,
+          "contract_documented": 0.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "2f2ace134a27b2678fe83db4cc407ea8916f0ddb9d8a5623b55a855d30fc3d9f",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 7.936328208015766,
+              "state_characters": 381,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.9207657920196652,
+              "state_characters": 381,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 7936.484333011322
+      },
+      "latency_ms": 7936.487249971833
+    },
+    {
+      "case_id": "complete_named_steps",
+      "repeat": 1,
+      "criterion_order": [
+        "implementation_present",
+        "contract_documented"
+      ],
+      "expected": {
+        "contract_documented": true,
+        "implementation_present": true
+      },
+      "result": {
+        "protocol": "native-rubric-v2",
+        "status": "passed",
+        "scores": {
+          "implementation_present": 0.95,
+          "contract_documented": 1.0
+        },
+        "pass_threshold": 0.9,
+        "rubric_version": "slug-contract-v1",
+        "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+        "task_sha256": "973be52736d9d8672916afe185c7316dc36114423f5e2164bc8cab63d69d815e",
+        "evidence_sha256": "079d5a8c2cd031dddfaac25ca685476cc418164aa7510eaadbe668e8dd158070",
+        "provenance": {
+          "implementation_present": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 3.578031584038399,
+              "state_characters": 456,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          },
+          "contract_documented": {
+            "provider_id": "localjev-qwen3-14b",
+            "role": "authoritative",
+            "implementation": "typesafe-sdk",
+            "endpoint": "http://127.0.0.1:8080",
+            "request_model": "jev-latest",
+            "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+            "inference": {
+              "timeout_seconds": 30.0,
+              "max_retries": 2,
+              "latency_seconds": 8.97665154200513,
+              "state_characters": 456,
+              "max_state_characters": 12000,
+              "state_format": "kv"
+            }
+          }
+        },
+        "latency_ms": 8977.199125045445
+      },
+      "latency_ms": 8977.20499994466
+    }
+  ],
+  "limits": [
+    "Synthetic labels authored before model calls, not human-calibrated workflow labels.",
+    "Fixtures assume shallow executable checks passed; this isolates semantic judgment.",
+    "Model errors count as rejected completions; they have no Brier score.",
+    "Repeats reverse criteria; score drift combines stochasticity and order effects.",
+    "Tiny calibration bins do not establish calibrated production probabilities."
+  ]
+}

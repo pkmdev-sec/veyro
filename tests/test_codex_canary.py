@@ -90,14 +90,14 @@ def test_environment_does_not_inherit_credentials(monkeypatch: pytest.MonkeyPatc
 
 
 def test_sandbox_denies_network_and_policy_writes_but_honors_requirements() -> None:
-    profile = canary._sandbox_profile(Path("/Users/example"))
+    profile = canary._sandbox_profile(Path("/workspace/example"))
     assert "(deny network*)" in profile
-    assert '(subpath "/Users/example")' in profile
+    assert '(subpath "/workspace/example")' in profile
     assert '(subpath "/etc/codex")' in profile
     assert '(subpath "/private/etc/codex")' in profile
     assert "com.openai.codex.plist" in profile
     assert '(deny file-write* (subpath "/etc/codex")' in profile
-    assert '(deny file-read* file-write* (subpath "/Users/example"))' in profile
+    assert '(deny file-read* file-write* (subpath "/workspace/example"))' in profile
 
 
 def test_hash_mismatch_never_launches_binary(

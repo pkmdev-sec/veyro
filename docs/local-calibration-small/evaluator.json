@@ -1,0 +1,33 @@
+{
+  "version": "slug-contract-v1",
+  "name": "native:slug-contract-v1",
+  "prompt": "Task:\n{{task}}\nArtifacts:\n{{artifacts}}\nExecutable checks:\n{{checks}}",
+  "variables": {
+    "task": {
+      "source": "input",
+      "path": [
+        "task"
+      ]
+    },
+    "artifacts": {
+      "source": "output",
+      "path": []
+    },
+    "checks": {
+      "source": "input",
+      "path": [
+        "checks"
+      ]
+    }
+  },
+  "questions": {
+    "contract_documented": {
+      "type": "noul",
+      "prompt": "The slug function has a docstring explaining all three rules: lowercase ASCII letters and digits; replace each run of other characters with one hyphen; trim leading and trailing hyphens."
+    },
+    "implementation_present": {
+      "type": "noul",
+      "prompt": "The module contains a real implementation of slug normalization, not a placeholder, TODO, or unconditional fixed return."
+    }
+  }
+}

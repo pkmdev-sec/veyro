@@ -1,0 +1,13 @@
+{
+ "base_prompt": "Implement slug(text) in slug.py: lowercase ASCII letters and digits, replace each run of other characters with one hyphen, and trim hyphens. Do not modify verify.py. Do not delegate this small task.",
+ "variants": {
+  "A-current-baseline": "Implement slug(text) in slug.py: lowercase ASCII letters and digits, replace each run of other characters with one hyphen, and trim hyphens. Do not modify verify.py. Do not delegate this small task.",
+  "B-explicit-nonascii": "Implement slug(text) in slug.py: lowercase ASCII letters and digits, replace each run of other characters with one hyphen, and trim hyphens. Do not modify verify.py. Do not delegate this small task. Note: non-ASCII letters such as accented characters are NOT ASCII letters, so they must be replaced like any other character.",
+  "C-warn-regex-class": "Implement slug(text) in slug.py: lowercase ASCII letters and digits, replace each run of other characters with one hyphen, and trim hyphens. Do not modify verify.py. Do not delegate this small task. Careful: Python's \\w and \\W are Unicode-aware, so they do not mean ASCII. Match ASCII explicitly.",
+  "D-worked-example": "Implement slug(text) in slug.py: lowercase ASCII letters and digits, replace each run of other characters with one hyphen, and trim hyphens. Do not modify verify.py. Do not delegate this small task. For example, slug('CAFÉ') must return 'caf'.",
+  "E-ascii-predicates": "Implement slug(text) in slug.py: lowercase ASCII letters and digits, replace each run of other characters with one hyphen, and trim hyphens. Do not modify verify.py. Do not delegate this small task. Careful: Python's default character tests are Unicode-aware. Both the regex word classes and str.isalnum() treat accented letters as letters. Test for ASCII explicitly.",
+  "F-restate-separator": "Implement slug(text) in slug.py: lowercase ASCII letters and digits, replace each run of other characters with one hyphen, and trim hyphens. Do not modify verify.py. Do not delegate this small task. Precisely: keep a character only if it is an ASCII letter a-z (after lowercasing) or an ASCII digit 0-9. Every other character, including accented letters, punctuation and whitespace, is a separator that forms part of a run."
+ },
+ "leaky_control": "D-worked-example",
+ "note": "D leaks held-out CASES[6] and is a diagnostic control only, never a shippable prompt."
+}

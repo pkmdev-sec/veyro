@@ -351,6 +351,6 @@ def test_restrictive_umask_still_creates_owner_readable_claim(scope):
         claim(ledger, session)
     finally:
         os.umask(previous)
-    path, = root.iterdir()
+    (path,) = root.iterdir()
     assert stat.S_IMODE(path.stat().st_mode) == 0o600
     assert json.loads(path.read_bytes())["request_sha256"] == DIGEST

@@ -1,59 +1,83 @@
-# Qwen model variants
+# Qwen3 model roles
 
-Veyro has a **14B released assessor** and a **4B experimental development profile**.
-The merge of the scoped supervision release did not include the local model-profile,
-readout, or evaluator stack. Do not treat the two sizes as selectable backends in `main`.
+Veyro's local autonomous harness assigns two pinned Qwen3 variants to different jobs.
+They work in one bounded task loop but run through separate local inference paths.
 
-## Compare the models
+| Role | Profile | Model | Runtime | Authority |
+|---|---|---|---|---|
+| Coding | `small` | `qwen3:4b-instruct-2507-q4_K_M` | Native agent through Ollama | Can plan, use tools, and edit files |
+| Typed evaluation | `14b` | `qwen3:14b` | Veyro GGUF readout service | Can score declared completion criteria |
 
-| | Qwen3 4B Instruct | Qwen3 14B |
-| --- | --- | --- |
-| Ollama tag | `qwen3:4b-instruct-2507-q4_K_M` | `qwen3:14b` |
-| Recorded parameter size | 4.0B | 14.8B |
-| Weight format | Q4_K_M GGUF | Q4_K_M GGUF |
-| Intended use | Lower-memory local coding and finite-label evaluation experiments | Existing-session checkpoint assessment through localjev |
-| Status in `main` | Not shipped; development work remains unmerged | Pinned assessor in the scoped release |
+The 4B model never approves its own work. The 14B model never edits the repository.
+Executable checks remain authoritative and always run before typed evaluation.
 
-At the same quantization, 4B needs less memory for weights. Total memory also includes
-context caches and loaded service copies. This does not establish a speed or accuracy
-advantage. The 4B experiments have not qualified it for autonomous task completion.
+## Task flow
 
-The exact **Instruct** tag matters. The experimental `small` profile does not select
-`qwen3:4b`, whose thinking template is unsuitable for that profile's first-answer-position
-label scoring. Installing that tag is not a substitute for the 4B Instruct weights.
+1. Prime Agent or OpenCode sends the task to the Qwen3 4B coding model.
+2. The native agent plans and edits with its normal tools and permission rules.
+3. Veyro runs every declared executable check.
+4. A failed check returns its bounded output to the 4B coding loop. The 14B evaluator is not called.
+5. After all checks pass, Veyro asks the Qwen3 14B readout service to score typed Noul criteria against only the declared evidence files.
+6. Failed or uncertain criteria return their scores to the 4B coding loop for repair.
+7. Veyro reports completion only when checks and typed criteria pass within the continuation and time limits.
 
-## The released 14B path
+Evaluator errors, unavailable services, and exhausted limits do not count as completion.
 
-Existing-session supervision uses:
+## Run the pair
 
-**Veyro checkpoints → localjev (`127.0.0.1:8080`) → Ollama (`127.0.0.1:11434`) → Qwen3 14B**
+The 14B readout service must be ready. The 4B model must be installed in Ollama.
+Veyro does not download either model.
 
-The [baseline manifest](../config/baselines/localjev-qwen3-14b.json) records the pinned
-weight identity and service settings. `jev-latest` is the SDK request alias; it is not
-the model's weight name. See [localjev setup](localjev.md) for installation checks.
+```sh
+veyro local models
+veyro local start 14b
+veyro local status 14b
+veyro local warm small
 
-localjev returns model-generated estimates. These are not calibrated guarantees or
-direct token-logit measurements. Veyro rejects invalid checkpoint scores. Deterministic
-policy and exact human approval still govern supported controls; a model score cannot
-grant permission.
+veyro agent prime-agent --repo . --autonomous \
+  --coding-profile small \
+  --evaluation-profile 14b \
+  --prompt 'Implement the requested change' \
+  --check '.venv/bin/python -m pytest -q' \
+  --evaluator rubric.json
+```
 
-## The unmerged local-profile path
+Use `opencode` instead of `prime-agent` for the other native adapter. Local model
+selection is launch-scoped. It does not edit global provider settings or remove native
+permission denials.
 
-The development profiles are named `small` and `14b`. They select 4B Instruct and 14B
-weights for local coding through Ollama and a separate GGUF readout worker.
-That readout uses `llama-cpp-python` directly. It does not call localjev.
+The evaluator normally requires a matching calibration artifact for each criterion.
+`--allow-uncalibrated-evaluator` enables a raw-score experiment. It does not establish
+accuracy. The older option names `--judge` and `--allow-uncalibrated-judge` remain CLI
+aliases for existing scripts; new documentation uses evaluator terminology.
 
-This path is distinct even when it uses the same 14B weight tag. It is not included in
-the current release. `veyro local`, `veyro evaluator`, and the autonomous task options
-are not available in `main`. No switching, fallback, or voting between 4B and 14B occurs
-in the released existing-session control plane.
+## Why separate runtimes?
 
-The architecture diagram shows both models with separate status labels. The 4B card
-is a model key, not a connection to the active supervision path.
+Coding uses Ollama's chat API because the native agents need generative tool use. Typed
+evaluation uses `llama-cpp-python` over the installed GGUF file because it needs bounded,
+finite-label token scores with zero generated answer tokens. Separate processes also keep
+service state and ports explicit:
 
-## Qualification limits
+| Service | Default endpoint |
+|---|---|
+| Ollama coding | `127.0.0.1:11434` |
+| `small` readout, when used separately | `127.0.0.1:8081` |
+| `14b` typed evaluator | `127.0.0.1:8082` |
 
-The development task runs have not passed across both native CLIs and both profiles.
-Independent workflow-labelled calibration is also incomplete. Showing both variants
-in documentation does not close those gaps. See the [release scope](release-scope.md)
-and [evidence limits](what-veyro-proves.md).
+Loading Ollama 4B and the GGUF 14B worker at the same time can use substantial memory.
+
+## Provenance and limits
+
+The autonomy snapshot records both profile IDs and pinned model identities under
+`model_roles`. The typed result also records readout profile and model provenance.
+Ollama coding requests identify the configured model tag but do not attest the weight
+digest on every response.
+
+This architecture is implemented and covered by local end-to-end tests. That does not
+qualify either model for unsupervised use. G4 remains open until both native adapters and
+both model paths pass the required held-out reliability evidence. G6 remains open until
+independent workflow-labelled calibration evidence is complete. See [GATES.md](../GATES.md).
+
+The Jev article supports typed classification and software routing. It does not specify
+this coding, check, evaluation, or repair design. See the stored
+[source boundary](sources/building-a-harness-with-jev.md).

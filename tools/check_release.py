@@ -28,6 +28,11 @@ def inspect_files(files: dict[str, bytes], retired_name: str | None) -> None:
             raise ValueError("Bytecode cache in archive: " + name)
         if retired and (retired in name.lower().encode() or retired in data.lower()):
             raise ValueError("Retired name in archive: " + name)
+        if b"orchestr" + b"at" in data.lower():
+            raise ValueError("Retired controller term in archive: " + name)
+        private_homes = (b"/" + b"Users" + b"/", b"/" + b"home" + b"/")
+        if any(prefix in data for prefix in private_homes):
+            raise ValueError("Machine-specific home path in archive: " + name)
 
 
 def check(wheel: Path, sdist: Path, retired_name: str | None = None) -> dict[str, object]:
@@ -82,15 +87,28 @@ def check(wheel: Path, sdist: Path, retired_name: str | None = None) -> dict[str
         "docs/assets/veyro-logo-animated.gif",
         "docs/assets/veyro-supervision.gif",
         "docs/assets/veyro-supervision.png",
+        "docs/assets/veyro-task-readout.png",
         "docs/release-scope.md",
         "docs/qwen-models.md",
         "tools/generate_supervision_diagram.py",
+        "examples/evaluator-case.json",
         "docs/assets/veyro-relay-logo.svg",
         "tools/generate_header_logo.py",
         "docs/assets/veyro-logo-animated-poster.png",
         "tools/generate_brand_assets.py",
         "tests/conftest.py",
         "docs/localjev.md",
+        "docs/local-harness.md",
+        "docs/sources/building-a-harness-with-jev.md",
+        "docs/sources/building-a-harness-with-jev.json",
+        "docs/evidence/local-final-regression.log",
+        "docs/evidence/g4_unicode_probe.py",
+        "docs/evidence/g4-prompt-experiment/README.md",
+        "docs/evidence/g4-prompt-experiment/small-round1.json",
+        "docs/evidence/g4-prompt-experiment/small-round2.json",
+        "docs/evidence/g4-prompt-experiment/variants.json",
+        "docs/evidence/g4-prompt-experiment/prompt_probe.py",
+        "docs/evidence/g4-prompt-experiment/14b-corrected.json",
         "examples/assess_localjev.py",
         "examples/failed-verification.json",
         "config/baselines/localjev-qwen3-14b.json",

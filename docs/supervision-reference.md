@@ -62,7 +62,7 @@ need approval. Stable interruption is disruptive and also needs approval.
 - Codex observations are hook boundaries, usually `unknown`, not successful tool
   outcomes or completion evidence. Local journal reads work through `veyro
   attach` despite unsupported native replay/attachment. Queue opt-in is an adapter
-  seam for an orchestrator; neither the listener CLI nor `supervise` enables it.
+  seam for an external controller; neither the listener CLI nor `supervise` enables it.
   Live queue delivery has not been verified.
 
 ## Privacy and retention

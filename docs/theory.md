@@ -6,10 +6,11 @@ structured evidence at review checkpoints. Veyro, not the model, authorizes cont
 
 ## Model sizes and release status
 
-**Qwen3 14B** is the pinned assessor in the released path below. **Qwen3 4B Instruct**
-is a lower-memory development profile; it is not merged into `main` and has no edge in
-this control flow. The separate local GGUF readout experiments are unmerged for both
-sizes. See the [model comparison](qwen-models.md) for tags, use cases, and limits.
+**Qwen3 14B** remains the pinned localjev assessor in the existing-session path below.
+The separate autonomous task path uses **Qwen3 4B Instruct** for coding, authoritative
+executable checks, then **Qwen3 14B** for typed evaluation. That task path does not grant
+model scores control authority. G4 native-task qualification and G6 calibration remain
+open. See the [model-role guide](qwen-models.md) for tags, boundaries, and limits.
 
 ## Existing-session data flow
 

@@ -1,0 +1,18 @@
+{
+  "training_ids": [
+    "complete",
+    "undocumented",
+    "stub_with_doc",
+    "partial_doc",
+    "irrelevant",
+    "prompt_injection"
+  ],
+  "holdout_ids": [
+    "empty",
+    "complete_multiline",
+    "todo",
+    "complete_extra_comment",
+    "contradictory_doc",
+    "complete_named_steps"
+  ]
+}

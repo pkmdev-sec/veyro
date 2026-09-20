@@ -1,7 +1,7 @@
 include .env.example
 recursive-include config *.json
-recursive-include docs *.md *.json *.svg *.png *.gif
+recursive-include docs *.md *.json *.svg *.png *.gif *.log *.py
 recursive-include tools *.py
-recursive-include tests *.py
+recursive-include tests *.py *.mjs
 global-exclude *.py[cod]
 recursive-include examples *.py *.json *.md

@@ -62,7 +62,7 @@ def test_diagram_generator_is_current_and_nonwriting():
     uv = shutil.which("uv")
     if uv is None:
         pytest.skip("uv is required for the isolated diagram builder")
-    assets = [DIAGRAM, DIAGRAM.with_suffix(".png")]
+    assets = [DIAGRAM, DIAGRAM.with_suffix(".png"), DIAGRAM.parent / "veyro-task-readout.png"]
     before = [(asset.read_bytes(), asset.stat().st_mtime_ns) for asset in assets]
     subprocess.run(
         [uv, "run", "--script", str(ROOT / "tools/generate_supervision_diagram.py"), "--check"],
@@ -73,16 +73,34 @@ def test_diagram_generator_is_current_and_nonwriting():
     assert [(asset.read_bytes(), asset.stat().st_mtime_ns) for asset in assets] == before
 
 
-def test_still_diagram_has_expected_dimensions():
-    data = DIAGRAM.with_suffix(".png").read_bytes()
-    assert data[:8] == b"\x89PNG\r\n\x1a\n"
-    assert data[12:16] == b"IHDR"
-    assert struct.unpack(">II", data[16:24]) == (1120, 1200)
+def test_still_diagrams_have_expected_dimensions():
+    for name, dimensions in [
+        ("veyro-supervision.png", (1120, 1200)),
+        ("veyro-task-readout.png", (1120, 900)),
+    ]:
+        data = (DIAGRAM.parent / name).read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n"
+        assert data[12:16] == b"IHDR"
+        assert struct.unpack(">II", data[16:24]) == dimensions
 
 
-def test_diagram_names_both_qwen_variants_and_release_status():
-    generator = (ROOT / "tools/generate_supervision_diagram.py").read_text()
-    assert '"Qwen3 14B"' in generator
-    assert '"In main: localjev assessor"' in generator
-    assert '"Qwen3 4B Instruct"' in generator
-    assert '"Experimental: not shipped"' in generator
+def test_task_diagram_names_the_dual_model_control_order():
+    source = (ROOT / "tools/generate_supervision_diagram.py").read_text()
+    for label in (
+        "01 / DUAL-MODEL TASK LOOP",
+        "4B coder",
+        "Run checks",
+        "Authoritative",
+        "14B evaluator",
+        "Runs only after executable checks pass",
+    ):
+        assert label in source
+
+
+def test_supervision_diagram_describes_current_model_roles():
+    source = (ROOT / "tools/generate_supervision_diagram.py").read_text()
+    assert "LOCAL MODEL ROLES / SEPARATE TASK PATH" in source
+    assert "Typed evaluation after checks" in source
+    assert "Native coding loop" in source
+    assert "G4 native-task qualification and G6 calibration remain open" in source
+    assert "not shipped" not in source.lower()

@@ -414,9 +414,7 @@ class FactoryRuntime:
 
             now = time.monotonic()
             # Lifecycle boundaries bypass debounce; routine output respects the configured floor.
-            interval_elapsed = (
-                now - last_assessment >= self.config.assessment_min_interval_seconds
-            )
+            interval_elapsed = now - last_assessment >= self.config.assessment_min_interval_seconds
             eligible = force or (dirty and interval_elapsed)
             if not eligible:
                 continue

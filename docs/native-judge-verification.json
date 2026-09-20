@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "native_canaries": [
+    {
+      "schema_version": 1,
+      "timestamp": "2026-09-20T04:29:06.646704+00:00",
+      "platform": "Darwin",
+      "python": "3.12.12",
+      "result": {
+        "kind": "live_native_tui",
+        "agent": "prime-agent",
+        "version": "0.9.5",
+        "model": "litellm/claude-haiku-4-5",
+        "phase": "completed",
+        "adapter_error": null,
+        "judge_enabled": true,
+        "judge_result": {
+          "protocol": "native-rubric-v2",
+          "status": "passed",
+          "scores": {
+            "contract_documented": 1.0,
+            "implementation_present": 1.0
+          },
+          "pass_threshold": 0.9,
+          "rubric_version": "slug-contract-v1",
+          "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+          "task_sha256": "72ecb7d0b496ec7e7bd8cf75a5099898b457a1098f204543365183f43d159fcd",
+          "evidence_sha256": "30ff81f74de57e13c313a028aee2b1b99ccd9d5345661a367aa87cbbd96e4ac4",
+          "provenance": {
+            "contract_documented": {
+              "provider_id": "localjev-qwen3-14b",
+              "role": "authoritative",
+              "implementation": "typesafe-sdk",
+              "endpoint": "http://127.0.0.1:8080",
+              "request_model": "jev-latest",
+              "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+              "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+              "inference": {
+                "timeout_seconds": 30.0,
+                "max_retries": 2,
+                "latency_seconds": 5.48328008298995,
+                "state_characters": 1218,
+                "max_state_characters": 12000,
+                "state_format": "kv"
+              }
+            },
+            "implementation_present": {
+              "provider_id": "localjev-qwen3-14b",
+              "role": "authoritative",
+              "implementation": "typesafe-sdk",
+              "endpoint": "http://127.0.0.1:8080",
+              "request_model": "jev-latest",
+              "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+              "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+              "inference": {
+                "timeout_seconds": 30.0,
+                "max_retries": 2,
+                "latency_seconds": 11.715600040974095,
+                "state_characters": 1218,
+                "max_state_characters": 12000,
+                "state_format": "kv"
+              }
+            }
+          },
+          "latency_ms": 11777.680707979016,
+          "process_latency_ms": 11978.866833029315
+        },
+        "elapsed_seconds": 101.13477279100334,
+        "assertions_passed": 8,
+        "assertions_total": 8,
+        "accuracy": 1.0,
+        "verifier_unchanged": true,
+        "transitions": [
+          "plan_ready",
+          "checks_and_judge_passed"
+        ],
+        "checkpoint_latency_ms": [
+          1.2630419805645943,
+          12056.077208020724
+        ],
+        "human_task_inputs": 0,
+        "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout.",
+        "fixture_docstring_inspected": true
+      }
+    },
+    {
+      "schema_version": 1,
+      "timestamp": "2026-09-20T04:29:06.646279+00:00",
+      "platform": "Darwin",
+      "python": "3.12.12",
+      "result": {
+        "kind": "live_native_tui",
+        "agent": "opencode",
+        "version": "1.18.31",
+        "model": "litellm/claude-haiku-4-5",
+        "phase": "completed",
+        "adapter_error": null,
+        "judge_enabled": true,
+        "judge_result": {
+          "protocol": "native-rubric-v2",
+          "status": "passed",
+          "scores": {
+            "contract_documented": 1.0,
+            "implementation_present": 1.0
+          },
+          "pass_threshold": 0.9,
+          "rubric_version": "slug-contract-v1",
+          "rubric_sha256": "71eadd9fd2bfb99e02d0f6613e7d099d91bf6d369f9d870f1bd4dd690c34c276",
+          "task_sha256": "72ecb7d0b496ec7e7bd8cf75a5099898b457a1098f204543365183f43d159fcd",
+          "evidence_sha256": "3c6461d908109bb533957e946eebb464be4fd4f03e842815237e6853d63ad138",
+          "provenance": {
+            "contract_documented": {
+              "provider_id": "localjev-qwen3-14b",
+              "role": "authoritative",
+              "implementation": "typesafe-sdk",
+              "endpoint": "http://127.0.0.1:8080",
+              "request_model": "jev-latest",
+              "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+              "question_version": "native-rubric-v2:slug-contract-v1:contract_documented",
+              "inference": {
+                "timeout_seconds": 30.0,
+                "max_retries": 2,
+                "latency_seconds": 7.38333350000903,
+                "state_characters": 969,
+                "max_state_characters": 12000,
+                "state_format": "kv"
+              }
+            },
+            "implementation_present": {
+              "provider_id": "localjev-qwen3-14b",
+              "role": "authoritative",
+              "implementation": "typesafe-sdk",
+              "endpoint": "http://127.0.0.1:8080",
+              "request_model": "jev-latest",
+              "checkpoint": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+              "question_version": "native-rubric-v2:slug-contract-v1:implementation_present",
+              "inference": {
+                "timeout_seconds": 30.0,
+                "max_retries": 2,
+                "latency_seconds": 4.365947125013918,
+                "state_characters": 969,
+                "max_state_characters": 12000,
+                "state_format": "kv"
+              }
+            }
+          },
+          "latency_ms": 7457.878708024509,
+          "process_latency_ms": 7687.186416995246
+        },
+        "elapsed_seconds": 88.2211392080062,
+        "assertions_passed": 8,
+        "assertions_total": 8,
+        "accuracy": 1.0,
+        "verifier_unchanged": true,
+        "transitions": [
+          "plan_ready",
+          "checks_and_judge_passed"
+        ],
+        "checkpoint_latency_ms": [
+          0.5794159951619804,
+          7764.179416000843
+        ],
+        "human_task_inputs": 0,
+        "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout.",
+        "fixture_docstring_inspected": true
+      }
+    }
+  ],
+  "default_path_benchmark": {
+    "schema_version": 1,
+    "timestamp": "2026-09-20T04:31:05.528476+00:00",
+    "platform": "Darwin",
+    "python": "3.12.12",
+    "result": {
+      "kind": "synthetic_completion_decisions",
+      "samples": 30,
+      "measurement": "cold Python hook process + real Python verifier + state/journal IO",
+      "p50_ms": 90.51875001750886,
+      "p95_ms": 129.32966696098447,
+      "max_ms": 132.36687501193956,
+      "subsecond_p95": true,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "false_completions": 0,
+      "cases": [
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 90.87112499400973
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 129.32966696098447
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 82.2309170034714
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 94.65024998644367
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 83.68316601263359
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 84.95312498416752
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 84.55591602250934
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 115.07912498200312
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 94.14050000486895
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 90.51875001750886
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 127.05850001657382
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 132.36687501193956
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 90.2904579997994
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 124.29270899156108
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 126.55029201414436
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 85.68604197353125
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 81.08279202133417
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 83.67362502031028
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 88.06783304316923
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 120.97845901735127
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 123.8345829769969
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 87.33875001780689
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 95.60412500286475
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 87.30437495978549
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 119.96587499743327
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 125.27704203967005
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 98.22583303321153
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 82.94125000247732
+        },
+        {
+          "expected_complete": true,
+          "actual_complete": true,
+          "latency_ms": 82.92116603115574
+        },
+        {
+          "expected_complete": false,
+          "actual_complete": false,
+          "latency_ms": 86.90137497615069
+        }
+      ],
+      "limits": "Synthetic exit-code labels, not general coding-task or semantic-judge accuracy."
+    }
+  },
+  "verification": {
+    "full_suite_passed": 675,
+    "full_suite_failed": 1,
+    "preexisting_failure": "tests/test_integration.py::test_noisy_events_are_coalesced"
+  },
+  "limits": "Fixture success is not general coding accuracy. Semantic model false acceptances are retained in native-judge-benchmark.json."
+}

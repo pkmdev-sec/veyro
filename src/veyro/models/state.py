@@ -69,4 +69,3 @@ class FactoryState(BaseModel):
 
     def touch(self) -> None:
         self.updated_at = datetime.now(UTC)
-

@@ -1,0 +1,49 @@
+{
+  "profile": "14b",
+  "model": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+  "data_role": "partitioned synthetic development study; NOT an untouched holdout",
+  "model_weights_trained": false,
+  "method": "post-hoc per-question temperature",
+  "training_ids": [
+    "complete",
+    "undocumented",
+    "stub_with_doc",
+    "partial_doc",
+    "irrelevant",
+    "prompt_injection"
+  ],
+  "holdout_ids": [
+    "empty",
+    "complete_multiline",
+    "todo",
+    "complete_extra_comment",
+    "contradictory_doc",
+    "complete_named_steps"
+  ],
+  "questions": {
+    "contract_documented": {
+      "inverse_temperature": 0.3950745602096918,
+      "training_log_loss_before": 0.48839282952487384,
+      "training_log_loss_after": 0.31376856211762866,
+      "heldout_partition": {
+        "count": 6,
+        "log_loss_before": 0.07599292493240568,
+        "log_loss_after": 0.16582148765555738,
+        "brier_before": 0.0423966020394988,
+        "brier_after": 0.07779209895088808
+      }
+    },
+    "implementation_present": {
+      "inverse_temperature": 20.0,
+      "training_log_loss_before": 0.0018783143957995794,
+      "training_log_loss_after": 0.0,
+      "heldout_partition": {
+        "count": 6,
+        "log_loss_before": 0.007648473332467791,
+        "log_loss_after": 0.0,
+        "brier_before": 0.0006123026560471194,
+        "brier_after": 1.808423656044029e-55
+      }
+    }
+  }
+}

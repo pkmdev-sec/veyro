@@ -30,3 +30,15 @@ def test_release_guard_rejects_private_or_retired_content(name, data):
 
 def test_release_guard_accepts_source_and_example_configuration():
     release_check.inspect_files({"veyro/__init__.py": b"", ".env.example": b""}, "retired")
+
+
+def test_release_guard_rejects_retired_controller_term():
+    retired = b"orchestr" + b"ation"
+    with pytest.raises(ValueError, match="Retired controller term"):
+        release_check.inspect_files({"README.md": retired}, None)
+
+
+def test_release_guard_rejects_machine_specific_home_paths():
+    home = b"/" + b"Users" + b"/example/project"
+    with pytest.raises(ValueError, match="Machine-specific home path"):
+        release_check.inspect_files({"evidence.json": home}, None)

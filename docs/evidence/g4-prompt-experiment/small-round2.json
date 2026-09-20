@@ -1,0 +1,265 @@
+[
+ {
+  "variant": "E-ascii-predicates",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 1,
+  "passed": 5,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "# slug.py\n\ndef slug(text):\n    result = []\n    for char in text:\n        if ord(char) > 127:\n            result.append('-')\n        else:\n            lower_char = char.lower()\n            if lower_char.isalnum():\n                result.append(lower_char)\n            else:\n                result.append('-')\n    return ''.join(result).strip('-')"
+ },
+ {
+  "variant": "E-ascii-predicates",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 2,
+  "passed": 4,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    \"\"\"\n    Convert text to a slug: lowercase ASCII letters and digits, \n    replace each run of other characters with one hyphen, and trim hyphens.\n    \n    Only handles ASCII characters (0-127).\n    \"\"\"\n    # Convert to lowercase and process each character\n    result = []\n    for char in text.lower():\n        if char.isalnum():\n            result.append(char)\n        else:\n            # Only replace non-alphanumeric ASCII characters with a hyphen\n            # But only if it's ASCII (we check explicitly)\n            if ord(char) < 128:\n                result.append('-')\n    \n    # Join the result and trim leading/trailing hyphens\n    return ''.join(result).strip('-')"
+ },
+ {
+  "variant": "E-ascii-predicates",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 3,
+  "passed": 4,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "# slug.py\n\ndef slug(text):\n    text = text.lower()\n    result = \"\"\n    for c in text:\n        if c.isalnum():\n            result += c\n        elif c.isascii():\n            result += '-'\n    return result.strip('-')"
+ },
+ {
+  "variant": "E-ascii-predicates",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 4,
+  "passed": 5,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "# slug.py\n\nimport string\n\ndef slug(text):\n    \"\"\"\n    Convert text to a slug: lowercase ASCII letters and digits,\n    replace each run of other characters with one hyphen,\n    and trim leading and trailing hyphens.\n    \n    Only uses ASCII characters (no Unicode-aware tests).\n    \"\"\"\n    # Convert to lowercase and filter only ASCII letters and digits\n    result = []\n    for char in text:\n        # Check if character is ASCII\n        if ord(char) > 127:\n            continue\n        if char.isalnum():\n            result.append(char.lower())\n        else:\n            # Replace non-alphanumeric ASCII characters with a hyphen\n            result.append('-')\n    \n    # Join the result list into a string\n    result_str = ''.join(result)\n    \n    # Trim leading and trailing hyphens\n    return result_str.strip('-')"
+ },
+ {
+  "variant": "E-ascii-predicates",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 5,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "def slug(text):\n    \"\"\"\n    Convert text to slug: lowercase ASCII letters and digits, \n    replace each run of other characters with one hyphen, and trim hyphens.\n    \n    Args:\n        text (str): Input text to convert\n        \n    Returns:\n        str: Slug representation of input text\n    \"\"\"\n    # Convert to lowercase and ensure ASCII\n    result = \"\"\n    for char in text.lower():\n        # Check if character is ASCII and alphanumeric\n        if ord(char) < 128 and char.isalnum():\n            result += char\n        else:\n            # Replace non-ASCII or non-alphanumeric with hyphen\n            result += '-'\n    \n    # Replace multiple hyphens with single hyphen\n    import re\n    result = re.sub(r'-+', '-', result)\n    \n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    \n    return result"
+ },
+ {
+  "variant": "F-restate-separator",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 1,
+  "passed": 3,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    " Hello, World! ",
+    "helloworld",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "abc",
+    "a-b-c"
+   ],
+   [
+    "a\nb\tc",
+    "abc",
+    "a-b-c"
+   ],
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ],
+   [
+    "a  -- !! b",
+    "ab",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    result = []\n    for char in text:\n        if char.islower() or char.isupper():\n            # Convert to lowercase and keep only letters\n            result.append(char.lower())\n        elif char.isdigit():\n            # Keep digits\n            result.append(char)\n        else:\n            # All other characters (punctuation, spaces, accented letters, etc.)\n            # are separators and will be replaced by a hyphen only if they\n            # form a run, but we will just skip them in the stream\n            # We'll handle runs later by joining with hyphens\n            pass\n    # Now we need to replace each run of non-letters-digits with one hyphen\n    # But we must only insert hyphens when there is a run of separators\n    # So we reconstruct the string with hyphens in place of runs\n    result_str = ''.join(result)\n    # Split by non-alphanumeric, then join with hyphens\n    tokens = []\n    current_token = \"\"\n    for char in result_str:\n        if char.isalnum():\n            current_token += char\n        else:\n            if current_token:\n                tokens.append(current_token)\n                current_token = \"\"\n    if current_token:\n        tokens.append(current_token)\n    \n    # Join tokens with hyphens\n    final = '-'.join(tokens)\n    \n    # Trim leading and trailing hyphens\n    return final.strip('-')"
+ },
+ {
+  "variant": "F-restate-separator",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 2,
+  "passed": 7,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ]
+  ],
+  "code": "def slug(text):\n    result = []\n    for char in text:\n        if char.isalpha():\n            result.append(char.lower())\n        elif char.isdigit():\n            result.append(char)\n        else:\n            # Separator: we only include a hyphen if it's part of a run of separators\n            # We'll add a hyphen only if the previous character was not already a hyphen\n            # But since we're building result character by character, we need to track\n            # whether we just added a hyphen.\n            # So we do: skip adding this char (it's not a letter/digit), but only add a hyphen\n            # if the last character added is not a hyphen.\n            if result and result[-1] == '-':\n                pass  # don't add another hyphen\n            else:\n                result.append('-')\n    # Now trim leading and trailing hyphens\n    while result and result[0] == '-':\n        result.pop(0)\n    while result and result[-1] == '-':\n        result.pop()\n    return ''.join(result)"
+ },
+ {
+  "variant": "F-restate-separator",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 3,
+  "passed": 3,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    " Hello, World! ",
+    "helloworld",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "abc",
+    "a-b-c"
+   ],
+   [
+    "a\nb\tc",
+    "abc",
+    "a-b-c"
+   ],
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ],
+   [
+    "a  -- !! b",
+    "ab",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    result = []\n    for char in text:\n        if char.isalpha():\n            result.append(char.lower())\n        elif char.isdigit():\n            result.append(char)\n        else:\n            # Every other character is a separator\n            # So we only add a hyphen if it's not already at the beginning\n            if result and result[-1] != '-':\n                result.append('-')\n    # Trim leading and trailing hyphens\n    result = [char for char in result if char != '-']\n    return ''.join(result)"
+ },
+ {
+  "variant": "F-restate-separator",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 4,
+  "passed": 3,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    " Hello, World! ",
+    "helloworld",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "abc",
+    "a-b-c"
+   ],
+   [
+    "a\nb\tc",
+    "abc",
+    "a-b-c"
+   ],
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ],
+   [
+    "a  -- !! b",
+    "ab",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    result = []\n    for char in text:\n        if char.islower() or char.isupper():\n            # Convert to lowercase and keep only letters\n            if char.isalpha():\n                result.append(char.lower())\n        elif char.isdigit():\n            result.append(char)\n        else:\n            # Separator: we will handle runs of separators later\n            # We'll mark as separator and then remove in a later step\n            # But we need to know when to skip\n            pass\n    # Now, merge runs of non-separators with hyphens\n    # But actually, we only want to keep letters and digits\n    # So we just need to go through and keep valid characters\n    # We already removed all non-letters-digits, so we can just join\n    return ''.join(result).strip('-')"
+ },
+ {
+  "variant": "F-restate-separator",
+  "seed": 5,
+  "error": "TimeoutError('timed out')",
+  "passed": null
+ }
+]

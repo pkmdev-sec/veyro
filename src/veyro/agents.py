@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
+    from veyro.autonomy import AutonomyOptions
     from veyro.native_session import ManagedNativeResult, NativeSessionRecord
 
 
@@ -204,6 +205,7 @@ def launch_native_agent(
     prompt: str | None,
     native_args: tuple[str, ...] = (),
     on_started: Callable[[NativeSessionRecord], None] | None = None,
+    autonomy: AutonomyOptions | None = None,
 ) -> ManagedNativeResult:
     from veyro.native_session import ManagedNativeSession
 
@@ -213,8 +215,27 @@ def launch_native_agent(
         raise FileNotFoundError(f"native agent executable not found: {definition.executable}")
     probe = probe_agent(definition)
     command = definition.interactive_command(prompt, native_args)
+    autonomous = None
+    if autonomy is not None:
+        from veyro.autonomy import prepare_autonomy
+
+        autonomous = prepare_autonomy(agent_id, repository, prompt or "", native_args, autonomy)
+        command = autonomous.command
     command[0] = executable
-    return ManagedNativeSession(
+
+    def completed() -> bool:
+        if autonomous is None:
+            return False
+        try:
+            state = json.loads((autonomous.directory / "state.json").read_text())
+            return (
+                state["phase"] == "completed"
+                and not (autonomous.directory / "adapter-error.json").exists()
+            )
+        except (OSError, ValueError, KeyError, TypeError):
+            return False
+
+    result = ManagedNativeSession(
         definition=definition,
         repository=repository,
         command=command,
@@ -222,7 +243,19 @@ def launch_native_agent(
         agent_version=probe["version"] if isinstance(probe["version"], str) else None,
         prompt=prompt,
         on_started=on_started,
+        environment=autonomous.environment if autonomous else None,
+        timeout_seconds=autonomy.timeout if autonomy else None,
+        completion_check=completed if autonomous else None,
     ).run()
+    if autonomous:
+        from dataclasses import replace
+
+        result = replace(
+            result,
+            autonomy_directory=autonomous.directory,
+            exit_code=(result.exit_code or (0 if completed() else 1)),
+        )
+    return result
 
 
 def probes_json() -> str:

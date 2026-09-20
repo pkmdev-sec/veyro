@@ -1,6 +1,6 @@
 # Factory runtime and event flow
 
-This reference describes `veyro run`, the separate worker-orchestration interface.
+This reference describes `veyro run`, the separate worker-harness interface.
 It is not the existing-session `supervise` command. The factory defaults to localjev
 with Qwen3-14B and Codex `exec`. Its observations and logs can include task text,
 Git diffs, and worker output. See [the control-plane architecture](theory.md) for
@@ -28,7 +28,7 @@ NativeCliWorker / Codex exec -> FactoryRuntime -> ObservationBuilder
   That experimental backend adds active-turn steering; `exec` is not a fallback.
 
 `veyro demo` uses simulation classes without model services or agent credentials.
-It validates orchestration, not Qwen3-14B accuracy or native-agent isolation.
+It validates the harness lifecycle, not Qwen3-14B accuracy or native-agent isolation.
 
 ## One assessment cycle
 

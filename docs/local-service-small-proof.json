@@ -1,0 +1,77 @@
+{
+  "profile": {
+    "id": "small",
+    "ollama_model": "qwen3:4b-instruct-2507-q4_K_M",
+    "expected_digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "parameter_size": "4.0B",
+    "quantization": "Q4_K_M",
+    "model_family": "qwen3"
+  },
+  "protocol": "qwen-label-readout-v4",
+  "unauthenticated_status": 401,
+  "invariance": {
+    "alone": {
+      "one": 0.9999995987679242,
+      "two": 4.012320757284287e-07
+    },
+    "with_prior_sibling": {
+      "one": 0.9999996004381257,
+      "two": 3.9956187430477043e-07
+    },
+    "reversed_options": {
+      "two": 1.6728648101817472e-05,
+      "one": 0.9999832713518981
+    },
+    "changed_state": {
+      "one": 1.697860459056933e-05,
+      "two": 0.9999830213954094
+    },
+    "max_sibling_probability_delta": 1.6702015326330866e-09,
+    "option_order_preserves_label": true,
+    "state_change_matches_expected": true
+  },
+  "responses": [
+    {
+      "status": "rejected",
+      "error": "Local service HTTP 429: {\"error\": \"readout queue is full\"}"
+    },
+    {
+      "status": "ok",
+      "metrics": {
+        "latency_ms": 7887.38316699164,
+        "prefill_ms": 7506.299582950305,
+        "branch_ms": 378.72866599354893,
+        "prefix_tokens": 2092,
+        "prefix_cache_hit": false,
+        "branch_tokens": 54,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "status": "rejected",
+      "error": "Local service HTTP 429: {\"error\": \"readout queue is full\"}"
+    },
+    {
+      "status": "ok",
+      "metrics": {
+        "latency_ms": 8223.711833998095,
+        "prefill_ms": 0.000125030055642128,
+        "branch_ms": 333.37670797482133,
+        "prefix_tokens": 2092,
+        "prefix_cache_hit": true,
+        "branch_tokens": 54,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "status": "rejected",
+      "error": "Local service HTTP 429: {\"error\": \"readout queue is full\"}"
+    },
+    {
+      "status": "rejected",
+      "error": "Local service HTTP 429: {\"error\": \"readout queue is full\"}"
+    }
+  ]
+}

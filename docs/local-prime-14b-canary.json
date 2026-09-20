@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-09-20T06:38:32.674616+00:00",
+  "platform": "Darwin",
+  "python": "3.12.12",
+  "result": {
+    "kind": "live_native_tui",
+    "native_cleanup": {
+      "success": true,
+      "stopped_sessions": 1
+    },
+    "agent": "prime-agent",
+    "version": "0.9.5",
+    "model": "qwen3:14b",
+    "model_manifest_digest": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "model_requests": [
+      {
+        "timestamp": 1789886318057,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789886479147,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789886512286,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789886538035,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789886578809,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      }
+    ],
+    "local_profile": "14b",
+    "phase": "completed",
+    "adapter_error": null,
+    "judge_enabled": true,
+    "judge_result": {
+      "protocol": "native-rubric-v3",
+      "readout_protocol": "qwen-label-readout-v1",
+      "status": "passed",
+      "scores": {
+        "docstring_present": 0.9999999999161187,
+        "implementation_present": 0.9999999999759148
+      },
+      "calibrated": false,
+      "pass_threshold": 0.9,
+      "rubric_version": "local-native-canary-v1",
+      "rubric_sha256": "716032f3b0709d9466a10a3edd853840b39b60db2a7023b8adc884771f903dac",
+      "task_sha256": "72ecb7d0b496ec7e7bd8cf75a5099898b457a1098f204543365183f43d159fcd",
+      "evidence_sha256": "838c4af082c49c9426598bda59dbe11533ad782504e8e75fd9947b569c3d9121",
+      "provenance": {
+        "docstring_present": {
+          "provider": "local-readout",
+          "profile": "14b",
+          "model": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+          "source": "uncalibrated_label_logits",
+          "calibration_schema_sha256": "c7bec85d38612a8f637a620eaed3a8359f708ccb5fea24c938578e02f51d45e7",
+          "calibration_sha256": null
+        },
+        "implementation_present": {
+          "provider": "local-readout",
+          "profile": "14b",
+          "model": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+          "source": "uncalibrated_label_logits",
+          "calibration_schema_sha256": "04e34bbe5338aa28ff30cc6b759c3deaf7e190d32b20f671a07c96559924b4c3",
+          "calibration_sha256": null
+        }
+      },
+      "metrics": {
+        "latency_ms": 8012.937583960593,
+        "prefill_ms": 7056.807790999301,
+        "branch_ms": 947.1255830139853,
+        "prefix_tokens": 281,
+        "prefix_cache_hit": false,
+        "branch_tokens": 101,
+        "generated_tokens": 0,
+        "questions": 2
+      },
+      "latency_ms": 8039.793084026314,
+      "process_latency_ms": 8339.32966698194
+    },
+    "elapsed_seconds": 265.4019345419947,
+    "assertions_passed": 7,
+    "assertions_total": 8,
+    "accuracy": 0.875,
+    "verifier_unchanged": true,
+    "transitions": [
+      "plan_ready",
+      "checks_failed",
+      "checks_failed",
+      "checks_and_judge_passed"
+    ],
+    "checkpoint_latency_ms": [
+      0.7331670494750142,
+      39.500084007158875,
+      44.27466698689386,
+      8430.207500001416
+    ],
+    "artifact_directory": "/var/folders/mg/wdx8vj9d419dcvk_v8_xs82c0000gn/T/veyro-live-prime-agent-p4h2jzlr",
+    "human_task_inputs": 0,
+    "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout."
+  }
+}

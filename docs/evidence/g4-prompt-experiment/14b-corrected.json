@@ -1,0 +1,68 @@
+[
+ {
+  "variant": "A-current-baseline",
+  "model": "qwen3:14b",
+  "seed": 1,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "import re\n\ndef slug(text):\n    # Convert to lowercase and replace all non-alphanumeric characters with hyphens\n    text = re.sub(r'[^a-z0-9]', '-', text.lower())\n    # Replace sequences of hyphens with a single hyphen\n    text = re.sub(r'-+', '-', text)\n    # Trim leading and trailing hyphens\n    return text.strip('-')"
+ },
+ {
+  "variant": "A-current-baseline",
+  "model": "qwen3:14b",
+  "seed": 2,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "# slug.py\n\ndef slug(text):\n    result = []\n    last_was_hyphen = False\n    for char in text:\n        lower_char = char.lower()\n        if ('a' <= lower_char <= 'z') or ('0' <= lower_char <= '9'):\n            result.append(lower_char)\n            last_was_hyphen = False\n        else:\n            if not last_was_hyphen:\n                result.append('-')\n                last_was_hyphen = True\n    return ''.join(result).strip('-')"
+ },
+ {
+  "variant": "A-current-baseline",
+  "model": "qwen3:14b",
+  "seed": 3,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "# slug.py\n\ndef slug(text):\n    result = []\n    last_was_hyphen = False\n    for char in text:\n        lower_char = char.lower()\n        if ('a' <= lower_char <= 'z') or lower_char.isdigit():\n            result.append(lower_char)\n            last_was_hyphen = False\n        else:\n            if not last_was_hyphen:\n                result.append('-')\n                last_was_hyphen = True\n    s = ''.join(result)\n    return s.strip('-')"
+ },
+ {
+  "variant": "C-warn-regex-class",
+  "model": "qwen3:14b",
+  "seed": 1,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "import re\n\ndef slug(text):\n    # Replace all non-ASCII letters and non-digits with hyphen\n    s = re.sub(r'[^a-zA-Z0-9]', '-', text)\n    # Convert to lowercase\n    s = s.lower()\n    # Replace sequences of hyphens with a single hyphen\n    s = re.sub(r'--+', '-', s)\n    # Trim leading and trailing hyphens\n    s = s.strip('-')\n    return s"
+ },
+ {
+  "variant": "C-warn-regex-class",
+  "model": "qwen3:14b",
+  "seed": 2,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "# slug.py\n\nimport re\n\ndef slug(text):\n    def replace_char(match):\n        char = match.group(0)\n        # Check if the character is an ASCII letter\n        if char.isalpha() and char.isascii():\n            return char.lower()\n        # Check if the character is a digit\n        elif char.isdigit():\n            return char\n        # Otherwise, replace with a hyphen\n        else:\n            return '-'\n\n    # Step 1: Replace each character with the appropriate value\n    processed = re.sub(r'(.|\\n)', replace_char, text)\n\n    # Step 2: Replace runs of hyphens with a single hyphen\n    processed = re.sub(r'-+', '-', processed)\n\n    # Step 3: Trim leading and trailing hyphens\n    processed = processed.strip('-')\n\n    return processed"
+ },
+ {
+  "variant": "C-warn-regex-class",
+  "model": "qwen3:14b",
+  "seed": 3,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "import re\n\ndef slug(text):\n    text = text.lower()\n    text = re.sub(r'[^a-z0-9]+', '-', text)\n    return text.strip('-')"
+ }
+]

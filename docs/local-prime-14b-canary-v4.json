@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-09-20T09:46:02.852414+00:00",
+  "platform": "Darwin",
+  "python": "3.12.12",
+  "result": {
+    "kind": "live_native_tui",
+    "native_cleanup": {
+      "success": true,
+      "stopped_sessions": 1
+    },
+    "agent": "prime-agent",
+    "native_executable": "~/.local/bin/prime-agent",
+    "version": "0.9.5",
+    "model": "qwen3:14b",
+    "model_manifest_digest": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "model_requests": [
+      {
+        "timestamp": 1789897568309,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789897754194,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789897781870,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789897810188,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789897839363,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789897869078,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789897899378,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      },
+      {
+        "timestamp": 1789897930856,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1"
+      }
+    ],
+    "local_profile": "14b",
+    "phase": "blocked",
+    "adapter_error": null,
+    "judge_enabled": true,
+    "judge_result": null,
+    "elapsed_seconds": 366.9182409159839,
+    "assertions_passed": 2,
+    "assertions_total": 8,
+    "accuracy": 0.25,
+    "verifier_unchanged": true,
+    "transitions": [
+      "plan_ready",
+      "checks_failed",
+      "checks_failed",
+      "checks_failed",
+      "checks_failed",
+      "checks_failed",
+      "continuation_limit"
+    ],
+    "checkpoint_latency_ms": [
+      1.3716249959543347,
+      142.83800002885982,
+      204.7574589960277,
+      166.65820794878528,
+      221.21004096698016,
+      185.14412496006116,
+      322.30558403534815
+    ],
+    "artifact_directory": "/var/folders/mg/wdx8vj9d419dcvk_v8_xs82c0000gn/T/veyro-live-prime-agent-6smur9l0",
+    "human_task_inputs": 0,
+    "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout."
+  }
+}

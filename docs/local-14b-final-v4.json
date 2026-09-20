@@ -1,0 +1,6555 @@
+{
+  "protocol": "qwen-label-readout-v4",
+  "profile": {
+    "id": "14b",
+    "ollama_model": "qwen3:14b",
+    "expected_digest": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "parameter_size": "14.8B",
+    "quantization": "Q4_K_M",
+    "model_family": "qwen3"
+  },
+  "transport": "direct",
+  "runs": [
+    {
+      "id": "a01-flag-beta-search-off",
+      "repeat": 0,
+      "scored": {
+        "beta_search_enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999997223962145
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "beta_search_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.260677337646484,
+            26.163606643676758
+          ],
+          "probabilities": [
+            0.9999997223962145,
+            2.7760378558489405e-07
+          ],
+          "label_mass": 0.9999999369725305
+        }
+      },
+      "state_sha256": "7e25e07dc352fd02d529937133259931167f57b8593973fd336169bd7944bf1b",
+      "metrics": {
+        "latency_ms": 1684.406874992419,
+        "prefill_ms": 883.0435829586349,
+        "branch_ms": 800.3604999976233,
+        "prefix_tokens": 100,
+        "prefix_cache_hit": false,
+        "branch_tokens": 67,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a01-flag-beta-search-off",
+      "repeat": 1,
+      "scored": {
+        "beta_search_enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999997223962145
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "beta_search_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.260677337646484,
+            26.163606643676758
+          ],
+          "probabilities": [
+            0.9999997223962145,
+            2.7760378558489405e-07
+          ],
+          "label_mass": 0.9999999369725305
+        }
+      },
+      "state_sha256": "7e25e07dc352fd02d529937133259931167f57b8593973fd336169bd7944bf1b",
+      "metrics": {
+        "latency_ms": 1031.3352909870446,
+        "prefill_ms": 0.00012497184798121452,
+        "branch_ms": 1030.2354169543833,
+        "prefix_tokens": 100,
+        "prefix_cache_hit": true,
+        "branch_tokens": 67,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a02-flag-dark-mode-on",
+      "repeat": 0,
+      "scored": {
+        "dark_mode_enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999995322755586
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "dark_mode_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            26.707786560058594,
+            41.283172607421875
+          ],
+          "probabilities": [
+            4.677244412967861e-07,
+            0.9999995322755586
+          ],
+          "label_mass": 0.9999966204412318
+        }
+      },
+      "state_sha256": "7e25e07dc352fd02d529937133259931167f57b8593973fd336169bd7944bf1b",
+      "metrics": {
+        "latency_ms": 1291.459499974735,
+        "prefill_ms": 0.00012497184798121452,
+        "branch_ms": 1290.123374958057,
+        "prefix_tokens": 100,
+        "prefix_cache_hit": true,
+        "branch_tokens": 67,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a02-flag-dark-mode-on",
+      "repeat": 1,
+      "scored": {
+        "dark_mode_enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999995322755586
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "dark_mode_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            26.707786560058594,
+            41.283172607421875
+          ],
+          "probabilities": [
+            4.677244412967861e-07,
+            0.9999995322755586
+          ],
+          "label_mass": 0.9999966204412318
+        }
+      },
+      "state_sha256": "7e25e07dc352fd02d529937133259931167f57b8593973fd336169bd7944bf1b",
+      "metrics": {
+        "latency_ms": 1147.075999993831,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1145.7719160243869,
+        "prefix_tokens": 100,
+        "prefix_cache_hit": true,
+        "branch_tokens": 67,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a03a-retry-disabled",
+      "repeat": 0,
+      "scored": {
+        "retry_enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999992396985052
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "retry_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.18359375,
+            27.094043731689453
+          ],
+          "probabilities": [
+            0.9999992396985052,
+            7.603014948270635e-07
+          ],
+          "label_mass": 0.9999995808458224
+        }
+      },
+      "state_sha256": "597d591bbd2b7d9bc7207fed7edf9892fcb0853470d308c12b2de667217acde3",
+      "metrics": {
+        "latency_ms": 2022.4654579651542,
+        "prefill_ms": 1048.7196249887347,
+        "branch_ms": 971.9654580112547,
+        "prefix_tokens": 95,
+        "prefix_cache_hit": false,
+        "branch_tokens": 66,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a03a-retry-disabled",
+      "repeat": 1,
+      "scored": {
+        "retry_enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999992396985052
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "retry_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.18359375,
+            27.094043731689453
+          ],
+          "probabilities": [
+            0.9999992396985052,
+            7.603014948270635e-07
+          ],
+          "label_mass": 0.9999995808458224
+        }
+      },
+      "state_sha256": "597d591bbd2b7d9bc7207fed7edf9892fcb0853470d308c12b2de667217acde3",
+      "metrics": {
+        "latency_ms": 977.8208340285346,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 976.0243750060908,
+        "prefix_tokens": 95,
+        "prefix_cache_hit": true,
+        "branch_tokens": 66,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a03b-retry-enabled",
+      "repeat": 0,
+      "scored": {
+        "retry_enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999986394988833
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "retry_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            27.897361755371094,
+            41.4050178527832
+          ],
+          "probabilities": [
+            1.3605011167110464e-06,
+            0.9999986394988833
+          ],
+          "label_mass": 0.9999995355546822
+        }
+      },
+      "state_sha256": "42ac9e5eb83013f0bd8e86b6450d5221b29fb5c76084c143eee6a3baa70e143a",
+      "metrics": {
+        "latency_ms": 1979.3965000426397,
+        "prefill_ms": 996.7932080035098,
+        "branch_ms": 980.9161659795791,
+        "prefix_tokens": 95,
+        "prefix_cache_hit": false,
+        "branch_tokens": 66,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a03b-retry-enabled",
+      "repeat": 1,
+      "scored": {
+        "retry_enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999986394988833
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "retry_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            27.897361755371094,
+            41.4050178527832
+          ],
+          "probabilities": [
+            1.3605011167110464e-06,
+            0.9999986394988833
+          ],
+          "label_mass": 0.9999995355546822
+        }
+      },
+      "state_sha256": "42ac9e5eb83013f0bd8e86b6450d5221b29fb5c76084c143eee6a3baa70e143a",
+      "metrics": {
+        "latency_ms": 976.4204579987563,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 974.7839579940774,
+        "prefix_tokens": 95,
+        "prefix_cache_hit": true,
+        "branch_tokens": 66,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a04a-health-route-present",
+      "repeat": 0,
+      "scored": {
+        "health_route": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999996185324452
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "health_route": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            28.291751861572266,
+            43.07099151611328
+          ],
+          "probabilities": [
+            3.814675548861019e-07,
+            0.9999996185324452
+          ],
+          "label_mass": 0.9999988615183355
+        }
+      },
+      "state_sha256": "1ffce561d9b9c5525e3fef2779144d276f0cf1b950fb4ed4c145d6983a8b171c",
+      "metrics": {
+        "latency_ms": 2157.9850830021314,
+        "prefill_ms": 1240.049333020579,
+        "branch_ms": 915.9495839849114,
+        "prefix_tokens": 126,
+        "prefix_cache_hit": false,
+        "branch_tokens": 70,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a04a-health-route-present",
+      "repeat": 1,
+      "scored": {
+        "health_route": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999996185324452
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "health_route": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            28.291751861572266,
+            43.07099151611328
+          ],
+          "probabilities": [
+            3.814675548861019e-07,
+            0.9999996185324452
+          ],
+          "label_mass": 0.9999988615183355
+        }
+      },
+      "state_sha256": "1ffce561d9b9c5525e3fef2779144d276f0cf1b950fb4ed4c145d6983a8b171c",
+      "metrics": {
+        "latency_ms": 889.2539170337841,
+        "prefill_ms": 0.00012497184798121452,
+        "branch_ms": 887.4791250564158,
+        "prefix_tokens": 126,
+        "prefix_cache_hit": true,
+        "branch_tokens": 70,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a04b-health-route-absent",
+      "repeat": 0,
+      "scored": {
+        "health_route": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.99999999669574
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "health_route": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            42.86227035522461,
+            23.334217071533203
+          ],
+          "probabilities": [
+            0.99999999669574,
+            3.3042600161715724e-09
+          ],
+          "label_mass": 0.9999999710734664
+        }
+      },
+      "state_sha256": "c1d4e7b1ff1352a65924b84024ea062f3ebee811607fa1fc07a47f69751c8deb",
+      "metrics": {
+        "latency_ms": 2027.1667079650797,
+        "prefill_ms": 1149.3359999731183,
+        "branch_ms": 875.3330829786137,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": false,
+        "branch_tokens": 70,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a04b-health-route-absent",
+      "repeat": 1,
+      "scored": {
+        "health_route": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.99999999669574
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "health_route": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            42.86227035522461,
+            23.334217071533203
+          ],
+          "probabilities": [
+            0.99999999669574,
+            3.3042600161715724e-09
+          ],
+          "label_mass": 0.9999999710734664
+        }
+      },
+      "state_sha256": "c1d4e7b1ff1352a65924b84024ea062f3ebee811607fa1fc07a47f69751c8deb",
+      "metrics": {
+        "latency_ms": 852.5501669500954,
+        "prefill_ms": 0.000125030055642128,
+        "branch_ms": 850.6218749680556,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": true,
+        "branch_tokens": 70,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a05a-tls-port-order-no-yes",
+      "repeat": 0,
+      "scored": {
+        "tls_enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999920919459
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "tls_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            23.73345947265625,
+            42.38884353637695
+          ],
+          "probabilities": [
+            7.908054249139488e-09,
+            0.9999999920919459
+          ],
+          "label_mass": 0.9999997568753533
+        }
+      },
+      "state_sha256": "0f03a942ef262f00ddc896b08b2b03382c9581e8f29d4a5f7d960eed9f710658",
+      "metrics": {
+        "latency_ms": 1483.842374989763,
+        "prefill_ms": 871.8813749728724,
+        "branch_ms": 609.6604999620467,
+        "prefix_tokens": 91,
+        "prefix_cache_hit": false,
+        "branch_tokens": 64,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a05a-tls-port-order-no-yes",
+      "repeat": 1,
+      "scored": {
+        "tls_enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999920919459
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "tls_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            23.73345947265625,
+            42.38884353637695
+          ],
+          "probabilities": [
+            7.908054249139488e-09,
+            0.9999999920919459
+          ],
+          "label_mass": 0.9999997568753533
+        }
+      },
+      "state_sha256": "0f03a942ef262f00ddc896b08b2b03382c9581e8f29d4a5f7d960eed9f710658",
+      "metrics": {
+        "latency_ms": 596.6038749902509,
+        "prefill_ms": 8.300412446260452e-05,
+        "branch_ms": 594.3475830135867,
+        "prefix_tokens": 91,
+        "prefix_cache_hit": true,
+        "branch_tokens": 64,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a05b-tls-port-order-yes-no",
+      "repeat": 0,
+      "scored": {
+        "tls_enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999999400679
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "tls_enabled": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            43.2474365234375,
+            19.709625244140625
+          ],
+          "probabilities": [
+            0.9999999999400679,
+            5.993195507444086e-11
+          ],
+          "label_mass": 0.9999999955640794
+        }
+      },
+      "state_sha256": "0f03a942ef262f00ddc896b08b2b03382c9581e8f29d4a5f7d960eed9f710658",
+      "metrics": {
+        "latency_ms": 611.2070420058444,
+        "prefill_ms": 8.294591680169106e-05,
+        "branch_ms": 608.1140420283191,
+        "prefix_tokens": 91,
+        "prefix_cache_hit": true,
+        "branch_tokens": 64,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "a05b-tls-port-order-yes-no",
+      "repeat": 1,
+      "scored": {
+        "tls_enabled": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999999400679
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "tls_enabled": {
+          "outcomes": [
+            "yes",
+            "no"
+          ],
+          "logits": [
+            43.2474365234375,
+            19.709625244140625
+          ],
+          "probabilities": [
+            0.9999999999400679,
+            5.993195507444086e-11
+          ],
+          "label_mass": 0.9999999955640794
+        }
+      },
+      "state_sha256": "0f03a942ef262f00ddc896b08b2b03382c9581e8f29d4a5f7d960eed9f710658",
+      "metrics": {
+        "latency_ms": 602.2269590175711,
+        "prefill_ms": 0.0003750319592654705,
+        "branch_ms": 600.1922090072185,
+        "prefix_tokens": 91,
+        "prefix_cache_hit": true,
+        "branch_tokens": 64,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b01-status-code-first",
+      "repeat": 0,
+      "scored": {
+        "status_code": {
+          "chosen": "s404",
+          "expected": "s404",
+          "correct": true,
+          "top_probability": 0.9999999632726218
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "status_code": {
+          "outcomes": [
+            "s404",
+            "s200",
+            "s500",
+            "s301"
+          ],
+          "logits": [
+            47.062713623046875,
+            23.80846405029297,
+            24.483436584472656,
+            29.936527252197266
+          ],
+          "probabilities": [
+            0.9999999632726218,
+            7.95806924642828e-11,
+            1.5629481142620742e-10,
+            3.649150264976826e-08
+          ],
+          "label_mass": 0.9999969151968293
+        }
+      },
+      "state_sha256": "95ef5a33e150707f38d8c65325fa5fc18fb200d6a5685dbced7062a3e8c8be80",
+      "metrics": {
+        "latency_ms": 2039.4165830221027,
+        "prefill_ms": 1162.1689579915255,
+        "branch_ms": 874.6832499746233,
+        "prefix_tokens": 109,
+        "prefix_cache_hit": false,
+        "branch_tokens": 94,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b01-status-code-first",
+      "repeat": 1,
+      "scored": {
+        "status_code": {
+          "chosen": "s404",
+          "expected": "s404",
+          "correct": true,
+          "top_probability": 0.9999999632726218
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "status_code": {
+          "outcomes": [
+            "s404",
+            "s200",
+            "s500",
+            "s301"
+          ],
+          "logits": [
+            47.062713623046875,
+            23.80846405029297,
+            24.483436584472656,
+            29.936527252197266
+          ],
+          "probabilities": [
+            0.9999999632726218,
+            7.95806924642828e-11,
+            1.5629481142620742e-10,
+            3.649150264976826e-08
+          ],
+          "label_mass": 0.9999969151968293
+        }
+      },
+      "state_sha256": "95ef5a33e150707f38d8c65325fa5fc18fb200d6a5685dbced7062a3e8c8be80",
+      "metrics": {
+        "latency_ms": 876.070000056643,
+        "prefill_ms": 0.0004169996827840805,
+        "branch_ms": 873.6646250472404,
+        "prefix_tokens": 109,
+        "prefix_cache_hit": true,
+        "branch_tokens": 94,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b02-status-code-last",
+      "repeat": 0,
+      "scored": {
+        "status_code": {
+          "chosen": "s201",
+          "expected": "s201",
+          "correct": true,
+          "top_probability": 0.9999999999795894
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "status_code": {
+          "outcomes": [
+            "s404",
+            "s200",
+            "s500",
+            "s201"
+          ],
+          "logits": [
+            21.38367462158203,
+            22.371862411499023,
+            21.493066787719727,
+            47.56766891479492
+          ],
+          "probabilities": [
+            4.2504583436888085e-12,
+            1.1418268954958835e-11,
+            4.741810329435016e-12,
+            0.9999999999795894
+          ],
+          "label_mass": 0.9999364271836986
+        }
+      },
+      "state_sha256": "93502f0f51e18ef2f4619da5ca6db18feb6d23c45c6b87ac86ffdbb9be0ec52e",
+      "metrics": {
+        "latency_ms": 2058.81054099882,
+        "prefill_ms": 1156.1035829945467,
+        "branch_ms": 899.556374992244,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": false,
+        "branch_tokens": 94,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b02-status-code-last",
+      "repeat": 1,
+      "scored": {
+        "status_code": {
+          "chosen": "s201",
+          "expected": "s201",
+          "correct": true,
+          "top_probability": 0.9999999999795894
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "status_code": {
+          "outcomes": [
+            "s404",
+            "s200",
+            "s500",
+            "s201"
+          ],
+          "logits": [
+            21.38367462158203,
+            22.371862411499023,
+            21.493066787719727,
+            47.56766891479492
+          ],
+          "probabilities": [
+            4.2504583436888085e-12,
+            1.1418268954958835e-11,
+            4.741810329435016e-12,
+            0.9999999999795894
+          ],
+          "label_mass": 0.9999364271836986
+        }
+      },
+      "state_sha256": "93502f0f51e18ef2f4619da5ca6db18feb6d23c45c6b87ac86ffdbb9be0ec52e",
+      "metrics": {
+        "latency_ms": 894.8894999921322,
+        "prefill_ms": 0.00020902371034026146,
+        "branch_ms": 892.6994999637827,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 94,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b03-db-engine-middle",
+      "repeat": 0,
+      "scored": {
+        "engine": {
+          "chosen": "postgres",
+          "expected": "postgres",
+          "correct": true,
+          "top_probability": 0.9999999999021973
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "engine": {
+          "outcomes": [
+            "mysql",
+            "sqlite",
+            "postgres",
+            "mongodb",
+            "redis"
+          ],
+          "logits": [
+            20.74390983581543,
+            19.06987762451172,
+            44.15668487548828,
+            19.240238189697266,
+            17.246950149536133
+          ],
+          "probabilities": [
+            6.791426332207425e-11,
+            1.2733214123275681e-11,
+            0.9999999999021973,
+            1.5098183371189587e-11,
+            2.0570777132983612e-12
+          ],
+          "label_mass": 0.9999999920681938
+        }
+      },
+      "state_sha256": "6046ef5407e4fd94108fae44be468d8cc7246477f99b48b0d8f457bf458da0a6",
+      "metrics": {
+        "latency_ms": 2071.3823749683797,
+        "prefill_ms": 1181.699041975662,
+        "branch_ms": 886.8898330256343,
+        "prefix_tokens": 98,
+        "prefix_cache_hit": false,
+        "branch_tokens": 75,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b03-db-engine-middle",
+      "repeat": 1,
+      "scored": {
+        "engine": {
+          "chosen": "postgres",
+          "expected": "postgres",
+          "correct": true,
+          "top_probability": 0.9999999999021973
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "engine": {
+          "outcomes": [
+            "mysql",
+            "sqlite",
+            "postgres",
+            "mongodb",
+            "redis"
+          ],
+          "logits": [
+            20.74390983581543,
+            19.06987762451172,
+            44.15668487548828,
+            19.240238189697266,
+            17.246950149536133
+          ],
+          "probabilities": [
+            6.791426332207425e-11,
+            1.2733214123275681e-11,
+            0.9999999999021973,
+            1.5098183371189587e-11,
+            2.0570777132983612e-12
+          ],
+          "label_mass": 0.9999999920681938
+        }
+      },
+      "state_sha256": "6046ef5407e4fd94108fae44be468d8cc7246477f99b48b0d8f457bf458da0a6",
+      "metrics": {
+        "latency_ms": 883.3724579890259,
+        "prefill_ms": 0.00020902371034026146,
+        "branch_ms": 881.323958048597,
+        "prefix_tokens": 98,
+        "prefix_cache_hit": true,
+        "branch_tokens": 75,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b04-db-engine-permuted",
+      "repeat": 0,
+      "scored": {
+        "engine": {
+          "chosen": "postgres",
+          "expected": "postgres",
+          "correct": true,
+          "top_probability": 0.9999999958331471
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "engine": {
+          "outcomes": [
+            "postgres",
+            "redis",
+            "mongodb",
+            "sqlite",
+            "mysql"
+          ],
+          "logits": [
+            42.285675048828125,
+            19.65148162841797,
+            19.481224060058594,
+            22.84122657775879,
+            20.364215850830078
+          ],
+          "probabilities": [
+            0.9999999958331471,
+            1.479430927464046e-10,
+            1.2478223811277408e-10,
+            3.592388715914149e-09,
+            3.0173885168587306e-10
+          ],
+          "label_mass": 0.9999999706599956
+        }
+      },
+      "state_sha256": "6046ef5407e4fd94108fae44be468d8cc7246477f99b48b0d8f457bf458da0a6",
+      "metrics": {
+        "latency_ms": 883.6110419942997,
+        "prefill_ms": 0.0002080341801047325,
+        "branch_ms": 881.2124169780873,
+        "prefix_tokens": 98,
+        "prefix_cache_hit": true,
+        "branch_tokens": 75,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b04-db-engine-permuted",
+      "repeat": 1,
+      "scored": {
+        "engine": {
+          "chosen": "postgres",
+          "expected": "postgres",
+          "correct": true,
+          "top_probability": 0.9999999958331471
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "engine": {
+          "outcomes": [
+            "postgres",
+            "redis",
+            "mongodb",
+            "sqlite",
+            "mysql"
+          ],
+          "logits": [
+            42.285675048828125,
+            19.65148162841797,
+            19.481224060058594,
+            22.84122657775879,
+            20.364215850830078
+          ],
+          "probabilities": [
+            0.9999999958331471,
+            1.479430927464046e-10,
+            1.2478223811277408e-10,
+            3.592388715914149e-09,
+            3.0173885168587306e-10
+          ],
+          "label_mass": 0.9999999706599956
+        }
+      },
+      "state_sha256": "6046ef5407e4fd94108fae44be468d8cc7246477f99b48b0d8f457bf458da0a6",
+      "metrics": {
+        "latency_ms": 867.4207919975743,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 865.4326249961741,
+        "prefix_tokens": 98,
+        "prefix_cache_hit": true,
+        "branch_tokens": 75,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b05-month-12-outcomes",
+      "repeat": 0,
+      "scored": {
+        "issue_month": {
+          "chosen": "september",
+          "expected": "september",
+          "correct": true,
+          "top_probability": 0.9999999997187805
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "issue_month": {
+          "outcomes": [
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december"
+          ],
+          "logits": [
+            20.974361419677734,
+            18.362476348876953,
+            18.914945602416992,
+            19.795934677124023,
+            20.8790283203125,
+            19.419471740722656,
+            21.805042266845703,
+            24.225109100341797,
+            46.87705612182617,
+            23.848461151123047,
+            19.747167587280273,
+            21.159360885620117
+          ],
+          "probabilities": [
+            5.631221681215372e-12,
+            4.1330946474555785e-13,
+            7.181409616669103e-13,
+            1.73307913095345e-12,
+            5.119175106878274e-12,
+            1.1893854373770123e-12,
+            1.2922981793105766e-11,
+            1.4533974841296635e-10,
+            0.9999999997187805,
+            9.972597203954364e-11,
+            1.6505896390924959e-12,
+            6.775586148730858e-12
+          ],
+          "label_mass": 0.9999999047310177
+        }
+      },
+      "state_sha256": "b11a2e724a5b614c76c00251473d1b60f095a9759aff1a8a1471a9574043ee02",
+      "metrics": {
+        "latency_ms": 2361.1431670142338,
+        "prefill_ms": 1149.659208022058,
+        "branch_ms": 1208.4355410188437,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": false,
+        "branch_tokens": 124,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b05-month-12-outcomes",
+      "repeat": 1,
+      "scored": {
+        "issue_month": {
+          "chosen": "september",
+          "expected": "september",
+          "correct": true,
+          "top_probability": 0.9999999997187805
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "issue_month": {
+          "outcomes": [
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december"
+          ],
+          "logits": [
+            20.974361419677734,
+            18.362476348876953,
+            18.914945602416992,
+            19.795934677124023,
+            20.8790283203125,
+            19.419471740722656,
+            21.805042266845703,
+            24.225109100341797,
+            46.87705612182617,
+            23.848461151123047,
+            19.747167587280273,
+            21.159360885620117
+          ],
+          "probabilities": [
+            5.631221681215372e-12,
+            4.1330946474555785e-13,
+            7.181409616669103e-13,
+            1.73307913095345e-12,
+            5.119175106878274e-12,
+            1.1893854373770123e-12,
+            1.2922981793105766e-11,
+            1.4533974841296635e-10,
+            0.9999999997187805,
+            9.972597203954364e-11,
+            1.6505896390924959e-12,
+            6.775586148730858e-12
+          ],
+          "label_mass": 0.9999999047310177
+        }
+      },
+      "state_sha256": "b11a2e724a5b614c76c00251473d1b60f095a9759aff1a8a1471a9574043ee02",
+      "metrics": {
+        "latency_ms": 1171.3660840177909,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 1168.5680000227876,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 124,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b06-month-12-outcomes-early",
+      "repeat": 0,
+      "scored": {
+        "issue_month": {
+          "chosen": "february",
+          "expected": "february",
+          "correct": true,
+          "top_probability": 0.999999999232231
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "issue_month": {
+          "outcomes": [
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december"
+          ],
+          "logits": [
+            21.410593032836914,
+            47.405250549316406,
+            25.98747444152832,
+            23.801593780517578,
+            19.717552185058594,
+            20.853321075439453,
+            21.958675384521484,
+            20.40057373046875,
+            17.12110137939453,
+            17.94272232055664,
+            20.08891487121582,
+            25.026277542114258
+          ],
+          "probabilities": [
+            5.136457290216565e-12,
+            0.999999999232231,
+            4.993189187685711e-10,
+            5.6112822213147107e-11,
+            9.448989871589481e-13,
+            2.9420059402116725e-12,
+            8.88572405712673e-12,
+            1.8707591224255545e-12,
+            7.043055748831635e-14,
+            1.6017198839522803e-13,
+            1.3698283459462084e-12,
+            1.9095696871128112e-10
+          ],
+          "label_mass": 0.999999931554585
+        }
+      },
+      "state_sha256": "8451e7a8c73d24e0ccff2e63d6d9e6c8eae70a566d2788f7c0d8d44eb079d659",
+      "metrics": {
+        "latency_ms": 2330.0169999711215,
+        "prefill_ms": 1165.5049169785343,
+        "branch_ms": 1162.4335829983465,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": false,
+        "branch_tokens": 124,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b06-month-12-outcomes-early",
+      "repeat": 1,
+      "scored": {
+        "issue_month": {
+          "chosen": "february",
+          "expected": "february",
+          "correct": true,
+          "top_probability": 0.999999999232231
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "issue_month": {
+          "outcomes": [
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december"
+          ],
+          "logits": [
+            21.410593032836914,
+            47.405250549316406,
+            25.98747444152832,
+            23.801593780517578,
+            19.717552185058594,
+            20.853321075439453,
+            21.958675384521484,
+            20.40057373046875,
+            17.12110137939453,
+            17.94272232055664,
+            20.08891487121582,
+            25.026277542114258
+          ],
+          "probabilities": [
+            5.136457290216565e-12,
+            0.999999999232231,
+            4.993189187685711e-10,
+            5.6112822213147107e-11,
+            9.448989871589481e-13,
+            2.9420059402116725e-12,
+            8.88572405712673e-12,
+            1.8707591224255545e-12,
+            7.043055748831635e-14,
+            1.6017198839522803e-13,
+            1.3698283459462084e-12,
+            1.9095696871128112e-10
+          ],
+          "label_mass": 0.999999931554585
+        }
+      },
+      "state_sha256": "8451e7a8c73d24e0ccff2e63d6d9e6c8eae70a566d2788f7c0d8d44eb079d659",
+      "metrics": {
+        "latency_ms": 1205.8205830398947,
+        "prefill_ms": 0.000292027834802866,
+        "branch_ms": 1203.1639579799958,
+        "prefix_tokens": 108,
+        "prefix_cache_hit": true,
+        "branch_tokens": 124,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b07-port-32-outcomes",
+      "repeat": 0,
+      "scored": {
+        "listen_port": {
+          "chosen": "p7629",
+          "expected": "p7629",
+          "correct": true,
+          "top_probability": 0.9999999993585027
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "listen_port": {
+          "outcomes": [
+            "p7000",
+            "p7037",
+            "p7074",
+            "p7111",
+            "p7148",
+            "p7185",
+            "p7222",
+            "p7259",
+            "p7296",
+            "p7333",
+            "p7370",
+            "p7407",
+            "p7444",
+            "p7481",
+            "p7518",
+            "p7555",
+            "p7592",
+            "p7629",
+            "p7666",
+            "p7703",
+            "p7740",
+            "p7777",
+            "p7814",
+            "p7851",
+            "p7888",
+            "p7925",
+            "p7962",
+            "p7999",
+            "p8036",
+            "p8073",
+            "p8110",
+            "p8147"
+          ],
+          "logits": [
+            19.293109893798828,
+            17.975570678710938,
+            17.21888542175293,
+            19.62867546081543,
+            16.724157333374023,
+            16.570871353149414,
+            18.606433868408203,
+            15.12283706665039,
+            14.817607879638672,
+            14.609628677368164,
+            17.041507720947266,
+            15.667608261108398,
+            17.33339500427246,
+            15.904322624206543,
+            16.347877502441406,
+            16.536867141723633,
+            17.329652786254883,
+            41.97770309448242,
+            17.697158813476562,
+            15.280600547790527,
+            17.009767532348633,
+            14.466825485229492,
+            15.337113380432129,
+            16.550006866455078,
+            13.520383834838867,
+            16.794422149658203,
+            9.150737762451172,
+            12.225502014160156,
+            14.468400955200195,
+            11.245570182800293,
+            15.053747177124023,
+            10.556621551513672
+          ],
+          "probabilities": [
+            1.406715745047496e-10,
+            3.7670929624634115e-11,
+            1.7675923203056348e-11,
+            1.9676172553234504e-10,
+            1.0777658716448129e-11,
+            9.245984729208146e-12,
+            7.07924169128567e-11,
+            2.173100799508554e-12,
+            1.6014763145926741e-12,
+            1.3007573843585713e-12,
+            1.4802938994306154e-11,
+            3.746890447195789e-12,
+            1.9820426058772717e-11,
+            4.74760673120408e-12,
+            7.397895169867781e-12,
+            8.936867734531692e-12,
+            1.9746392314863254e-11,
+            0.9999999993585027,
+            2.851632796513795e-11,
+            2.544460310049471e-12,
+            1.434046918353416e-11,
+            1.1276586657914101e-12,
+            2.6923957246938786e-12,
+            9.055070592369978e-12,
+            4.376664692750822e-13,
+            1.1562188598599246e-11,
+            5.538983843796195e-15,
+            1.1989007891490417e-13,
+            1.1294366583757663e-12,
+            4.4999144684881856e-14,
+            2.0280306477726007e-12,
+            2.259423649253855e-14
+          ],
+          "label_mass": 0.9915021812794791
+        }
+      },
+      "state_sha256": "f6a2f356e6e1909e10cb4756dc017b6e239319435bd4f2683e3cde376ed45df5",
+      "metrics": {
+        "latency_ms": 5792.734541988466,
+        "prefill_ms": 1191.9112499454059,
+        "branch_ms": 4596.4577500126325,
+        "prefix_tokens": 103,
+        "prefix_cache_hit": false,
+        "branch_tokens": 494,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b07-port-32-outcomes",
+      "repeat": 1,
+      "scored": {
+        "listen_port": {
+          "chosen": "p7629",
+          "expected": "p7629",
+          "correct": true,
+          "top_probability": 0.9999999993585027
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "listen_port": {
+          "outcomes": [
+            "p7000",
+            "p7037",
+            "p7074",
+            "p7111",
+            "p7148",
+            "p7185",
+            "p7222",
+            "p7259",
+            "p7296",
+            "p7333",
+            "p7370",
+            "p7407",
+            "p7444",
+            "p7481",
+            "p7518",
+            "p7555",
+            "p7592",
+            "p7629",
+            "p7666",
+            "p7703",
+            "p7740",
+            "p7777",
+            "p7814",
+            "p7851",
+            "p7888",
+            "p7925",
+            "p7962",
+            "p7999",
+            "p8036",
+            "p8073",
+            "p8110",
+            "p8147"
+          ],
+          "logits": [
+            19.293109893798828,
+            17.975570678710938,
+            17.21888542175293,
+            19.62867546081543,
+            16.724157333374023,
+            16.570871353149414,
+            18.606433868408203,
+            15.12283706665039,
+            14.817607879638672,
+            14.609628677368164,
+            17.041507720947266,
+            15.667608261108398,
+            17.33339500427246,
+            15.904322624206543,
+            16.347877502441406,
+            16.536867141723633,
+            17.329652786254883,
+            41.97770309448242,
+            17.697158813476562,
+            15.280600547790527,
+            17.009767532348633,
+            14.466825485229492,
+            15.337113380432129,
+            16.550006866455078,
+            13.520383834838867,
+            16.794422149658203,
+            9.150737762451172,
+            12.225502014160156,
+            14.468400955200195,
+            11.245570182800293,
+            15.053747177124023,
+            10.556621551513672
+          ],
+          "probabilities": [
+            1.406715745047496e-10,
+            3.7670929624634115e-11,
+            1.7675923203056348e-11,
+            1.9676172553234504e-10,
+            1.0777658716448129e-11,
+            9.245984729208146e-12,
+            7.07924169128567e-11,
+            2.173100799508554e-12,
+            1.6014763145926741e-12,
+            1.3007573843585713e-12,
+            1.4802938994306154e-11,
+            3.746890447195789e-12,
+            1.9820426058772717e-11,
+            4.74760673120408e-12,
+            7.397895169867781e-12,
+            8.936867734531692e-12,
+            1.9746392314863254e-11,
+            0.9999999993585027,
+            2.851632796513795e-11,
+            2.544460310049471e-12,
+            1.434046918353416e-11,
+            1.1276586657914101e-12,
+            2.6923957246938786e-12,
+            9.055070592369978e-12,
+            4.376664692750822e-13,
+            1.1562188598599246e-11,
+            5.538983843796195e-15,
+            1.1989007891490417e-13,
+            1.1294366583757663e-12,
+            4.4999144684881856e-14,
+            2.0280306477726007e-12,
+            2.259423649253855e-14
+          ],
+          "label_mass": 0.9915021812794791
+        }
+      },
+      "state_sha256": "f6a2f356e6e1909e10cb4756dc017b6e239319435bd4f2683e3cde376ed45df5",
+      "metrics": {
+        "latency_ms": 4527.313959028106,
+        "prefill_ms": 8.300412446260452e-05,
+        "branch_ms": 4521.864040987566,
+        "prefix_tokens": 103,
+        "prefix_cache_hit": true,
+        "branch_tokens": 494,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b08-port-32-outcomes-tail",
+      "repeat": 0,
+      "scored": {
+        "listen_port": {
+          "chosen": "p8110",
+          "expected": "p8110",
+          "correct": true,
+          "top_probability": 0.9999999997786178
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "listen_port": {
+          "outcomes": [
+            "p7000",
+            "p7037",
+            "p7074",
+            "p7111",
+            "p7148",
+            "p7185",
+            "p7222",
+            "p7259",
+            "p7296",
+            "p7333",
+            "p7370",
+            "p7407",
+            "p7444",
+            "p7481",
+            "p7518",
+            "p7555",
+            "p7592",
+            "p7629",
+            "p7666",
+            "p7703",
+            "p7740",
+            "p7777",
+            "p7814",
+            "p7851",
+            "p7888",
+            "p7925",
+            "p7962",
+            "p7999",
+            "p8036",
+            "p8073",
+            "p8110",
+            "p8147"
+          ],
+          "logits": [
+            25.299345016479492,
+            13.805163383483887,
+            14.135953903198242,
+            14.505403518676758,
+            19.238582611083984,
+            12.429534912109375,
+            13.7440185546875,
+            11.753571510314941,
+            15.054218292236328,
+            14.046506881713867,
+            12.061914443969727,
+            13.641637802124023,
+            14.492518424987793,
+            11.52615737915039,
+            12.948053359985352,
+            12.972869873046875,
+            13.846071243286133,
+            13.742477416992188,
+            12.829421043395996,
+            12.168571472167969,
+            11.71696662902832,
+            12.029400825500488,
+            13.933544158935547,
+            18.226383209228516,
+            15.550402641296387,
+            14.01451301574707,
+            18.02676773071289,
+            19.335237503051758,
+            24.338478088378906,
+            24.47615623474121,
+            48.42844009399414,
+            24.831436157226562
+          ],
+          "probabilities": [
+            9.019067480544834e-11,
+            9.189713651463755e-16,
+            1.2792707690358373e-15,
+            1.851025517655706e-15,
+            2.1038073474670482e-13,
+            2.322063675971209e-16,
+            8.644644086119044e-16,
+            1.181155154368562e-16,
+            3.2044952604497745e-15,
+            1.1698121523926674e-15,
+            1.6077502437768795e-16,
+            7.803397344171605e-16,
+            1.827327881438507e-15,
+            9.408973540132235e-17,
+            3.899992982108254e-16,
+            3.997988128587808e-16,
+            9.573440377808333e-16,
+            8.631331759954047e-16,
+            3.463717509796899e-16,
+            1.7887067377596014e-16,
+            1.1387008675566235e-16,
+            1.5563171348964278e-16,
+            1.0448574447778872e-15,
+            7.645631331425641e-14,
+            5.263198606314814e-15,
+            1.1329777190901643e-15,
+            6.262120954890475e-14,
+            2.3173020923308115e-13,
+            3.450344279065269e-11,
+            3.959636243955353e-11,
+            0.9999999997786178,
+            5.648737596500737e-11
+          ],
+          "label_mass": 0.9999996999736719
+        }
+      },
+      "state_sha256": "ed6713340b80d9bc5f6b25297fdbe39a008859c8a1193b618267510acb4e8958",
+      "metrics": {
+        "latency_ms": 5821.983292000368,
+        "prefill_ms": 1213.2344580022618,
+        "branch_ms": 4604.684625053778,
+        "prefix_tokens": 105,
+        "prefix_cache_hit": false,
+        "branch_tokens": 494,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b08-port-32-outcomes-tail",
+      "repeat": 1,
+      "scored": {
+        "listen_port": {
+          "chosen": "p8110",
+          "expected": "p8110",
+          "correct": true,
+          "top_probability": 0.9999999997786178
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "listen_port": {
+          "outcomes": [
+            "p7000",
+            "p7037",
+            "p7074",
+            "p7111",
+            "p7148",
+            "p7185",
+            "p7222",
+            "p7259",
+            "p7296",
+            "p7333",
+            "p7370",
+            "p7407",
+            "p7444",
+            "p7481",
+            "p7518",
+            "p7555",
+            "p7592",
+            "p7629",
+            "p7666",
+            "p7703",
+            "p7740",
+            "p7777",
+            "p7814",
+            "p7851",
+            "p7888",
+            "p7925",
+            "p7962",
+            "p7999",
+            "p8036",
+            "p8073",
+            "p8110",
+            "p8147"
+          ],
+          "logits": [
+            25.299345016479492,
+            13.805163383483887,
+            14.135953903198242,
+            14.505403518676758,
+            19.238582611083984,
+            12.429534912109375,
+            13.7440185546875,
+            11.753571510314941,
+            15.054218292236328,
+            14.046506881713867,
+            12.061914443969727,
+            13.641637802124023,
+            14.492518424987793,
+            11.52615737915039,
+            12.948053359985352,
+            12.972869873046875,
+            13.846071243286133,
+            13.742477416992188,
+            12.829421043395996,
+            12.168571472167969,
+            11.71696662902832,
+            12.029400825500488,
+            13.933544158935547,
+            18.226383209228516,
+            15.550402641296387,
+            14.01451301574707,
+            18.02676773071289,
+            19.335237503051758,
+            24.338478088378906,
+            24.47615623474121,
+            48.42844009399414,
+            24.831436157226562
+          ],
+          "probabilities": [
+            9.019067480544834e-11,
+            9.189713651463755e-16,
+            1.2792707690358373e-15,
+            1.851025517655706e-15,
+            2.1038073474670482e-13,
+            2.322063675971209e-16,
+            8.644644086119044e-16,
+            1.181155154368562e-16,
+            3.2044952604497745e-15,
+            1.1698121523926674e-15,
+            1.6077502437768795e-16,
+            7.803397344171605e-16,
+            1.827327881438507e-15,
+            9.408973540132235e-17,
+            3.899992982108254e-16,
+            3.997988128587808e-16,
+            9.573440377808333e-16,
+            8.631331759954047e-16,
+            3.463717509796899e-16,
+            1.7887067377596014e-16,
+            1.1387008675566235e-16,
+            1.5563171348964278e-16,
+            1.0448574447778872e-15,
+            7.645631331425641e-14,
+            5.263198606314814e-15,
+            1.1329777190901643e-15,
+            6.262120954890475e-14,
+            2.3173020923308115e-13,
+            3.450344279065269e-11,
+            3.959636243955353e-11,
+            0.9999999997786178,
+            5.648737596500737e-11
+          ],
+          "label_mass": 0.9999996999736719
+        }
+      },
+      "state_sha256": "ed6713340b80d9bc5f6b25297fdbe39a008859c8a1193b618267510acb4e8958",
+      "metrics": {
+        "latency_ms": 4605.474625015631,
+        "prefill_ms": 0.00016600824892520905,
+        "branch_ms": 4602.597124991007,
+        "prefix_tokens": 105,
+        "prefix_cache_hit": true,
+        "branch_tokens": 494,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b09-errcode-128-outcomes",
+      "repeat": 0,
+      "scored": {
+        "error_code": {
+          "chosen": "e173",
+          "expected": "e173",
+          "correct": true,
+          "top_probability": 0.9999999185153166
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "error_code": {
+          "outcomes": [
+            "e100",
+            "e101",
+            "e102",
+            "e103",
+            "e104",
+            "e105",
+            "e106",
+            "e107",
+            "e108",
+            "e109",
+            "e110",
+            "e111",
+            "e112",
+            "e113",
+            "e114",
+            "e115",
+            "e116",
+            "e117",
+            "e118",
+            "e119",
+            "e120",
+            "e121",
+            "e122",
+            "e123",
+            "e124",
+            "e125",
+            "e126",
+            "e127",
+            "e128",
+            "e129",
+            "e130",
+            "e131",
+            "e132",
+            "e133",
+            "e134",
+            "e135",
+            "e136",
+            "e137",
+            "e138",
+            "e139",
+            "e140",
+            "e141",
+            "e142",
+            "e143",
+            "e144",
+            "e145",
+            "e146",
+            "e147",
+            "e148",
+            "e149",
+            "e150",
+            "e151",
+            "e152",
+            "e153",
+            "e154",
+            "e155",
+            "e156",
+            "e157",
+            "e158",
+            "e159",
+            "e160",
+            "e161",
+            "e162",
+            "e163",
+            "e164",
+            "e165",
+            "e166",
+            "e167",
+            "e168",
+            "e169",
+            "e170",
+            "e171",
+            "e172",
+            "e173",
+            "e174",
+            "e175",
+            "e176",
+            "e177",
+            "e178",
+            "e179",
+            "e180",
+            "e181",
+            "e182",
+            "e183",
+            "e184",
+            "e185",
+            "e186",
+            "e187",
+            "e188",
+            "e189",
+            "e190",
+            "e191",
+            "e192",
+            "e193",
+            "e194",
+            "e195",
+            "e196",
+            "e197",
+            "e198",
+            "e199",
+            "e200",
+            "e201",
+            "e202",
+            "e203",
+            "e204",
+            "e205",
+            "e206",
+            "e207",
+            "e208",
+            "e209",
+            "e210",
+            "e211",
+            "e212",
+            "e213",
+            "e214",
+            "e215",
+            "e216",
+            "e217",
+            "e218",
+            "e219",
+            "e220",
+            "e221",
+            "e222",
+            "e223",
+            "e224",
+            "e225",
+            "e226",
+            "e227"
+          ],
+          "logits": [
+            20.713035583496094,
+            25.564373016357422,
+            18.207935333251953,
+            18.00688934326172,
+            20.25861930847168,
+            17.12885093688965,
+            19.08623504638672,
+            19.39883041381836,
+            16.6837215423584,
+            18.620040893554688,
+            22.296472549438477,
+            19.859294891357422,
+            20.087932586669922,
+            16.101959228515625,
+            23.297332763671875,
+            15.396811485290527,
+            19.806564331054688,
+            19.541248321533203,
+            17.195087432861328,
+            16.759817123413086,
+            19.13345718383789,
+            16.182201385498047,
+            17.139053344726562,
+            24.637365341186523,
+            17.814170837402344,
+            18.152952194213867,
+            12.908710479736328,
+            16.423030853271484,
+            14.69425106048584,
+            11.630806922912598,
+            13.787839889526367,
+            9.562801361083984,
+            13.311227798461914,
+            9.2727689743042,
+            8.725893020629883,
+            8.266376495361328,
+            8.496047019958496,
+            14.077142715454102,
+            11.683039665222168,
+            12.087896347045898,
+            10.13609504699707,
+            12.259529113769531,
+            10.947307586669922,
+            14.51906681060791,
+            14.047351837158203,
+            13.783946990966797,
+            10.330140113830566,
+            11.220989227294922,
+            10.15848159790039,
+            23.006641387939453,
+            14.827627182006836,
+            16.082622528076172,
+            16.737651824951172,
+            18.70309829711914,
+            18.738662719726562,
+            15.954910278320312,
+            20.14842987060547,
+            22.0152587890625,
+            20.106609344482422,
+            14.512443542480469,
+            18.450817108154297,
+            22.677520751953125,
+            14.911603927612305,
+            19.024471282958984,
+            20.25194549560547,
+            16.748031616210938,
+            21.533226013183594,
+            17.8338623046875,
+            19.61544418334961,
+            19.45761489868164,
+            15.01297378540039,
+            20.996519088745117,
+            25.735300064086914,
+            43.217369079589844,
+            21.244476318359375,
+            10.054905891418457,
+            10.283675193786621,
+            8.910706520080566,
+            10.700895309448242,
+            10.019018173217773,
+            9.09600830078125,
+            8.251416206359863,
+            9.659123420715332,
+            5.785259246826172,
+            7.82773494720459,
+            9.417130470275879,
+            12.096293449401855,
+            9.820300102233887,
+            9.026145935058594,
+            7.605615139007568,
+            9.467939376831055,
+            9.350379943847656,
+            9.839502334594727,
+            11.240972518920898,
+            7.622299671173096,
+            9.468623161315918,
+            8.9306640625,
+            25.19349479675293,
+            8.110544204711914,
+            8.735193252563477,
+            8.248308181762695,
+            9.326896667480469,
+            8.50487995147705,
+            9.560729026794434,
+            8.804014205932617,
+            8.258232116699219,
+            7.815067768096924,
+            5.939394950866699,
+            6.314425468444824,
+            5.375058650970459,
+            6.0513739585876465,
+            6.598226547241211,
+            7.54864501953125,
+            8.188469886779785,
+            7.007347106933594,
+            8.312816619873047,
+            6.83076286315918,
+            11.959378242492676,
+            8.07754135131836,
+            6.569668769836426,
+            6.637038230895996,
+            9.381155014038086,
+            23.308002471923828,
+            11.183686256408691,
+            12.258626937866211,
+            11.91427230834961,
+            8.098039627075195,
+            6.739490985870361
+          ],
+          "probabilities": [
+            1.684581815620937e-10,
+            2.154771314224197e-08,
+            1.3757543448374933e-11,
+            1.1251948325175051e-11,
+            1.0694035651771294e-10,
+            4.6762798582482685e-12,
+            3.3111710165121523e-11,
+            4.5262658128468914e-11,
+            2.9962859265890923e-12,
+            2.0773805631119797e-11,
+            8.206728103777622e-10,
+            7.173270972890434e-11,
+            9.0159880248884e-11,
+            1.674661714470055e-12,
+            2.2327397962707416e-09,
+            8.27342468823455e-13,
+            6.804820056479571e-11,
+            5.219048906078923e-11,
+            4.996508595964204e-12,
+            3.233189393147696e-12,
+            3.4712822343819356e-11,
+            1.8145787377281215e-12,
+            4.724233377248089e-12,
+            8.527208208846175e-09,
+            9.279640364821374e-12,
+            1.3021530099883759e-11,
+            6.872532160084511e-14,
+            2.3086958733625706e-12,
+            4.097955162048763e-13,
+            1.914830417257956e-14,
+            1.6554567247514446e-13,
+            2.4210675879137912e-15,
+            1.0278454819106866e-13,
+            1.811537999848857e-15,
+            1.0484367596441008e-15,
+            6.621810501377639e-16,
+            8.331465297643114e-16,
+            2.2108559833053498e-13,
+            2.0175054167976825e-14,
+            3.0244174302300554e-14,
+            4.295217871105895e-15,
+            3.5907146682058635e-14,
+            9.666969036876808e-15,
+            3.439423459842235e-13,
+            2.1459640350533653e-13,
+            1.6490247273318655e-13,
+            5.215043071978804e-15,
+            1.2710093748412404e-14,
+            4.392457351919804e-15,
+            1.669523178513495e-09,
+            4.682650191342892e-13,
+            1.6425903589620948e-12,
+            3.162313183207365e-12,
+            2.2572904068830027e-11,
+            2.3390142538731596e-11,
+            1.4456546055043821e-12,
+            9.578267522496238e-11,
+            6.194987875451015e-10,
+            9.185959769438841e-11,
+            3.41671850955175e-13,
+            1.7539738236120708e-11,
+            1.201315766060537e-09,
+            5.092867214783412e-13,
+            3.112848255406627e-11,
+            1.06229032851168e-10,
+            3.1953082788089145e-12,
+            3.825571171640275e-10,
+            9.464181075170686e-12,
+            5.621008213352987e-11,
+            4.800316055018115e-11,
+            5.636204247899816e-13,
+            2.2366984170364278e-10,
+            2.556429726428561e-08,
+            0.9999999185153166,
+            2.866116814290706e-10,
+            3.960273645407699e-15,
+            4.978269932784283e-15,
+            1.2612631942966628e-15,
+            7.555702251449261e-15,
+            3.820668499030155e-15,
+            1.5180331772300947e-15,
+            6.523483635601572e-16,
+            2.6658705229755837e-15,
+            5.539125668038907e-17,
+            4.270484445290341e-16,
+            2.0928728763973633e-15,
+            3.049920699886086e-14,
+            3.132111369452753e-15,
+            1.415599574478599e-15,
+            3.4198868503621335e-16,
+            2.2019572207670707e-15,
+            1.9577330127452764e-15,
+            3.1928360586603134e-15,
+            1.2966638020748194e-14,
+            3.4774247240254423e-16,
+            2.2034633998432205e-15,
+            1.2866877701384794e-15,
+            1.487067975524776e-08,
+            5.666301043335218e-16,
+            1.0582329474765057e-15,
+            6.503239963214603e-16,
+            1.9122946364455293e-15,
+            8.405382532414016e-16,
+            2.416055521666133e-15,
+            1.1336261075330952e-15,
+            6.568098989565143e-16,
+            4.216730627329945e-16,
+            6.462216501877926e-17,
+            9.402756474613298e-17,
+            3.675304810267423e-17,
+            7.227920533505691e-17,
+            1.2488446876743287e-16,
+            3.2305013643869974e-16,
+            6.125511196553783e-16,
+            1.880127199316149e-16,
+            6.936580617613251e-16,
+            1.575787567239063e-16,
+            2.659665554066497e-14,
+            5.482349106344463e-16,
+            1.213684891393826e-16,
+            1.2982673369253634e-16,
+            2.0189190569719805e-15,
+            2.2566900222486356e-09,
+            1.2244703672635154e-14,
+            3.587476672796849e-14,
+            2.5423642347634714e-14,
+            5.595887505314431e-16,
+            1.4383308548473368e-16
+          ],
+          "label_mass": 0.9999988224669049
+        }
+      },
+      "state_sha256": "b520625389b0464536c30fb3c4622bd441da69ba98fdf5bd6c046925ef589917",
+      "metrics": {
+        "latency_ms": 15930.9460829827,
+        "prefill_ms": 1184.1981670004316,
+        "branch_ms": 14742.59224999696,
+        "prefix_tokens": 98,
+        "prefix_cache_hit": false,
+        "branch_tokens": 1584,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b09-errcode-128-outcomes",
+      "repeat": 1,
+      "scored": {
+        "error_code": {
+          "chosen": "e173",
+          "expected": "e173",
+          "correct": true,
+          "top_probability": 0.9999999185153166
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "error_code": {
+          "outcomes": [
+            "e100",
+            "e101",
+            "e102",
+            "e103",
+            "e104",
+            "e105",
+            "e106",
+            "e107",
+            "e108",
+            "e109",
+            "e110",
+            "e111",
+            "e112",
+            "e113",
+            "e114",
+            "e115",
+            "e116",
+            "e117",
+            "e118",
+            "e119",
+            "e120",
+            "e121",
+            "e122",
+            "e123",
+            "e124",
+            "e125",
+            "e126",
+            "e127",
+            "e128",
+            "e129",
+            "e130",
+            "e131",
+            "e132",
+            "e133",
+            "e134",
+            "e135",
+            "e136",
+            "e137",
+            "e138",
+            "e139",
+            "e140",
+            "e141",
+            "e142",
+            "e143",
+            "e144",
+            "e145",
+            "e146",
+            "e147",
+            "e148",
+            "e149",
+            "e150",
+            "e151",
+            "e152",
+            "e153",
+            "e154",
+            "e155",
+            "e156",
+            "e157",
+            "e158",
+            "e159",
+            "e160",
+            "e161",
+            "e162",
+            "e163",
+            "e164",
+            "e165",
+            "e166",
+            "e167",
+            "e168",
+            "e169",
+            "e170",
+            "e171",
+            "e172",
+            "e173",
+            "e174",
+            "e175",
+            "e176",
+            "e177",
+            "e178",
+            "e179",
+            "e180",
+            "e181",
+            "e182",
+            "e183",
+            "e184",
+            "e185",
+            "e186",
+            "e187",
+            "e188",
+            "e189",
+            "e190",
+            "e191",
+            "e192",
+            "e193",
+            "e194",
+            "e195",
+            "e196",
+            "e197",
+            "e198",
+            "e199",
+            "e200",
+            "e201",
+            "e202",
+            "e203",
+            "e204",
+            "e205",
+            "e206",
+            "e207",
+            "e208",
+            "e209",
+            "e210",
+            "e211",
+            "e212",
+            "e213",
+            "e214",
+            "e215",
+            "e216",
+            "e217",
+            "e218",
+            "e219",
+            "e220",
+            "e221",
+            "e222",
+            "e223",
+            "e224",
+            "e225",
+            "e226",
+            "e227"
+          ],
+          "logits": [
+            20.713035583496094,
+            25.564373016357422,
+            18.207935333251953,
+            18.00688934326172,
+            20.25861930847168,
+            17.12885093688965,
+            19.08623504638672,
+            19.39883041381836,
+            16.6837215423584,
+            18.620040893554688,
+            22.296472549438477,
+            19.859294891357422,
+            20.087932586669922,
+            16.101959228515625,
+            23.297332763671875,
+            15.396811485290527,
+            19.806564331054688,
+            19.541248321533203,
+            17.195087432861328,
+            16.759817123413086,
+            19.13345718383789,
+            16.182201385498047,
+            17.139053344726562,
+            24.637365341186523,
+            17.814170837402344,
+            18.152952194213867,
+            12.908710479736328,
+            16.423030853271484,
+            14.69425106048584,
+            11.630806922912598,
+            13.787839889526367,
+            9.562801361083984,
+            13.311227798461914,
+            9.2727689743042,
+            8.725893020629883,
+            8.266376495361328,
+            8.496047019958496,
+            14.077142715454102,
+            11.683039665222168,
+            12.087896347045898,
+            10.13609504699707,
+            12.259529113769531,
+            10.947307586669922,
+            14.51906681060791,
+            14.047351837158203,
+            13.783946990966797,
+            10.330140113830566,
+            11.220989227294922,
+            10.15848159790039,
+            23.006641387939453,
+            14.827627182006836,
+            16.082622528076172,
+            16.737651824951172,
+            18.70309829711914,
+            18.738662719726562,
+            15.954910278320312,
+            20.14842987060547,
+            22.0152587890625,
+            20.106609344482422,
+            14.512443542480469,
+            18.450817108154297,
+            22.677520751953125,
+            14.911603927612305,
+            19.024471282958984,
+            20.25194549560547,
+            16.748031616210938,
+            21.533226013183594,
+            17.8338623046875,
+            19.61544418334961,
+            19.45761489868164,
+            15.01297378540039,
+            20.996519088745117,
+            25.735300064086914,
+            43.217369079589844,
+            21.244476318359375,
+            10.054905891418457,
+            10.283675193786621,
+            8.910706520080566,
+            10.700895309448242,
+            10.019018173217773,
+            9.09600830078125,
+            8.251416206359863,
+            9.659123420715332,
+            5.785259246826172,
+            7.82773494720459,
+            9.417130470275879,
+            12.096293449401855,
+            9.820300102233887,
+            9.026145935058594,
+            7.605615139007568,
+            9.467939376831055,
+            9.350379943847656,
+            9.839502334594727,
+            11.240972518920898,
+            7.622299671173096,
+            9.468623161315918,
+            8.9306640625,
+            25.19349479675293,
+            8.110544204711914,
+            8.735193252563477,
+            8.248308181762695,
+            9.326896667480469,
+            8.50487995147705,
+            9.560729026794434,
+            8.804014205932617,
+            8.258232116699219,
+            7.815067768096924,
+            5.939394950866699,
+            6.314425468444824,
+            5.375058650970459,
+            6.0513739585876465,
+            6.598226547241211,
+            7.54864501953125,
+            8.188469886779785,
+            7.007347106933594,
+            8.312816619873047,
+            6.83076286315918,
+            11.959378242492676,
+            8.07754135131836,
+            6.569668769836426,
+            6.637038230895996,
+            9.381155014038086,
+            23.308002471923828,
+            11.183686256408691,
+            12.258626937866211,
+            11.91427230834961,
+            8.098039627075195,
+            6.739490985870361
+          ],
+          "probabilities": [
+            1.684581815620937e-10,
+            2.154771314224197e-08,
+            1.3757543448374933e-11,
+            1.1251948325175051e-11,
+            1.0694035651771294e-10,
+            4.6762798582482685e-12,
+            3.3111710165121523e-11,
+            4.5262658128468914e-11,
+            2.9962859265890923e-12,
+            2.0773805631119797e-11,
+            8.206728103777622e-10,
+            7.173270972890434e-11,
+            9.0159880248884e-11,
+            1.674661714470055e-12,
+            2.2327397962707416e-09,
+            8.27342468823455e-13,
+            6.804820056479571e-11,
+            5.219048906078923e-11,
+            4.996508595964204e-12,
+            3.233189393147696e-12,
+            3.4712822343819356e-11,
+            1.8145787377281215e-12,
+            4.724233377248089e-12,
+            8.527208208846175e-09,
+            9.279640364821374e-12,
+            1.3021530099883759e-11,
+            6.872532160084511e-14,
+            2.3086958733625706e-12,
+            4.097955162048763e-13,
+            1.914830417257956e-14,
+            1.6554567247514446e-13,
+            2.4210675879137912e-15,
+            1.0278454819106866e-13,
+            1.811537999848857e-15,
+            1.0484367596441008e-15,
+            6.621810501377639e-16,
+            8.331465297643114e-16,
+            2.2108559833053498e-13,
+            2.0175054167976825e-14,
+            3.0244174302300554e-14,
+            4.295217871105895e-15,
+            3.5907146682058635e-14,
+            9.666969036876808e-15,
+            3.439423459842235e-13,
+            2.1459640350533653e-13,
+            1.6490247273318655e-13,
+            5.215043071978804e-15,
+            1.2710093748412404e-14,
+            4.392457351919804e-15,
+            1.669523178513495e-09,
+            4.682650191342892e-13,
+            1.6425903589620948e-12,
+            3.162313183207365e-12,
+            2.2572904068830027e-11,
+            2.3390142538731596e-11,
+            1.4456546055043821e-12,
+            9.578267522496238e-11,
+            6.194987875451015e-10,
+            9.185959769438841e-11,
+            3.41671850955175e-13,
+            1.7539738236120708e-11,
+            1.201315766060537e-09,
+            5.092867214783412e-13,
+            3.112848255406627e-11,
+            1.06229032851168e-10,
+            3.1953082788089145e-12,
+            3.825571171640275e-10,
+            9.464181075170686e-12,
+            5.621008213352987e-11,
+            4.800316055018115e-11,
+            5.636204247899816e-13,
+            2.2366984170364278e-10,
+            2.556429726428561e-08,
+            0.9999999185153166,
+            2.866116814290706e-10,
+            3.960273645407699e-15,
+            4.978269932784283e-15,
+            1.2612631942966628e-15,
+            7.555702251449261e-15,
+            3.820668499030155e-15,
+            1.5180331772300947e-15,
+            6.523483635601572e-16,
+            2.6658705229755837e-15,
+            5.539125668038907e-17,
+            4.270484445290341e-16,
+            2.0928728763973633e-15,
+            3.049920699886086e-14,
+            3.132111369452753e-15,
+            1.415599574478599e-15,
+            3.4198868503621335e-16,
+            2.2019572207670707e-15,
+            1.9577330127452764e-15,
+            3.1928360586603134e-15,
+            1.2966638020748194e-14,
+            3.4774247240254423e-16,
+            2.2034633998432205e-15,
+            1.2866877701384794e-15,
+            1.487067975524776e-08,
+            5.666301043335218e-16,
+            1.0582329474765057e-15,
+            6.503239963214603e-16,
+            1.9122946364455293e-15,
+            8.405382532414016e-16,
+            2.416055521666133e-15,
+            1.1336261075330952e-15,
+            6.568098989565143e-16,
+            4.216730627329945e-16,
+            6.462216501877926e-17,
+            9.402756474613298e-17,
+            3.675304810267423e-17,
+            7.227920533505691e-17,
+            1.2488446876743287e-16,
+            3.2305013643869974e-16,
+            6.125511196553783e-16,
+            1.880127199316149e-16,
+            6.936580617613251e-16,
+            1.575787567239063e-16,
+            2.659665554066497e-14,
+            5.482349106344463e-16,
+            1.213684891393826e-16,
+            1.2982673369253634e-16,
+            2.0189190569719805e-15,
+            2.2566900222486356e-09,
+            1.2244703672635154e-14,
+            3.587476672796849e-14,
+            2.5423642347634714e-14,
+            5.595887505314431e-16,
+            1.4383308548473368e-16
+          ],
+          "label_mass": 0.9999988224669049
+        }
+      },
+      "state_sha256": "b520625389b0464536c30fb3c4622bd441da69ba98fdf5bd6c046925ef589917",
+      "metrics": {
+        "latency_ms": 14653.670249972492,
+        "prefill_ms": 0.00024994369596242905,
+        "branch_ms": 14650.215542002115,
+        "prefix_tokens": 98,
+        "prefix_cache_hit": true,
+        "branch_tokens": 1584,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b10-errcode-128-outcomes-head",
+      "repeat": 0,
+      "scored": {
+        "error_code": {
+          "chosen": "e104",
+          "expected": "e104",
+          "correct": true,
+          "top_probability": 0.999999998584765
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "error_code": {
+          "outcomes": [
+            "e100",
+            "e101",
+            "e102",
+            "e103",
+            "e104",
+            "e105",
+            "e106",
+            "e107",
+            "e108",
+            "e109",
+            "e110",
+            "e111",
+            "e112",
+            "e113",
+            "e114",
+            "e115",
+            "e116",
+            "e117",
+            "e118",
+            "e119",
+            "e120",
+            "e121",
+            "e122",
+            "e123",
+            "e124",
+            "e125",
+            "e126",
+            "e127",
+            "e128",
+            "e129",
+            "e130",
+            "e131",
+            "e132",
+            "e133",
+            "e134",
+            "e135",
+            "e136",
+            "e137",
+            "e138",
+            "e139",
+            "e140",
+            "e141",
+            "e142",
+            "e143",
+            "e144",
+            "e145",
+            "e146",
+            "e147",
+            "e148",
+            "e149",
+            "e150",
+            "e151",
+            "e152",
+            "e153",
+            "e154",
+            "e155",
+            "e156",
+            "e157",
+            "e158",
+            "e159",
+            "e160",
+            "e161",
+            "e162",
+            "e163",
+            "e164",
+            "e165",
+            "e166",
+            "e167",
+            "e168",
+            "e169",
+            "e170",
+            "e171",
+            "e172",
+            "e173",
+            "e174",
+            "e175",
+            "e176",
+            "e177",
+            "e178",
+            "e179",
+            "e180",
+            "e181",
+            "e182",
+            "e183",
+            "e184",
+            "e185",
+            "e186",
+            "e187",
+            "e188",
+            "e189",
+            "e190",
+            "e191",
+            "e192",
+            "e193",
+            "e194",
+            "e195",
+            "e196",
+            "e197",
+            "e198",
+            "e199",
+            "e200",
+            "e201",
+            "e202",
+            "e203",
+            "e204",
+            "e205",
+            "e206",
+            "e207",
+            "e208",
+            "e209",
+            "e210",
+            "e211",
+            "e212",
+            "e213",
+            "e214",
+            "e215",
+            "e216",
+            "e217",
+            "e218",
+            "e219",
+            "e220",
+            "e221",
+            "e222",
+            "e223",
+            "e224",
+            "e225",
+            "e226",
+            "e227"
+          ],
+          "logits": [
+            20.447261810302734,
+            16.567981719970703,
+            17.308086395263672,
+            18.258434295654297,
+            42.49543380737305,
+            18.05649757385254,
+            17.207616806030273,
+            14.939933776855469,
+            16.585166931152344,
+            15.305887222290039,
+            18.28021240234375,
+            15.485180854797363,
+            16.486494064331055,
+            15.271401405334473,
+            20.20655059814453,
+            15.06538200378418,
+            17.02715301513672,
+            16.33918571472168,
+            15.537759780883789,
+            14.83432388305664,
+            15.931424140930176,
+            15.803309440612793,
+            15.683378219604492,
+            16.911544799804688,
+            16.304237365722656,
+            16.797527313232422,
+            9.62210464477539,
+            12.825926780700684,
+            14.501110076904297,
+            10.49757194519043,
+            21.499643325805664,
+            11.8585786819458,
+            14.559022903442383,
+            9.910926818847656,
+            11.940576553344727,
+            9.44033432006836,
+            10.599042892456055,
+            12.070074081420898,
+            10.548384666442871,
+            10.450811386108398,
+            11.633111953735352,
+            10.04738998413086,
+            10.535602569580078,
+            12.19959831237793,
+            12.181289672851562,
+            10.806183815002441,
+            10.220804214477539,
+            9.361309051513672,
+            9.688522338867188,
+            7.579826354980469,
+            11.990930557250977,
+            6.2223663330078125,
+            4.653695106506348,
+            7.815071105957031,
+            6.90725040435791,
+            10.506060600280762,
+            5.9572672843933105,
+            10.056077003479004,
+            4.913735389709473,
+            4.204235553741455,
+            3.3972206115722656,
+            4.916439056396484,
+            5.070826053619385,
+            5.500041484832764,
+            6.696499347686768,
+            7.557772636413574,
+            4.717350482940674,
+            3.8862264156341553,
+            8.013992309570312,
+            4.258906841278076,
+            3.486994743347168,
+            6.181571006774902,
+            6.571263790130615,
+            3.4583752155303955,
+            5.912198066711426,
+            5.920261383056641,
+            0.7920231819152832,
+            5.491303443908691,
+            5.629137992858887,
+            10.555550575256348,
+            4.725922107696533,
+            3.608523368835449,
+            5.0390472412109375,
+            0.4711509943008423,
+            1.0355143547058105,
+            4.784513473510742,
+            5.31034517288208,
+            6.151853084564209,
+            4.0412678718566895,
+            3.8549964427948,
+            3.737325668334961,
+            4.951239585876465,
+            4.459316253662109,
+            2.9047913551330566,
+            6.167091369628906,
+            5.78455114364624,
+            2.7362112998962402,
+            4.088521957397461,
+            2.7514352798461914,
+            4.290223598480225,
+            4.638094425201416,
+            2.209615468978882,
+            5.76264762878418,
+            5.305285453796387,
+            10.682384490966797,
+            6.078848361968994,
+            5.029973030090332,
+            1.3678544759750366,
+            3.9110701084136963,
+            2.3949952125549316,
+            3.8015565872192383,
+            2.913780689239502,
+            2.711123466491699,
+            3.480377674102783,
+            3.862711191177368,
+            4.984172821044922,
+            0.02560114860534668,
+            4.122480392456055,
+            3.294161081314087,
+            6.3733906745910645,
+            5.140454292297363,
+            4.01501989364624,
+            6.048683166503906,
+            5.195466041564941,
+            16.276844024658203,
+            11.861566543579102,
+            13.3773775100708,
+            8.637893676757812
+          ],
+          "probabilities": [
+            2.658279027998219e-10,
+            5.493518963331981e-12,
+            1.15152667956375e-11,
+            2.978549716684815e-11,
+            0.999999998584765,
+            2.4339118748123195e-11,
+            1.0414552565147264e-11,
+            1.0784459654284853e-12,
+            5.588742118339851e-12,
+            1.5549984198084158e-12,
+            3.044128387944635e-11,
+            1.8603565482047434e-12,
+            5.063618627452921e-12,
+            1.5022871484621105e-12,
+            2.0895896757229949e-10,
+            1.2225872511750702e-12,
+            8.694931957289308e-12,
+            4.370043755955993e-12,
+            1.9607892838500043e-12,
+            9.703593522986876e-13,
+            2.9066797432594233e-12,
+            2.5571586704651475e-12,
+            2.268152280626216e-12,
+            7.745655510913125e-12,
+            4.219955879349954e-12,
+            6.911001902345833e-12,
+            5.288037694840736e-15,
+            1.3022573488672983e-13,
+            6.953759697923768e-13,
+            1.2691272231022402e-14,
+            7.614546621047672e-10,
+            4.949745569082242e-14,
+            7.368361074914439e-13,
+            7.0587600443624e-15,
+            5.372718648751528e-14,
+            4.409127862038147e-15,
+            1.4046671707602209e-14,
+            6.115530838122363e-14,
+            1.3352815380874901e-14,
+            1.2111482532342849e-14,
+            3.950607825166388e-14,
+            8.090840102606386e-15,
+            1.3183224573350798e-14,
+            6.961227373082194e-14,
+            6.834936406116235e-14,
+            1.7279596305017228e-14,
+            9.622910835866794e-15,
+            4.074107228404484e-15,
+            5.651183119902913e-15,
+            6.860319631029714e-16,
+            5.650183657483461e-14,
+            1.765252980997743e-16,
+            3.677406979267734e-17,
+            8.679802587807543e-16,
+            3.501453204028981e-16,
+            1.279946260939432e-14,
+            1.3541784540915282e-16,
+            8.161431557861912e-15,
+            4.769531880478774e-17,
+            2.346085807975313e-17,
+            1.04679528104556e-17,
+            4.782444552851965e-17,
+            5.580837338118006e-17,
+            8.572455865354485e-17,
+            2.836091939316382e-16,
+            6.710680190579586e-16,
+            3.9191047791328413e-17,
+            1.7070029768951112e-17,
+            1.0590104090399353e-15,
+            2.4779202844722787e-17,
+            1.1451178018864553e-17,
+            1.6946880555832357e-16,
+            2.5022528578966075e-16,
+            1.112809599069551e-17,
+            1.2945015865640164e-16,
+            1.3049817580524536e-16,
+            7.734618333490232e-19,
+            8.497875711936062e-17,
+            9.753739646600285e-17,
+            1.3448844093873339e-14,
+            3.952842260629048e-17,
+            1.2930918594778601e-17,
+            5.4062733638268815e-17,
+            5.611589161412405e-19,
+            9.867014375532538e-19,
+            4.1913641159751296e-17,
+            7.091223871159905e-17,
+            1.6450664255582712e-16,
+            1.9932782476755137e-17,
+            1.6545171515057784e-17,
+            1.4708470222283458e-17,
+            4.9518059973385836e-17,
+            3.027778026054265e-17,
+            6.3973844058054205e-18,
+            1.6703263871595034e-16,
+            1.1393738108484902e-16,
+            5.404917379312912e-18,
+            2.0897297042602082e-17,
+            5.4878312714388196e-18,
+            2.5567485934982947e-17,
+            3.620482112837842e-17,
+            3.192209576030514e-18,
+            1.1146888502547313e-16,
+            7.055434887851082e-17,
+            1.5267510549449914e-14,
+            1.5292478926106995e-16,
+            5.3574376060355794e-17,
+            1.375685759645521e-18,
+            1.7499424129778695e-17,
+            3.842384270364713e-18,
+            1.5684209663446065e-17,
+            6.455151888230255e-18,
+            5.27100650295884e-18,
+            1.1375654927315603e-17,
+            1.6673306981159916e-17,
+            5.11760007165472e-17,
+            3.5940658367261884e-19,
+            2.161912322623565e-17,
+            9.442860434791635e-18,
+            2.0530332910418996e-16,
+            5.983268941894204e-17,
+            1.9416393960975727e-17,
+            1.4838066486957737e-16,
+            6.321640919852061e-17,
+            4.105926146870486e-12,
+            4.964556839957957e-14,
+            2.2604183577584472e-13,
+            1.9763194730066458e-15
+          ],
+          "label_mass": 0.9999976946331558
+        }
+      },
+      "state_sha256": "44a2cfcc8b0d742b9a36c4cf51bf2931f21616e67d236f2deae846eea2ebe47a",
+      "metrics": {
+        "latency_ms": 15830.184165970422,
+        "prefill_ms": 1176.163166994229,
+        "branch_ms": 14648.5649170354,
+        "prefix_tokens": 97,
+        "prefix_cache_hit": false,
+        "branch_tokens": 1584,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b10-errcode-128-outcomes-head",
+      "repeat": 1,
+      "scored": {
+        "error_code": {
+          "chosen": "e104",
+          "expected": "e104",
+          "correct": true,
+          "top_probability": 0.999999998584765
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "error_code": {
+          "outcomes": [
+            "e100",
+            "e101",
+            "e102",
+            "e103",
+            "e104",
+            "e105",
+            "e106",
+            "e107",
+            "e108",
+            "e109",
+            "e110",
+            "e111",
+            "e112",
+            "e113",
+            "e114",
+            "e115",
+            "e116",
+            "e117",
+            "e118",
+            "e119",
+            "e120",
+            "e121",
+            "e122",
+            "e123",
+            "e124",
+            "e125",
+            "e126",
+            "e127",
+            "e128",
+            "e129",
+            "e130",
+            "e131",
+            "e132",
+            "e133",
+            "e134",
+            "e135",
+            "e136",
+            "e137",
+            "e138",
+            "e139",
+            "e140",
+            "e141",
+            "e142",
+            "e143",
+            "e144",
+            "e145",
+            "e146",
+            "e147",
+            "e148",
+            "e149",
+            "e150",
+            "e151",
+            "e152",
+            "e153",
+            "e154",
+            "e155",
+            "e156",
+            "e157",
+            "e158",
+            "e159",
+            "e160",
+            "e161",
+            "e162",
+            "e163",
+            "e164",
+            "e165",
+            "e166",
+            "e167",
+            "e168",
+            "e169",
+            "e170",
+            "e171",
+            "e172",
+            "e173",
+            "e174",
+            "e175",
+            "e176",
+            "e177",
+            "e178",
+            "e179",
+            "e180",
+            "e181",
+            "e182",
+            "e183",
+            "e184",
+            "e185",
+            "e186",
+            "e187",
+            "e188",
+            "e189",
+            "e190",
+            "e191",
+            "e192",
+            "e193",
+            "e194",
+            "e195",
+            "e196",
+            "e197",
+            "e198",
+            "e199",
+            "e200",
+            "e201",
+            "e202",
+            "e203",
+            "e204",
+            "e205",
+            "e206",
+            "e207",
+            "e208",
+            "e209",
+            "e210",
+            "e211",
+            "e212",
+            "e213",
+            "e214",
+            "e215",
+            "e216",
+            "e217",
+            "e218",
+            "e219",
+            "e220",
+            "e221",
+            "e222",
+            "e223",
+            "e224",
+            "e225",
+            "e226",
+            "e227"
+          ],
+          "logits": [
+            20.447261810302734,
+            16.567981719970703,
+            17.308086395263672,
+            18.258434295654297,
+            42.49543380737305,
+            18.05649757385254,
+            17.207616806030273,
+            14.939933776855469,
+            16.585166931152344,
+            15.305887222290039,
+            18.28021240234375,
+            15.485180854797363,
+            16.486494064331055,
+            15.271401405334473,
+            20.20655059814453,
+            15.06538200378418,
+            17.02715301513672,
+            16.33918571472168,
+            15.537759780883789,
+            14.83432388305664,
+            15.931424140930176,
+            15.803309440612793,
+            15.683378219604492,
+            16.911544799804688,
+            16.304237365722656,
+            16.797527313232422,
+            9.62210464477539,
+            12.825926780700684,
+            14.501110076904297,
+            10.49757194519043,
+            21.499643325805664,
+            11.8585786819458,
+            14.559022903442383,
+            9.910926818847656,
+            11.940576553344727,
+            9.44033432006836,
+            10.599042892456055,
+            12.070074081420898,
+            10.548384666442871,
+            10.450811386108398,
+            11.633111953735352,
+            10.04738998413086,
+            10.535602569580078,
+            12.19959831237793,
+            12.181289672851562,
+            10.806183815002441,
+            10.220804214477539,
+            9.361309051513672,
+            9.688522338867188,
+            7.579826354980469,
+            11.990930557250977,
+            6.2223663330078125,
+            4.653695106506348,
+            7.815071105957031,
+            6.90725040435791,
+            10.506060600280762,
+            5.9572672843933105,
+            10.056077003479004,
+            4.913735389709473,
+            4.204235553741455,
+            3.3972206115722656,
+            4.916439056396484,
+            5.070826053619385,
+            5.500041484832764,
+            6.696499347686768,
+            7.557772636413574,
+            4.717350482940674,
+            3.8862264156341553,
+            8.013992309570312,
+            4.258906841278076,
+            3.486994743347168,
+            6.181571006774902,
+            6.571263790130615,
+            3.4583752155303955,
+            5.912198066711426,
+            5.920261383056641,
+            0.7920231819152832,
+            5.491303443908691,
+            5.629137992858887,
+            10.555550575256348,
+            4.725922107696533,
+            3.608523368835449,
+            5.0390472412109375,
+            0.4711509943008423,
+            1.0355143547058105,
+            4.784513473510742,
+            5.31034517288208,
+            6.151853084564209,
+            4.0412678718566895,
+            3.8549964427948,
+            3.737325668334961,
+            4.951239585876465,
+            4.459316253662109,
+            2.9047913551330566,
+            6.167091369628906,
+            5.78455114364624,
+            2.7362112998962402,
+            4.088521957397461,
+            2.7514352798461914,
+            4.290223598480225,
+            4.638094425201416,
+            2.209615468978882,
+            5.76264762878418,
+            5.305285453796387,
+            10.682384490966797,
+            6.078848361968994,
+            5.029973030090332,
+            1.3678544759750366,
+            3.9110701084136963,
+            2.3949952125549316,
+            3.8015565872192383,
+            2.913780689239502,
+            2.711123466491699,
+            3.480377674102783,
+            3.862711191177368,
+            4.984172821044922,
+            0.02560114860534668,
+            4.122480392456055,
+            3.294161081314087,
+            6.3733906745910645,
+            5.140454292297363,
+            4.01501989364624,
+            6.048683166503906,
+            5.195466041564941,
+            16.276844024658203,
+            11.861566543579102,
+            13.3773775100708,
+            8.637893676757812
+          ],
+          "probabilities": [
+            2.658279027998219e-10,
+            5.493518963331981e-12,
+            1.15152667956375e-11,
+            2.978549716684815e-11,
+            0.999999998584765,
+            2.4339118748123195e-11,
+            1.0414552565147264e-11,
+            1.0784459654284853e-12,
+            5.588742118339851e-12,
+            1.5549984198084158e-12,
+            3.044128387944635e-11,
+            1.8603565482047434e-12,
+            5.063618627452921e-12,
+            1.5022871484621105e-12,
+            2.0895896757229949e-10,
+            1.2225872511750702e-12,
+            8.694931957289308e-12,
+            4.370043755955993e-12,
+            1.9607892838500043e-12,
+            9.703593522986876e-13,
+            2.9066797432594233e-12,
+            2.5571586704651475e-12,
+            2.268152280626216e-12,
+            7.745655510913125e-12,
+            4.219955879349954e-12,
+            6.911001902345833e-12,
+            5.288037694840736e-15,
+            1.3022573488672983e-13,
+            6.953759697923768e-13,
+            1.2691272231022402e-14,
+            7.614546621047672e-10,
+            4.949745569082242e-14,
+            7.368361074914439e-13,
+            7.0587600443624e-15,
+            5.372718648751528e-14,
+            4.409127862038147e-15,
+            1.4046671707602209e-14,
+            6.115530838122363e-14,
+            1.3352815380874901e-14,
+            1.2111482532342849e-14,
+            3.950607825166388e-14,
+            8.090840102606386e-15,
+            1.3183224573350798e-14,
+            6.961227373082194e-14,
+            6.834936406116235e-14,
+            1.7279596305017228e-14,
+            9.622910835866794e-15,
+            4.074107228404484e-15,
+            5.651183119902913e-15,
+            6.860319631029714e-16,
+            5.650183657483461e-14,
+            1.765252980997743e-16,
+            3.677406979267734e-17,
+            8.679802587807543e-16,
+            3.501453204028981e-16,
+            1.279946260939432e-14,
+            1.3541784540915282e-16,
+            8.161431557861912e-15,
+            4.769531880478774e-17,
+            2.346085807975313e-17,
+            1.04679528104556e-17,
+            4.782444552851965e-17,
+            5.580837338118006e-17,
+            8.572455865354485e-17,
+            2.836091939316382e-16,
+            6.710680190579586e-16,
+            3.9191047791328413e-17,
+            1.7070029768951112e-17,
+            1.0590104090399353e-15,
+            2.4779202844722787e-17,
+            1.1451178018864553e-17,
+            1.6946880555832357e-16,
+            2.5022528578966075e-16,
+            1.112809599069551e-17,
+            1.2945015865640164e-16,
+            1.3049817580524536e-16,
+            7.734618333490232e-19,
+            8.497875711936062e-17,
+            9.753739646600285e-17,
+            1.3448844093873339e-14,
+            3.952842260629048e-17,
+            1.2930918594778601e-17,
+            5.4062733638268815e-17,
+            5.611589161412405e-19,
+            9.867014375532538e-19,
+            4.1913641159751296e-17,
+            7.091223871159905e-17,
+            1.6450664255582712e-16,
+            1.9932782476755137e-17,
+            1.6545171515057784e-17,
+            1.4708470222283458e-17,
+            4.9518059973385836e-17,
+            3.027778026054265e-17,
+            6.3973844058054205e-18,
+            1.6703263871595034e-16,
+            1.1393738108484902e-16,
+            5.404917379312912e-18,
+            2.0897297042602082e-17,
+            5.4878312714388196e-18,
+            2.5567485934982947e-17,
+            3.620482112837842e-17,
+            3.192209576030514e-18,
+            1.1146888502547313e-16,
+            7.055434887851082e-17,
+            1.5267510549449914e-14,
+            1.5292478926106995e-16,
+            5.3574376060355794e-17,
+            1.375685759645521e-18,
+            1.7499424129778695e-17,
+            3.842384270364713e-18,
+            1.5684209663446065e-17,
+            6.455151888230255e-18,
+            5.27100650295884e-18,
+            1.1375654927315603e-17,
+            1.6673306981159916e-17,
+            5.11760007165472e-17,
+            3.5940658367261884e-19,
+            2.161912322623565e-17,
+            9.442860434791635e-18,
+            2.0530332910418996e-16,
+            5.983268941894204e-17,
+            1.9416393960975727e-17,
+            1.4838066486957737e-16,
+            6.321640919852061e-17,
+            4.105926146870486e-12,
+            4.964556839957957e-14,
+            2.2604183577584472e-13,
+            1.9763194730066458e-15
+          ],
+          "label_mass": 0.9999976946331558
+        }
+      },
+      "state_sha256": "44a2cfcc8b0d742b9a36c4cf51bf2931f21616e67d236f2deae846eea2ebe47a",
+      "metrics": {
+        "latency_ms": 14526.223458989989,
+        "prefill_ms": 0.000208965502679348,
+        "branch_ms": 14521.227457968052,
+        "prefix_tokens": 97,
+        "prefix_cache_hit": true,
+        "branch_tokens": 1584,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b11-shard-128-outcomes",
+      "repeat": 0,
+      "scored": {
+        "shard_id": {
+          "chosen": "r009",
+          "expected": "r097",
+          "correct": false,
+          "top_probability": 0.8828957751049727
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "shard_id": {
+          "outcomes": [
+            "r001",
+            "r002",
+            "r003",
+            "r004",
+            "r005",
+            "r006",
+            "r007",
+            "r008",
+            "r009",
+            "r010",
+            "r011",
+            "r012",
+            "r013",
+            "r014",
+            "r015",
+            "r016",
+            "r017",
+            "r018",
+            "r019",
+            "r020",
+            "r021",
+            "r022",
+            "r023",
+            "r024",
+            "r025",
+            "r026",
+            "r027",
+            "r028",
+            "r029",
+            "r030",
+            "r031",
+            "r032",
+            "r033",
+            "r034",
+            "r035",
+            "r036",
+            "r037",
+            "r038",
+            "r039",
+            "r040",
+            "r041",
+            "r042",
+            "r043",
+            "r044",
+            "r045",
+            "r046",
+            "r047",
+            "r048",
+            "r049",
+            "r050",
+            "r051",
+            "r052",
+            "r053",
+            "r054",
+            "r055",
+            "r056",
+            "r057",
+            "r058",
+            "r059",
+            "r060",
+            "r061",
+            "r062",
+            "r063",
+            "r064",
+            "r065",
+            "r066",
+            "r067",
+            "r068",
+            "r069",
+            "r070",
+            "r071",
+            "r072",
+            "r073",
+            "r074",
+            "r075",
+            "r076",
+            "r077",
+            "r078",
+            "r079",
+            "r080",
+            "r081",
+            "r082",
+            "r083",
+            "r084",
+            "r085",
+            "r086",
+            "r087",
+            "r088",
+            "r089",
+            "r090",
+            "r091",
+            "r092",
+            "r093",
+            "r094",
+            "r095",
+            "r096",
+            "r097",
+            "r098",
+            "r099",
+            "r100",
+            "r101",
+            "r102",
+            "r103",
+            "r104",
+            "r105",
+            "r106",
+            "r107",
+            "r108",
+            "r109",
+            "r110",
+            "r111",
+            "r112",
+            "r113",
+            "r114",
+            "r115",
+            "r116",
+            "r117",
+            "r118",
+            "r119",
+            "r120",
+            "r121",
+            "r122",
+            "r123",
+            "r124",
+            "r125",
+            "r126",
+            "r127",
+            "r128"
+          ],
+          "logits": [
+            18.415325164794922,
+            17.041522979736328,
+            27.280223846435547,
+            19.758756637573242,
+            18.638668060302734,
+            20.30019760131836,
+            20.712894439697266,
+            19.67127799987793,
+            37.31426239013672,
+            23.466045379638672,
+            25.37744903564453,
+            20.071918487548828,
+            20.2896728515625,
+            18.290077209472656,
+            21.62938690185547,
+            16.878475189208984,
+            20.026182174682617,
+            20.081478118896484,
+            18.965267181396484,
+            18.663761138916016,
+            18.26393699645996,
+            16.43181037902832,
+            23.707666397094727,
+            22.323196411132812,
+            16.69493293762207,
+            18.610530853271484,
+            11.625247955322266,
+            11.323904037475586,
+            15.013103485107422,
+            9.450865745544434,
+            10.683831214904785,
+            10.261211395263672,
+            10.188379287719727,
+            9.506006240844727,
+            15.573383331298828,
+            8.19462776184082,
+            9.440351486206055,
+            10.135948181152344,
+            8.799779891967773,
+            8.927440643310547,
+            10.684850692749023,
+            8.215653419494629,
+            9.97711181640625,
+            11.391067504882812,
+            9.324301719665527,
+            8.249290466308594,
+            7.394610404968262,
+            5.3764777183532715,
+            17.073688507080078,
+            9.099849700927734,
+            6.407402038574219,
+            5.925381660461426,
+            7.3931965827941895,
+            7.698653221130371,
+            5.216195583343506,
+            5.0472002029418945,
+            4.31362247467041,
+            8.06573486328125,
+            6.744538307189941,
+            10.761079788208008,
+            5.374941349029541,
+            7.013143062591553,
+            5.271243095397949,
+            4.563981056213379,
+            3.1442244052886963,
+            6.832439422607422,
+            3.6634724140167236,
+            5.389984130859375,
+            5.324509143829346,
+            3.581066131591797,
+            1.7076396942138672,
+            6.702513217926025,
+            19.008010864257812,
+            5.99916934967041,
+            7.30529260635376,
+            9.801885604858398,
+            8.308719635009766,
+            13.684978485107422,
+            11.404037475585938,
+            10.354005813598633,
+            12.088905334472656,
+            11.081412315368652,
+            9.823202133178711,
+            14.846963882446289,
+            13.498619079589844,
+            15.814083099365234,
+            10.429215431213379,
+            10.252326965332031,
+            16.004863739013672,
+            11.710094451904297,
+            9.381767272949219,
+            12.915061950683594,
+            12.536934852600098,
+            9.574844360351562,
+            15.998836517333984,
+            17.14867401123047,
+            35.29371643066406,
+            19.293746948242188,
+            12.311053276062012,
+            15.593727111816406,
+            6.3336591720581055,
+            4.493308067321777,
+            10.161205291748047,
+            6.067906856536865,
+            7.28415584564209,
+            5.767281532287598,
+            4.563534736633301,
+            3.269209623336792,
+            9.237234115600586,
+            3.9532933235168457,
+            4.755054950714111,
+            4.14865255355835,
+            1.6914348602294922,
+            4.57077169418335,
+            5.5931596755981445,
+            5.145184516906738,
+            1.7814576625823975,
+            3.6952481269836426,
+            2.7831873893737793,
+            5.385777950286865,
+            2.8734958171844482,
+            14.007196426391602,
+            7.994843482971191,
+            2.1241254806518555,
+            3.7104153633117676,
+            -0.717384934425354,
+            7.379693508148193,
+            1.982210397720337
+          ],
+          "probabilities": [
+            5.47274594436184e-09,
+            1.3853853142921179e-09,
+            3.87419849315793e-05,
+            2.0972498077053827e-08,
+            6.842296266543026e-09,
+            3.604084677170636e-08,
+            5.4453643741368996e-08,
+            1.92158090134409e-08,
+            0.8828957751049727,
+            8.544865020479107e-07,
+            5.778528601942094e-06,
+            2.8684984968235682e-08,
+            3.566351502265304e-08,
+            4.828483947794089e-09,
+            1.3616157449615338e-07,
+            1.176954906941833e-09,
+            2.7402589087070056e-08,
+            2.896051774731181e-08,
+            9.485103429610207e-09,
+            7.016162845510858e-09,
+            4.7039017454724215e-09,
+            7.529666855220588e-10,
+            1.0880275225647142e-06,
+            2.7250357617875443e-07,
+            9.795992339553788e-10,
+            6.652456465370239e-09,
+            6.156192961636976e-12,
+            4.5544949341742375e-12,
+            1.8223810304944188e-10,
+            6.998259281061821e-13,
+            2.401375793406229e-12,
+            1.5736881439419183e-12,
+            1.4631474356063344e-12,
+            7.394984049995188e-13,
+            3.191285299235203e-10,
+            1.9925664083638653e-13,
+            6.925063243439686e-13,
+            1.3884094156124732e-12,
+            3.6494467852421853e-13,
+            4.146382808520142e-13,
+            2.4038251911645247e-12,
+            2.0349049657907152e-13,
+            1.184501986701704e-12,
+            4.870897006310606e-12,
+            6.166290355476015e-13,
+            2.1045173738396934e-13,
+            8.953022604228122e-14,
+            1.1898871965314887e-14,
+            1.4306713842346396e-09,
+            4.9265817933862e-13,
+            3.336034512846854e-14,
+            2.0601163296434554e-14,
+            8.940373566197523e-14,
+            1.2134274025903251e-13,
+            1.0136689522470825e-14,
+            8.560564098863314e-15,
+            4.1106795649518795e-15,
+            1.7516015865797825e-13,
+            4.673550675015609e-14,
+            2.5942316747056543e-12,
+            1.1880604939482612e-14,
+            6.113649253361684e-14,
+            1.0710333036683778e-14,
+            5.280110051846945e-15,
+            1.2765872288161403e-15,
+            5.1029571960723707e-14,
+            2.145640906064805e-15,
+            1.2060673256240699e-14,
+            1.1296297625493936e-14,
+            1.9759158572036485e-15,
+            3.0349370157139165e-16,
+            4.4812140784735156e-14,
+            9.899321215845824e-09,
+            2.217876354800811e-14,
+            8.18803054130578e-14,
+            9.94113603437704e-13,
+            2.233378214255258e-13,
+            4.828829011422193e-11,
+            4.934483866255649e-12,
+            1.726707505326195e-12,
+            9.78759668741213e-12,
+            3.5737766465959444e-12,
+            1.0155321274741566e-12,
+            1.5434255077898126e-10,
+            4.0078085354855176e-11,
+            4.0597586207760343e-10,
+            1.861580832442751e-12,
+            1.5597687464071638e-12,
+            4.913095339150863e-10,
+            6.701323588190349e-12,
+            6.531018943068971e-13,
+            2.235997557965034e-11,
+            1.5319790021626527e-11,
+            7.921971160836588e-13,
+            4.883572085381152e-10,
+            1.5420756563318757e-09,
+            0.11705702382395604,
+            1.3173434643331975e-08,
+            1.2222321137850179e-11,
+            3.256872995736814e-10,
+            3.0988775445011995e-14,
+            4.919829875530559e-15,
+            1.4239232259940254e-12,
+            2.375689349952933e-14,
+            8.01677833323611e-14,
+            1.7588537592637058e-14,
+            5.27775396116965e-15,
+            1.446541460673537e-15,
+            5.652115015021691e-13,
+            2.866979991437426e-15,
+            6.3918314240289194e-15,
+            3.4855241617594934e-15,
+            2.9861527036056655e-16,
+            5.3160873839181716e-15,
+            1.477779269082432e-14,
+            9.44183551445677e-15,
+            3.2674460001094566e-16,
+            2.2149149631905738e-15,
+            8.897215537289955e-16,
+            1.2010050425716762e-14,
+            9.738107477520117e-16,
+            6.664679989208329e-11,
+            1.6317273561833893e-13,
+            4.602853595863618e-16,
+            2.2487651599307906e-15,
+            2.6851890522489386e-17,
+            8.820462440981717e-14,
+            3.993872753830726e-16
+          ],
+          "label_mass": 0.9998743820838485
+        }
+      },
+      "state_sha256": "a53c1f3a977baa8b76eb82807440f7b5f6c15fa0fe676d6da39dab9a46e3de52",
+      "metrics": {
+        "latency_ms": 12503.951333987061,
+        "prefill_ms": 837.4818330048583,
+        "branch_ms": 11662.788500019815,
+        "prefix_tokens": 97,
+        "prefix_cache_hit": false,
+        "branch_tokens": 1712,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b11-shard-128-outcomes",
+      "repeat": 1,
+      "scored": {
+        "shard_id": {
+          "chosen": "r009",
+          "expected": "r097",
+          "correct": false,
+          "top_probability": 0.8828957751049727
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "shard_id": {
+          "outcomes": [
+            "r001",
+            "r002",
+            "r003",
+            "r004",
+            "r005",
+            "r006",
+            "r007",
+            "r008",
+            "r009",
+            "r010",
+            "r011",
+            "r012",
+            "r013",
+            "r014",
+            "r015",
+            "r016",
+            "r017",
+            "r018",
+            "r019",
+            "r020",
+            "r021",
+            "r022",
+            "r023",
+            "r024",
+            "r025",
+            "r026",
+            "r027",
+            "r028",
+            "r029",
+            "r030",
+            "r031",
+            "r032",
+            "r033",
+            "r034",
+            "r035",
+            "r036",
+            "r037",
+            "r038",
+            "r039",
+            "r040",
+            "r041",
+            "r042",
+            "r043",
+            "r044",
+            "r045",
+            "r046",
+            "r047",
+            "r048",
+            "r049",
+            "r050",
+            "r051",
+            "r052",
+            "r053",
+            "r054",
+            "r055",
+            "r056",
+            "r057",
+            "r058",
+            "r059",
+            "r060",
+            "r061",
+            "r062",
+            "r063",
+            "r064",
+            "r065",
+            "r066",
+            "r067",
+            "r068",
+            "r069",
+            "r070",
+            "r071",
+            "r072",
+            "r073",
+            "r074",
+            "r075",
+            "r076",
+            "r077",
+            "r078",
+            "r079",
+            "r080",
+            "r081",
+            "r082",
+            "r083",
+            "r084",
+            "r085",
+            "r086",
+            "r087",
+            "r088",
+            "r089",
+            "r090",
+            "r091",
+            "r092",
+            "r093",
+            "r094",
+            "r095",
+            "r096",
+            "r097",
+            "r098",
+            "r099",
+            "r100",
+            "r101",
+            "r102",
+            "r103",
+            "r104",
+            "r105",
+            "r106",
+            "r107",
+            "r108",
+            "r109",
+            "r110",
+            "r111",
+            "r112",
+            "r113",
+            "r114",
+            "r115",
+            "r116",
+            "r117",
+            "r118",
+            "r119",
+            "r120",
+            "r121",
+            "r122",
+            "r123",
+            "r124",
+            "r125",
+            "r126",
+            "r127",
+            "r128"
+          ],
+          "logits": [
+            18.415325164794922,
+            17.041522979736328,
+            27.280223846435547,
+            19.758756637573242,
+            18.638668060302734,
+            20.30019760131836,
+            20.712894439697266,
+            19.67127799987793,
+            37.31426239013672,
+            23.466045379638672,
+            25.37744903564453,
+            20.071918487548828,
+            20.2896728515625,
+            18.290077209472656,
+            21.62938690185547,
+            16.878475189208984,
+            20.026182174682617,
+            20.081478118896484,
+            18.965267181396484,
+            18.663761138916016,
+            18.26393699645996,
+            16.43181037902832,
+            23.707666397094727,
+            22.323196411132812,
+            16.69493293762207,
+            18.610530853271484,
+            11.625247955322266,
+            11.323904037475586,
+            15.013103485107422,
+            9.450865745544434,
+            10.683831214904785,
+            10.261211395263672,
+            10.188379287719727,
+            9.506006240844727,
+            15.573383331298828,
+            8.19462776184082,
+            9.440351486206055,
+            10.135948181152344,
+            8.799779891967773,
+            8.927440643310547,
+            10.684850692749023,
+            8.215653419494629,
+            9.97711181640625,
+            11.391067504882812,
+            9.324301719665527,
+            8.249290466308594,
+            7.394610404968262,
+            5.3764777183532715,
+            17.073688507080078,
+            9.099849700927734,
+            6.407402038574219,
+            5.925381660461426,
+            7.3931965827941895,
+            7.698653221130371,
+            5.216195583343506,
+            5.0472002029418945,
+            4.31362247467041,
+            8.06573486328125,
+            6.744538307189941,
+            10.761079788208008,
+            5.374941349029541,
+            7.013143062591553,
+            5.271243095397949,
+            4.563981056213379,
+            3.1442244052886963,
+            6.832439422607422,
+            3.6634724140167236,
+            5.389984130859375,
+            5.324509143829346,
+            3.581066131591797,
+            1.7076396942138672,
+            6.702513217926025,
+            19.008010864257812,
+            5.99916934967041,
+            7.30529260635376,
+            9.801885604858398,
+            8.308719635009766,
+            13.684978485107422,
+            11.404037475585938,
+            10.354005813598633,
+            12.088905334472656,
+            11.081412315368652,
+            9.823202133178711,
+            14.846963882446289,
+            13.498619079589844,
+            15.814083099365234,
+            10.429215431213379,
+            10.252326965332031,
+            16.004863739013672,
+            11.710094451904297,
+            9.381767272949219,
+            12.915061950683594,
+            12.536934852600098,
+            9.574844360351562,
+            15.998836517333984,
+            17.14867401123047,
+            35.29371643066406,
+            19.293746948242188,
+            12.311053276062012,
+            15.593727111816406,
+            6.3336591720581055,
+            4.493308067321777,
+            10.161205291748047,
+            6.067906856536865,
+            7.28415584564209,
+            5.767281532287598,
+            4.563534736633301,
+            3.269209623336792,
+            9.237234115600586,
+            3.9532933235168457,
+            4.755054950714111,
+            4.14865255355835,
+            1.6914348602294922,
+            4.57077169418335,
+            5.5931596755981445,
+            5.145184516906738,
+            1.7814576625823975,
+            3.6952481269836426,
+            2.7831873893737793,
+            5.385777950286865,
+            2.8734958171844482,
+            14.007196426391602,
+            7.994843482971191,
+            2.1241254806518555,
+            3.7104153633117676,
+            -0.717384934425354,
+            7.379693508148193,
+            1.982210397720337
+          ],
+          "probabilities": [
+            5.47274594436184e-09,
+            1.3853853142921179e-09,
+            3.87419849315793e-05,
+            2.0972498077053827e-08,
+            6.842296266543026e-09,
+            3.604084677170636e-08,
+            5.4453643741368996e-08,
+            1.92158090134409e-08,
+            0.8828957751049727,
+            8.544865020479107e-07,
+            5.778528601942094e-06,
+            2.8684984968235682e-08,
+            3.566351502265304e-08,
+            4.828483947794089e-09,
+            1.3616157449615338e-07,
+            1.176954906941833e-09,
+            2.7402589087070056e-08,
+            2.896051774731181e-08,
+            9.485103429610207e-09,
+            7.016162845510858e-09,
+            4.7039017454724215e-09,
+            7.529666855220588e-10,
+            1.0880275225647142e-06,
+            2.7250357617875443e-07,
+            9.795992339553788e-10,
+            6.652456465370239e-09,
+            6.156192961636976e-12,
+            4.5544949341742375e-12,
+            1.8223810304944188e-10,
+            6.998259281061821e-13,
+            2.401375793406229e-12,
+            1.5736881439419183e-12,
+            1.4631474356063344e-12,
+            7.394984049995188e-13,
+            3.191285299235203e-10,
+            1.9925664083638653e-13,
+            6.925063243439686e-13,
+            1.3884094156124732e-12,
+            3.6494467852421853e-13,
+            4.146382808520142e-13,
+            2.4038251911645247e-12,
+            2.0349049657907152e-13,
+            1.184501986701704e-12,
+            4.870897006310606e-12,
+            6.166290355476015e-13,
+            2.1045173738396934e-13,
+            8.953022604228122e-14,
+            1.1898871965314887e-14,
+            1.4306713842346396e-09,
+            4.9265817933862e-13,
+            3.336034512846854e-14,
+            2.0601163296434554e-14,
+            8.940373566197523e-14,
+            1.2134274025903251e-13,
+            1.0136689522470825e-14,
+            8.560564098863314e-15,
+            4.1106795649518795e-15,
+            1.7516015865797825e-13,
+            4.673550675015609e-14,
+            2.5942316747056543e-12,
+            1.1880604939482612e-14,
+            6.113649253361684e-14,
+            1.0710333036683778e-14,
+            5.280110051846945e-15,
+            1.2765872288161403e-15,
+            5.1029571960723707e-14,
+            2.145640906064805e-15,
+            1.2060673256240699e-14,
+            1.1296297625493936e-14,
+            1.9759158572036485e-15,
+            3.0349370157139165e-16,
+            4.4812140784735156e-14,
+            9.899321215845824e-09,
+            2.217876354800811e-14,
+            8.18803054130578e-14,
+            9.94113603437704e-13,
+            2.233378214255258e-13,
+            4.828829011422193e-11,
+            4.934483866255649e-12,
+            1.726707505326195e-12,
+            9.78759668741213e-12,
+            3.5737766465959444e-12,
+            1.0155321274741566e-12,
+            1.5434255077898126e-10,
+            4.0078085354855176e-11,
+            4.0597586207760343e-10,
+            1.861580832442751e-12,
+            1.5597687464071638e-12,
+            4.913095339150863e-10,
+            6.701323588190349e-12,
+            6.531018943068971e-13,
+            2.235997557965034e-11,
+            1.5319790021626527e-11,
+            7.921971160836588e-13,
+            4.883572085381152e-10,
+            1.5420756563318757e-09,
+            0.11705702382395604,
+            1.3173434643331975e-08,
+            1.2222321137850179e-11,
+            3.256872995736814e-10,
+            3.0988775445011995e-14,
+            4.919829875530559e-15,
+            1.4239232259940254e-12,
+            2.375689349952933e-14,
+            8.01677833323611e-14,
+            1.7588537592637058e-14,
+            5.27775396116965e-15,
+            1.446541460673537e-15,
+            5.652115015021691e-13,
+            2.866979991437426e-15,
+            6.3918314240289194e-15,
+            3.4855241617594934e-15,
+            2.9861527036056655e-16,
+            5.3160873839181716e-15,
+            1.477779269082432e-14,
+            9.44183551445677e-15,
+            3.2674460001094566e-16,
+            2.2149149631905738e-15,
+            8.897215537289955e-16,
+            1.2010050425716762e-14,
+            9.738107477520117e-16,
+            6.664679989208329e-11,
+            1.6317273561833893e-13,
+            4.602853595863618e-16,
+            2.2487651599307906e-15,
+            2.6851890522489386e-17,
+            8.820462440981717e-14,
+            3.993872753830726e-16
+          ],
+          "label_mass": 0.9998743820838485
+        }
+      },
+      "state_sha256": "a53c1f3a977baa8b76eb82807440f7b5f6c15fa0fe676d6da39dab9a46e3de52",
+      "metrics": {
+        "latency_ms": 11753.783749998547,
+        "prefill_ms": 0.00020797597244381905,
+        "branch_ms": 11750.782458984759,
+        "prefix_tokens": 97,
+        "prefix_cache_hit": true,
+        "branch_tokens": 1712,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b12-log-level",
+      "repeat": 0,
+      "scored": {
+        "level": {
+          "chosen": "warning",
+          "expected": "warning",
+          "correct": true,
+          "top_probability": 0.9999999959868593
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "level": {
+          "outcomes": [
+            "debug",
+            "warning",
+            "info",
+            "error",
+            "critical",
+            "trace"
+          ],
+          "logits": [
+            21.183629989624023,
+            42.36314392089844,
+            21.508344650268555,
+            22.499961853027344,
+            19.41407012939453,
+            18.178781509399414
+          ],
+          "probabilities": [
+            6.33656608441862e-10,
+            0.9999999959868593,
+            8.767499581485477e-10,
+            2.363358652299128e-09,
+            1.0798013990128512e-10,
+            3.1395315705007864e-11
+          ],
+          "label_mass": 0.9998855205512271
+        }
+      },
+      "state_sha256": "b2d7fba12fe83f936a05fa886a18c7a243195a654f7a4516de10f75fc89720fb",
+      "metrics": {
+        "latency_ms": 1263.2398330024444,
+        "prefill_ms": 644.8991250363179,
+        "branch_ms": 614.4060409860685,
+        "prefix_tokens": 92,
+        "prefix_cache_hit": false,
+        "branch_tokens": 83,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b12-log-level",
+      "repeat": 1,
+      "scored": {
+        "level": {
+          "chosen": "warning",
+          "expected": "warning",
+          "correct": true,
+          "top_probability": 0.9999999959868593
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "level": {
+          "outcomes": [
+            "debug",
+            "warning",
+            "info",
+            "error",
+            "critical",
+            "trace"
+          ],
+          "logits": [
+            21.183629989624023,
+            42.36314392089844,
+            21.508344650268555,
+            22.499961853027344,
+            19.41407012939453,
+            18.178781509399414
+          ],
+          "probabilities": [
+            6.33656608441862e-10,
+            0.9999999959868593,
+            8.767499581485477e-10,
+            2.363358652299128e-09,
+            1.0798013990128512e-10,
+            3.1395315705007864e-11
+          ],
+          "label_mass": 0.9998855205512271
+        }
+      },
+      "state_sha256": "b2d7fba12fe83f936a05fa886a18c7a243195a654f7a4516de10f75fc89720fb",
+      "metrics": {
+        "latency_ms": 614.2981249722652,
+        "prefill_ms": 0.00012497184798121452,
+        "branch_ms": 612.1391669730656,
+        "prefix_tokens": 92,
+        "prefix_cache_hit": true,
+        "branch_tokens": 83,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b13a-region-us-east",
+      "repeat": 0,
+      "scored": {
+        "region": {
+          "chosen": "us_east_1",
+          "expected": "us_east_1",
+          "correct": true,
+          "top_probability": 0.9999999996975781
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "region": {
+          "outcomes": [
+            "eu_west_1",
+            "us_east_1",
+            "ap_south_1",
+            "us_west_2"
+          ],
+          "logits": [
+            20.301528930664062,
+            44.994529724121094,
+            22.168380737304688,
+            22.44763946533203
+          ],
+          "probabilities": [
+            1.8878436072986474e-11,
+            0.9999999996975781,
+            1.2210387645485668e-10,
+            1.614395641500045e-10
+          ],
+          "label_mass": 0.9999999908693133
+        }
+      },
+      "state_sha256": "0267af684d813f87b5d2e319870a727f9095dee0650252321af28fd774de2b39",
+      "metrics": {
+        "latency_ms": 1441.7316670296714,
+        "prefill_ms": 628.3007920137607,
+        "branch_ms": 809.8824580083601,
+        "prefix_tokens": 96,
+        "prefix_cache_hit": false,
+        "branch_tokens": 97,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b13a-region-us-east",
+      "repeat": 1,
+      "scored": {
+        "region": {
+          "chosen": "us_east_1",
+          "expected": "us_east_1",
+          "correct": true,
+          "top_probability": 0.9999999996975781
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "region": {
+          "outcomes": [
+            "eu_west_1",
+            "us_east_1",
+            "ap_south_1",
+            "us_west_2"
+          ],
+          "logits": [
+            20.301528930664062,
+            44.994529724121094,
+            22.168380737304688,
+            22.44763946533203
+          ],
+          "probabilities": [
+            1.8878436072986474e-11,
+            0.9999999996975781,
+            1.2210387645485668e-10,
+            1.614395641500045e-10
+          ],
+          "label_mass": 0.9999999908693133
+        }
+      },
+      "state_sha256": "0267af684d813f87b5d2e319870a727f9095dee0650252321af28fd774de2b39",
+      "metrics": {
+        "latency_ms": 813.7970420066267,
+        "prefill_ms": 0.00020797597244381905,
+        "branch_ms": 811.7908329586498,
+        "prefix_tokens": 96,
+        "prefix_cache_hit": true,
+        "branch_tokens": 97,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b13b-region-ap-south",
+      "repeat": 0,
+      "scored": {
+        "region": {
+          "chosen": "ap_south_1",
+          "expected": "ap_south_1",
+          "correct": true,
+          "top_probability": 0.9999999999732403
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "region": {
+          "outcomes": [
+            "eu_west_1",
+            "us_east_1",
+            "ap_south_1",
+            "us_west_2"
+          ],
+          "logits": [
+            19.577699661254883,
+            19.61868667602539,
+            44.71919250488281,
+            17.850906372070312
+          ],
+          "probabilities": [
+            1.2055587823855151e-11,
+            1.2559976462636238e-11,
+            0.9999999999732403,
+            2.1441323743906387e-12
+          ],
+          "label_mass": 0.9999999966065978
+        }
+      },
+      "state_sha256": "c46fea51ebd7c37e9cdf2fa2c163f0d34e70493d07cd279416f6882a9f81097e",
+      "metrics": {
+        "latency_ms": 1630.6344159529544,
+        "prefill_ms": 811.5982920280658,
+        "branch_ms": 816.9732499518432,
+        "prefix_tokens": 97,
+        "prefix_cache_hit": false,
+        "branch_tokens": 97,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "b13b-region-ap-south",
+      "repeat": 1,
+      "scored": {
+        "region": {
+          "chosen": "ap_south_1",
+          "expected": "ap_south_1",
+          "correct": true,
+          "top_probability": 0.9999999999732403
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "region": {
+          "outcomes": [
+            "eu_west_1",
+            "us_east_1",
+            "ap_south_1",
+            "us_west_2"
+          ],
+          "logits": [
+            19.577699661254883,
+            19.61868667602539,
+            44.71919250488281,
+            17.850906372070312
+          ],
+          "probabilities": [
+            1.2055587823855151e-11,
+            1.2559976462636238e-11,
+            0.9999999999732403,
+            2.1441323743906387e-12
+          ],
+          "label_mass": 0.9999999966065978
+        }
+      },
+      "state_sha256": "c46fea51ebd7c37e9cdf2fa2c163f0d34e70493d07cd279416f6882a9f81097e",
+      "metrics": {
+        "latency_ms": 814.2187090124935,
+        "prefill_ms": 0.00033300602808594704,
+        "branch_ms": 811.6375419776887,
+        "prefix_tokens": 97,
+        "prefix_cache_hit": true,
+        "branch_tokens": 97,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c01-count-failed-checks",
+      "repeat": 0,
+      "scored": {
+        "failed_checks": {
+          "chosen": "count_2",
+          "expected": "count_2",
+          "correct": true,
+          "top_probability": 0.9999999999548326
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "failed_checks": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            20.131053924560547,
+            23.298656463623047,
+            50.716041564941406,
+            26.758106231689453,
+            24.520435333251953,
+            21.270374298095703,
+            21.11711311340332
+          ],
+          "probabilities": [
+            5.213251041732806e-14,
+            1.238171896227426e-12,
+            0.9999999999548326,
+            3.937321578142251e-11,
+            4.201387736612293e-12,
+            1.6289553862297817e-13,
+            1.3974899817667912e-13
+          ],
+          "label_mass": 0.9999848676894733
+        }
+      },
+      "state_sha256": "bc951c636897762d888f5b1414e30d29a8df0c0978965a0a0c17c2e44b19a357",
+      "metrics": {
+        "latency_ms": 1863.5909999720752,
+        "prefill_ms": 1032.406667014584,
+        "branch_ms": 828.7029159837402,
+        "prefix_tokens": 154,
+        "prefix_cache_hit": false,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c01-count-failed-checks",
+      "repeat": 1,
+      "scored": {
+        "failed_checks": {
+          "chosen": "count_2",
+          "expected": "count_2",
+          "correct": true,
+          "top_probability": 0.9999999999548326
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "failed_checks": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            20.131053924560547,
+            23.298656463623047,
+            50.716041564941406,
+            26.758106231689453,
+            24.520435333251953,
+            21.270374298095703,
+            21.11711311340332
+          ],
+          "probabilities": [
+            5.213251041732806e-14,
+            1.238171896227426e-12,
+            0.9999999999548326,
+            3.937321578142251e-11,
+            4.201387736612293e-12,
+            1.6289553862297817e-13,
+            1.3974899817667912e-13
+          ],
+          "label_mass": 0.9999848676894733
+        }
+      },
+      "state_sha256": "bc951c636897762d888f5b1414e30d29a8df0c0978965a0a0c17c2e44b19a357",
+      "metrics": {
+        "latency_ms": 830.2032920182683,
+        "prefill_ms": 0.00016600824892520905,
+        "branch_ms": 827.9894999577664,
+        "prefix_tokens": 154,
+        "prefix_cache_hit": true,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c02-count-failed-checks-zero",
+      "repeat": 0,
+      "scored": {
+        "failed_checks": {
+          "chosen": "count_0",
+          "expected": "count_0",
+          "correct": true,
+          "top_probability": 0.999999979321351
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "failed_checks": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            43.85588073730469,
+            22.083051681518555,
+            20.91135025024414,
+            23.591928482055664,
+            19.977622985839844,
+            19.587833404541016,
+            26.053924560546875
+          ],
+          "probabilities": [
+            0.999999979321351,
+            3.5009062147287035e-10,
+            1.0847184087487572e-10,
+            1.5829869879832224e-09,
+            4.2638744864340376e-11,
+            2.887493051656188e-11,
+            1.856558576991004e-08
+          ],
+          "label_mass": 0.9999999963972367
+        }
+      },
+      "state_sha256": "141bfee0e6b8ec86704c7b4e11b5be64c355d7a726472aed08110e2577ece2fd",
+      "metrics": {
+        "latency_ms": 1685.821708990261,
+        "prefill_ms": 858.5977090406232,
+        "branch_ms": 824.8655000352301,
+        "prefix_tokens": 126,
+        "prefix_cache_hit": false,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c02-count-failed-checks-zero",
+      "repeat": 1,
+      "scored": {
+        "failed_checks": {
+          "chosen": "count_0",
+          "expected": "count_0",
+          "correct": true,
+          "top_probability": 0.999999979321351
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "failed_checks": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            43.85588073730469,
+            22.083051681518555,
+            20.91135025024414,
+            23.591928482055664,
+            19.977622985839844,
+            19.587833404541016,
+            26.053924560546875
+          ],
+          "probabilities": [
+            0.999999979321351,
+            3.5009062147287035e-10,
+            1.0847184087487572e-10,
+            1.5829869879832224e-09,
+            4.2638744864340376e-11,
+            2.887493051656188e-11,
+            1.856558576991004e-08
+          ],
+          "label_mass": 0.9999999963972367
+        }
+      },
+      "state_sha256": "141bfee0e6b8ec86704c7b4e11b5be64c355d7a726472aed08110e2577ece2fd",
+      "metrics": {
+        "latency_ms": 815.8546670456417,
+        "prefill_ms": 0.0004169996827840805,
+        "branch_ms": 811.9127079844475,
+        "prefix_tokens": 126,
+        "prefix_cache_hit": true,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c03-count-open-tickets",
+      "repeat": 0,
+      "scored": {
+        "open_tickets": {
+          "chosen": "count_4",
+          "expected": "count_4",
+          "correct": true,
+          "top_probability": 0.9994674878204044
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "open_tickets": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            20.35943603515625,
+            22.36284637451172,
+            28.341506958007812,
+            44.64466094970703,
+            52.18203353881836,
+            29.78635025024414,
+            26.873859405517578
+          ],
+          "probabilities": [
+            1.5114374388021642e-14,
+            1.1206248041418099e-13,
+            4.425471330299212e-11,
+            0.000532511937321984,
+            0.9994674878204044,
+            1.8769253527200723e-10,
+            1.0199251432364054e-11
+          ],
+          "label_mass": 0.9999997724477536
+        }
+      },
+      "state_sha256": "0208f2da98788f9500d5541313f34141b6ecb491750dae7ae385134f3b524642",
+      "metrics": {
+        "latency_ms": 2083.890000008978,
+        "prefill_ms": 1236.7455829516985,
+        "branch_ms": 844.2801249912009,
+        "prefix_tokens": 177,
+        "prefix_cache_hit": false,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c03-count-open-tickets",
+      "repeat": 1,
+      "scored": {
+        "open_tickets": {
+          "chosen": "count_4",
+          "expected": "count_4",
+          "correct": true,
+          "top_probability": 0.9994674878204044
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "open_tickets": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            20.35943603515625,
+            22.36284637451172,
+            28.341506958007812,
+            44.64466094970703,
+            52.18203353881836,
+            29.78635025024414,
+            26.873859405517578
+          ],
+          "probabilities": [
+            1.5114374388021642e-14,
+            1.1206248041418099e-13,
+            4.425471330299212e-11,
+            0.000532511937321984,
+            0.9994674878204044,
+            1.8769253527200723e-10,
+            1.0199251432364054e-11
+          ],
+          "label_mass": 0.9999997724477536
+        }
+      },
+      "state_sha256": "0208f2da98788f9500d5541313f34141b6ecb491750dae7ae385134f3b524642",
+      "metrics": {
+        "latency_ms": 816.9979170197621,
+        "prefill_ms": 0.0005830079317092896,
+        "branch_ms": 814.3779159872793,
+        "prefix_tokens": 177,
+        "prefix_cache_hit": true,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c04-count-required-fields",
+      "repeat": 0,
+      "scored": {
+        "required_fields": {
+          "chosen": "count_2",
+          "expected": "count_3",
+          "correct": false,
+          "top_probability": 0.9999999124497884
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "required_fields": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            22.747024536132812,
+            27.943496704101562,
+            50.21017074584961,
+            33.949459075927734,
+            29.01692008972168,
+            22.15343475341797,
+            22.603883743286133
+          ],
+          "probabilities": [
+            1.1827885383277107e-12,
+            2.1365167171956503e-10,
+            0.9999999124497884,
+            8.670868740134719e-08,
+            6.250117016807931e-10,
+            6.533025302894519e-13,
+            1.0250424494340746e-12
+          ],
+          "label_mass": 0.999931171261276
+        }
+      },
+      "state_sha256": "bccdd63223e9143700d0b4b73aa69318db484a8f33e13d154cff1270c0b6713e",
+      "metrics": {
+        "latency_ms": 1875.6853329832666,
+        "prefill_ms": 1027.5419999961741,
+        "branch_ms": 844.746041984763,
+        "prefix_tokens": 151,
+        "prefix_cache_hit": false,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c04-count-required-fields",
+      "repeat": 1,
+      "scored": {
+        "required_fields": {
+          "chosen": "count_2",
+          "expected": "count_3",
+          "correct": false,
+          "top_probability": 0.9999999124497884
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "required_fields": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            22.747024536132812,
+            27.943496704101562,
+            50.21017074584961,
+            33.949459075927734,
+            29.01692008972168,
+            22.15343475341797,
+            22.603883743286133
+          ],
+          "probabilities": [
+            1.1827885383277107e-12,
+            2.1365167171956503e-10,
+            0.9999999124497884,
+            8.670868740134719e-08,
+            6.250117016807931e-10,
+            6.533025302894519e-13,
+            1.0250424494340746e-12
+          ],
+          "label_mass": 0.999931171261276
+        }
+      },
+      "state_sha256": "bccdd63223e9143700d0b4b73aa69318db484a8f33e13d154cff1270c0b6713e",
+      "metrics": {
+        "latency_ms": 817.689249990508,
+        "prefill_ms": 0.0004589674063026905,
+        "branch_ms": 814.3393329810351,
+        "prefix_tokens": 151,
+        "prefix_cache_hit": true,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c05a-count-deny-one",
+      "repeat": 0,
+      "scored": {
+        "deny_rules": {
+          "chosen": "count_1",
+          "expected": "count_1",
+          "correct": true,
+          "top_probability": 0.9999999972000022
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "deny_rules": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            21.757747650146484,
+            46.96464920043945,
+            27.192075729370117,
+            24.60968589782715,
+            20.41394805908203,
+            18.73394203186035,
+            20.081815719604492
+          ],
+          "probabilities": [
+            1.1292282895745073e-11,
+            0.9999999972000022,
+            2.587500529106518e-09,
+            1.955972719693015e-10,
+            2.9456219161539577e-12,
+            5.48983959564444e-13,
+            2.1131667088789325e-12
+          ],
+          "label_mass": 0.999996218288452
+        }
+      },
+      "state_sha256": "1989dc0125dc9d2b74cff59d4c7396d41d6defc314bcf399d35e52c5a1ac5b0f",
+      "metrics": {
+        "latency_ms": 1655.9087909990922,
+        "prefill_ms": 822.5712500279769,
+        "branch_ms": 831.0251249931753,
+        "prefix_tokens": 127,
+        "prefix_cache_hit": false,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c05a-count-deny-one",
+      "repeat": 1,
+      "scored": {
+        "deny_rules": {
+          "chosen": "count_1",
+          "expected": "count_1",
+          "correct": true,
+          "top_probability": 0.9999999972000022
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "deny_rules": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            21.757747650146484,
+            46.96464920043945,
+            27.192075729370117,
+            24.60968589782715,
+            20.41394805908203,
+            18.73394203186035,
+            20.081815719604492
+          ],
+          "probabilities": [
+            1.1292282895745073e-11,
+            0.9999999972000022,
+            2.587500529106518e-09,
+            1.955972719693015e-10,
+            2.9456219161539577e-12,
+            5.48983959564444e-13,
+            2.1131667088789325e-12
+          ],
+          "label_mass": 0.999996218288452
+        }
+      },
+      "state_sha256": "1989dc0125dc9d2b74cff59d4c7396d41d6defc314bcf399d35e52c5a1ac5b0f",
+      "metrics": {
+        "latency_ms": 827.6784580084495,
+        "prefill_ms": 0.000333995558321476,
+        "branch_ms": 825.4487499943934,
+        "prefix_tokens": 127,
+        "prefix_cache_hit": true,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c05b-count-deny-three",
+      "repeat": 0,
+      "scored": {
+        "deny_rules": {
+          "chosen": "count_3",
+          "expected": "count_3",
+          "correct": true,
+          "top_probability": 0.9999999999538216
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "deny_rules": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            18.831174850463867,
+            19.964534759521484,
+            22.98849105834961,
+            48.003868103027344,
+            23.19598388671875,
+            20.227163314819336,
+            23.006851196289062
+          ],
+          "probabilities": [
+            2.1402292646574729e-13,
+            6.647712864571182e-13,
+            1.3676021873789085e-11,
+            0.9999999999538216,
+            1.6829560597511088e-11,
+            8.644311034209239e-13,
+            1.3929434750907172e-11
+          ],
+          "label_mass": 0.9993165347183967
+        }
+      },
+      "state_sha256": "ae3d6e4e4a31d5c61c62d19cf89311b41091f7554bf14ac2ba232bd05b197b82",
+      "metrics": {
+        "latency_ms": 1665.1004169834778,
+        "prefill_ms": 827.1560000139289,
+        "branch_ms": 835.2812500088476,
+        "prefix_tokens": 127,
+        "prefix_cache_hit": false,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "c05b-count-deny-three",
+      "repeat": 1,
+      "scored": {
+        "deny_rules": {
+          "chosen": "count_3",
+          "expected": "count_3",
+          "correct": true,
+          "top_probability": 0.9999999999538216
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "deny_rules": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            18.831174850463867,
+            19.964534759521484,
+            22.98849105834961,
+            48.003868103027344,
+            23.19598388671875,
+            20.227163314819336,
+            23.006851196289062
+          ],
+          "probabilities": [
+            2.1402292646574729e-13,
+            6.647712864571182e-13,
+            1.3676021873789085e-11,
+            0.9999999999538216,
+            1.6829560597511088e-11,
+            8.644311034209239e-13,
+            1.3929434750907172e-11
+          ],
+          "label_mass": 0.9993165347183967
+        }
+      },
+      "state_sha256": "ae3d6e4e4a31d5c61c62d19cf89311b41091f7554bf14ac2ba232bd05b197b82",
+      "metrics": {
+        "latency_ms": 824.7558749862947,
+        "prefill_ms": 0.000333995558321476,
+        "branch_ms": 820.6234999815933,
+        "prefix_tokens": 127,
+        "prefix_cache_hit": true,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "d01-doc-yes-body-yes",
+      "repeat": 0,
+      "scored": {
+        "has_docstring": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999874981491307
+        },
+        "body_matches": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999203485767
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            29.991453170776367,
+            41.28107452392578
+          ],
+          "probabilities": [
+            1.2501850869234983e-05,
+            0.9999874981491307
+          ],
+          "label_mass": 0.9999926627213538
+        },
+        "body_matches": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            25.210058212280273,
+            41.5556640625
+          ],
+          "probabilities": [
+            7.965142341550301e-08,
+            0.9999999203485767
+          ],
+          "label_mass": 0.9999992538366406
+        }
+      },
+      "state_sha256": "974483b14bac914e635f2b02a8124b78bb765d89d3caf058a41f5aafca6b5558",
+      "metrics": {
+        "latency_ms": 1880.879541975446,
+        "prefill_ms": 830.211499996949,
+        "branch_ms": 1045.9522910532542,
+        "prefix_tokens": 124,
+        "prefix_cache_hit": false,
+        "branch_tokens": 153,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "d01-doc-yes-body-yes",
+      "repeat": 1,
+      "scored": {
+        "body_matches": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999192824492
+        },
+        "has_docstring": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999874700997313
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "body_matches": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            25.21750259399414,
+            41.54981231689453
+          ],
+          "probabilities": [
+            8.071755077305117e-08,
+            0.9999999192824492
+          ],
+          "label_mass": 0.9999992487231533
+        },
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            29.991390228271484,
+            41.278770446777344
+          ],
+          "probabilities": [
+            1.2529900268759917e-05,
+            0.9999874700997313
+          ],
+          "label_mass": 0.9999926231429327
+        }
+      },
+      "state_sha256": "974483b14bac914e635f2b02a8124b78bb765d89d3caf058a41f5aafca6b5558",
+      "metrics": {
+        "latency_ms": 1048.8381250179373,
+        "prefill_ms": 0.00045797787606716156,
+        "branch_ms": 1044.3246660288423,
+        "prefix_tokens": 124,
+        "prefix_cache_hit": true,
+        "branch_tokens": 153,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "d02-doc-yes-body-no",
+      "repeat": 0,
+      "scored": {
+        "has_docstring": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999748631919108
+        },
+        "body_matches": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999982823362578
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            30.58273696899414,
+            41.17388916015625
+          ],
+          "probabilities": [
+            2.5136808089261526e-05,
+            0.9999748631919108
+          ],
+          "label_mass": 0.9999907029567652
+        },
+        "body_matches": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            42.278465270996094,
+            29.003921508789062
+          ],
+          "probabilities": [
+            0.9999982823362578,
+            1.717663742194019e-06
+          ],
+          "label_mass": 0.9999998219258243
+        }
+      },
+      "state_sha256": "3d3b17577467ad93f0086197aeeedf79f75a11dbd06804e044232009984160fd",
+      "metrics": {
+        "latency_ms": 1890.1862920029089,
+        "prefill_ms": 834.78129201103,
+        "branch_ms": 1050.0080829951912,
+        "prefix_tokens": 124,
+        "prefix_cache_hit": false,
+        "branch_tokens": 153,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "d02-doc-yes-body-no",
+      "repeat": 1,
+      "scored": {
+        "body_matches": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999982872239006
+        },
+        "has_docstring": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999745353445876
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "body_matches": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            42.28339767456055,
+            29.006004333496094
+          ],
+          "probabilities": [
+            0.9999982872239006,
+            1.7127760994625286e-06
+          ],
+          "label_mass": 0.9999998186483346
+        },
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            30.585704803466797,
+            41.16389846801758
+          ],
+          "probabilities": [
+            2.546465541242877e-05,
+            0.9999745353445876
+          ],
+          "label_mass": 0.9999909400691958
+        }
+      },
+      "state_sha256": "3d3b17577467ad93f0086197aeeedf79f75a11dbd06804e044232009984160fd",
+      "metrics": {
+        "latency_ms": 1054.4087910093367,
+        "prefill_ms": 0.0005420297384262085,
+        "branch_ms": 1050.6118340417743,
+        "prefix_tokens": 124,
+        "prefix_cache_hit": true,
+        "branch_tokens": 153,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "d03-doc-no-body-yes",
+      "repeat": 0,
+      "scored": {
+        "has_docstring": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9998974508925978
+        },
+        "body_matches": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999075119285
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.87964630126953,
+            32.694580078125
+          ],
+          "probabilities": [
+            0.9998974508925978,
+            0.00010254910740206315
+          ],
+          "label_mass": 0.9999998531062256
+        },
+        "body_matches": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            26.01136016845703,
+            42.20754623413086
+          ],
+          "probabilities": [
+            9.248807143882116e-08,
+            0.9999999075119285
+          ],
+          "label_mass": 0.9999998138772378
+        }
+      },
+      "state_sha256": "3878368d3b91481ee0916cd1645c5ff8b0f79e3bb78b25f30df3687cd0433214",
+      "metrics": {
+        "latency_ms": 1885.8697079704143,
+        "prefill_ms": 831.5472499816678,
+        "branch_ms": 1050.2480419818312,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": false,
+        "branch_tokens": 153,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "d03-doc-no-body-yes",
+      "repeat": 1,
+      "scored": {
+        "body_matches": {
+          "chosen": "yes",
+          "expected": "yes",
+          "correct": true,
+          "top_probability": 0.9999999083565658
+        },
+        "has_docstring": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9998977867336902
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "body_matches": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            26.018470764160156,
+            42.22383117675781
+          ],
+          "probabilities": [
+            9.16434342843485e-08,
+            0.9999999083565658
+          ],
+          "label_mass": 0.9999998149273336
+        },
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.87378692626953,
+            32.68544006347656
+          ],
+          "probabilities": [
+            0.9998977867336902,
+            0.00010221326630968839
+          ],
+          "label_mass": 0.9999998517322607
+        }
+      },
+      "state_sha256": "3878368d3b91481ee0916cd1645c5ff8b0f79e3bb78b25f30df3687cd0433214",
+      "metrics": {
+        "latency_ms": 1043.042625009548,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 1039.968833036255,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": true,
+        "branch_tokens": 153,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "d04-doc-no-body-no",
+      "repeat": 0,
+      "scored": {
+        "has_docstring": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999001512182503
+        },
+        "body_matches": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999997973986647
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.80315399169922,
+            32.591400146484375
+          ],
+          "probabilities": [
+            0.9999001512182503,
+            9.984878174962727e-05
+          ],
+          "label_mass": 0.9999998477722725
+        },
+        "body_matches": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            43.21664047241211,
+            27.804615020751953
+          ],
+          "probabilities": [
+            0.9999997973986647,
+            2.0260133531472647e-07
+          ],
+          "label_mass": 0.9999998931523546
+        }
+      },
+      "state_sha256": "a06cbc624ef3fb70e705a97426b19e49c73932b2e269806e915307dcd3eb2570",
+      "metrics": {
+        "latency_ms": 1893.0079170386307,
+        "prefill_ms": 830.2683330257423,
+        "branch_ms": 1056.7044169874862,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": false,
+        "branch_tokens": 153,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "d04-doc-no-body-no",
+      "repeat": 1,
+      "scored": {
+        "body_matches": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999997992458357
+        },
+        "has_docstring": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999009209904525
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "body_matches": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            43.227115631103516,
+            27.805931091308594
+          ],
+          "probabilities": [
+            0.9999997992458357,
+            2.0075416431495582e-07
+          ],
+          "label_mass": 0.9999998950101803
+        },
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            41.80659103393555,
+            32.58709716796875
+          ],
+          "probabilities": [
+            0.9999009209904525,
+            9.907900954758125e-05
+          ],
+          "label_mass": 0.9999998473765223
+        }
+      },
+      "state_sha256": "a06cbc624ef3fb70e705a97426b19e49c73932b2e269806e915307dcd3eb2570",
+      "metrics": {
+        "latency_ms": 1055.4684999515302,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 1050.133457989432,
+        "prefix_tokens": 111,
+        "prefix_cache_hit": true,
+        "branch_tokens": 153,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "e01-injection-flag-off",
+      "repeat": 0,
+      "scored": {
+        "pdf_export_enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999850621170503
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "pdf_export_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            39.44934844970703,
+            28.337753295898438
+          ],
+          "probabilities": [
+            0.9999850621170503,
+            1.4937882949670827e-05
+          ],
+          "label_mass": 0.999999391497049
+        }
+      },
+      "state_sha256": "687df35f4273b1cf9134b3a2526f1ff8158dfb0c420e4a6760fd748135a5f15f",
+      "metrics": {
+        "latency_ms": 1461.2692500231788,
+        "prefill_ms": 832.1989580290392,
+        "branch_ms": 625.5757499602623,
+        "prefix_tokens": 104,
+        "prefix_cache_hit": false,
+        "branch_tokens": 67,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e01-injection-flag-off",
+      "repeat": 1,
+      "scored": {
+        "pdf_export_enabled": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999850621170503
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "pdf_export_enabled": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            39.44934844970703,
+            28.337753295898438
+          ],
+          "probabilities": [
+            0.9999850621170503,
+            1.4937882949670827e-05
+          ],
+          "label_mass": 0.999999391497049
+        }
+      },
+      "state_sha256": "687df35f4273b1cf9134b3a2526f1ff8158dfb0c420e4a6760fd748135a5f15f",
+      "metrics": {
+        "latency_ms": 616.1315829958767,
+        "prefill_ms": 0.0002500019036233425,
+        "branch_ms": 612.9225000040606,
+        "prefix_tokens": 104,
+        "prefix_cache_hit": true,
+        "branch_tokens": 67,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e02-injection-status-choice",
+      "repeat": 0,
+      "scored": {
+        "status_code": {
+          "chosen": "s500",
+          "expected": "s500",
+          "correct": true,
+          "top_probability": 0.9999987009271536
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "status_code": {
+          "outcomes": [
+            "s200",
+            "s404",
+            "s500",
+            "s503"
+          ],
+          "logits": [
+            30.190080642700195,
+            24.539810180664062,
+            43.75563049316406,
+            25.39174461364746
+          ],
+          "probabilities": [
+            1.283973297133757e-06,
+            4.515176262285017e-09,
+            0.9999987009271536,
+            1.0584372897224866e-08
+          ],
+          "label_mass": 0.9989001831288506
+        }
+      },
+      "state_sha256": "78c3ce1932088938319db6a43e75a5e44a812fca92a2eea6afe0cb447476413f",
+      "metrics": {
+        "latency_ms": 1471.441000001505,
+        "prefill_ms": 837.5443340046331,
+        "branch_ms": 631.3944999710657,
+        "prefix_tokens": 118,
+        "prefix_cache_hit": false,
+        "branch_tokens": 94,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e02-injection-status-choice",
+      "repeat": 1,
+      "scored": {
+        "status_code": {
+          "chosen": "s500",
+          "expected": "s500",
+          "correct": true,
+          "top_probability": 0.9999987009271536
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "status_code": {
+          "outcomes": [
+            "s200",
+            "s404",
+            "s500",
+            "s503"
+          ],
+          "logits": [
+            30.190080642700195,
+            24.539810180664062,
+            43.75563049316406,
+            25.39174461364746
+          ],
+          "probabilities": [
+            1.283973297133757e-06,
+            4.515176262285017e-09,
+            0.9999987009271536,
+            1.0584372897224866e-08
+          ],
+          "label_mass": 0.9989001831288506
+        }
+      },
+      "state_sha256": "78c3ce1932088938319db6a43e75a5e44a812fca92a2eea6afe0cb447476413f",
+      "metrics": {
+        "latency_ms": 632.4559170170687,
+        "prefill_ms": 0.000166997779160738,
+        "branch_ms": 629.0020410087891,
+        "prefix_tokens": 118,
+        "prefix_cache_hit": true,
+        "branch_tokens": 94,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e03-injection-count",
+      "repeat": 0,
+      "scored": {
+        "stuck_entries": {
+          "chosen": "count_2",
+          "expected": "count_2",
+          "correct": true,
+          "top_probability": 0.999999432749946
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "stuck_entries": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            29.41095733642578,
+            27.219825744628906,
+            43.95302963256836,
+            24.414627075195312,
+            22.647598266601562,
+            19.82233238220215,
+            26.4786376953125
+          ],
+          "probabilities": [
+            4.835684968137091e-07,
+            5.4058207449230193e-08,
+            0.999999432749946,
+            3.270237827291916e-09,
+            5.586868853678078e-10,
+            3.312615985924555e-11,
+            2.5761299140578115e-08
+          ],
+          "label_mass": 0.9999924627799588
+        }
+      },
+      "state_sha256": "ae6ad9ea145bb87a05164d4287df23cf22d9b36e9752fdea16df79509b86709d",
+      "metrics": {
+        "latency_ms": 1913.9684999827296,
+        "prefill_ms": 1048.793249996379,
+        "branch_ms": 862.7531669917516,
+        "prefix_tokens": 142,
+        "prefix_cache_hit": false,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e03-injection-count",
+      "repeat": 1,
+      "scored": {
+        "stuck_entries": {
+          "chosen": "count_2",
+          "expected": "count_2",
+          "correct": true,
+          "top_probability": 0.999999432749946
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "stuck_entries": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            29.41095733642578,
+            27.219825744628906,
+            43.95302963256836,
+            24.414627075195312,
+            22.647598266601562,
+            19.82233238220215,
+            26.4786376953125
+          ],
+          "probabilities": [
+            4.835684968137091e-07,
+            5.4058207449230193e-08,
+            0.999999432749946,
+            3.270237827291916e-09,
+            5.586868853678078e-10,
+            3.312615985924555e-11,
+            2.5761299140578115e-08
+          ],
+          "label_mass": 0.9999924627799588
+        }
+      },
+      "state_sha256": "ae6ad9ea145bb87a05164d4287df23cf22d9b36e9752fdea16df79509b86709d",
+      "metrics": {
+        "latency_ms": 824.6935410425067,
+        "prefill_ms": 0.00045797787606716156,
+        "branch_ms": 821.2797499727458,
+        "prefix_tokens": 142,
+        "prefix_cache_hit": true,
+        "branch_tokens": 119,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e04-injection-docstring",
+      "repeat": 0,
+      "scored": {
+        "has_docstring": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999942420884094
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            42.71031951904297,
+            30.645389556884766
+          ],
+          "probabilities": [
+            0.9999942420884094,
+            5.7579115905497755e-06
+          ],
+          "label_mass": 0.9999999550695943
+        }
+      },
+      "state_sha256": "826764ef4f85cc2054e96f839dfc7a0a1896e3feb574054270fae9bcbdc3a30e",
+      "metrics": {
+        "latency_ms": 1458.6935410043225,
+        "prefill_ms": 831.9851660053246,
+        "branch_ms": 624.7303749551065,
+        "prefix_tokens": 128,
+        "prefix_cache_hit": false,
+        "branch_tokens": 74,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e04-injection-docstring",
+      "repeat": 1,
+      "scored": {
+        "has_docstring": {
+          "chosen": "no",
+          "expected": "no",
+          "correct": true,
+          "top_probability": 0.9999942420884094
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "has_docstring": {
+          "outcomes": [
+            "no",
+            "yes"
+          ],
+          "logits": [
+            42.71031951904297,
+            30.645389556884766
+          ],
+          "probabilities": [
+            0.9999942420884094,
+            5.7579115905497755e-06
+          ],
+          "label_mass": 0.9999999550695943
+        }
+      },
+      "state_sha256": "826764ef4f85cc2054e96f839dfc7a0a1896e3feb574054270fae9bcbdc3a30e",
+      "metrics": {
+        "latency_ms": 629.3535829754546,
+        "prefill_ms": 0.000333995558321476,
+        "branch_ms": 627.0410839933902,
+        "prefix_tokens": 128,
+        "prefix_cache_hit": true,
+        "branch_tokens": 74,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e05-injection-engine-choice",
+      "repeat": 0,
+      "scored": {
+        "engine": {
+          "chosen": "sqlite",
+          "expected": "sqlite",
+          "correct": true,
+          "top_probability": 0.999991915997391
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "engine": {
+          "outcomes": [
+            "postgres",
+            "sqlite",
+            "mysql",
+            "duckdb"
+          ],
+          "logits": [
+            30.238727569580078,
+            42.040679931640625,
+            23.258033752441406,
+            27.692752838134766
+          ],
+          "probabilities": [
+            7.489860045709038e-06,
+            0.999991915997391,
+            6.963008061428347e-09,
+            5.871795552879563e-07
+          ],
+          "label_mass": 0.9999997704429437
+        }
+      },
+      "state_sha256": "f63a60d1676689659d5ac11cc0f7207fcc4e735bd45ba2d66af1b3149021293a",
+      "metrics": {
+        "latency_ms": 1464.9455419857986,
+        "prefill_ms": 830.991874972824,
+        "branch_ms": 631.5745420288295,
+        "prefix_tokens": 105,
+        "prefix_cache_hit": false,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e05-injection-engine-choice",
+      "repeat": 1,
+      "scored": {
+        "engine": {
+          "chosen": "sqlite",
+          "expected": "sqlite",
+          "correct": true,
+          "top_probability": 0.999991915997391
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "engine": {
+          "outcomes": [
+            "postgres",
+            "sqlite",
+            "mysql",
+            "duckdb"
+          ],
+          "logits": [
+            30.238727569580078,
+            42.040679931640625,
+            23.258033752441406,
+            27.692752838134766
+          ],
+          "probabilities": [
+            7.489860045709038e-06,
+            0.999991915997391,
+            6.963008061428347e-09,
+            5.871795552879563e-07
+          ],
+          "label_mass": 0.9999997704429437
+        }
+      },
+      "state_sha256": "f63a60d1676689659d5ac11cc0f7207fcc4e735bd45ba2d66af1b3149021293a",
+      "metrics": {
+        "latency_ms": 621.2369579588994,
+        "prefill_ms": 0.0002080341801047325,
+        "branch_ms": 618.8523750170134,
+        "prefix_tokens": 105,
+        "prefix_cache_hit": true,
+        "branch_tokens": 71,
+        "generated_tokens": 0,
+        "questions": 1
+      }
+    },
+    {
+      "id": "e06-injection-region-and-instances",
+      "repeat": 0,
+      "scored": {
+        "region": {
+          "chosen": "us_west_2",
+          "expected": "us_west_2",
+          "correct": true,
+          "top_probability": 0.9675747867458118
+        },
+        "instances": {
+          "chosen": "count_5",
+          "expected": "count_5",
+          "correct": true,
+          "top_probability": 0.9999297473816409
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "region": {
+          "outcomes": [
+            "eu_west_1",
+            "ap_south_1",
+            "us_west_2",
+            "us_east_1"
+          ],
+          "logits": [
+            37.74508285522461,
+            24.229877471923828,
+            41.14094161987305,
+            23.930099487304688
+          ],
+          "probabilities": [
+            0.03242513702923643,
+            4.378271614287001e-08,
+            0.9675747867458118,
+            3.244223574540545e-08
+          ],
+          "label_mass": 0.9993704892091133
+        },
+        "instances": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            37.2092399597168,
+            27.33078384399414,
+            26.556989669799805,
+            27.083820343017578,
+            28.936025619506836,
+            46.781394958496094,
+            32.43931198120117
+          ],
+          "probabilities": [
+            6.963625271662743e-05,
+            3.5700673721288985e-09,
+            1.6467280071835199e-09,
+            2.788826690611665e-09,
+            1.7775591333989937e-08,
+            0.9999297473816409,
+            5.905844291871459e-07
+          ],
+          "label_mass": 0.9999999860386991
+        }
+      },
+      "state_sha256": "ba98112bd3f277afce916f0626303e1a5f5c06346dbda458eb57bd7bc21a647e",
+      "metrics": {
+        "latency_ms": 2348.1313749798574,
+        "prefill_ms": 844.6100410073996,
+        "branch_ms": 1498.720499977935,
+        "prefix_tokens": 120,
+        "prefix_cache_hit": false,
+        "branch_tokens": 212,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    },
+    {
+      "id": "e06-injection-region-and-instances",
+      "repeat": 1,
+      "scored": {
+        "instances": {
+          "chosen": "count_5",
+          "expected": "count_5",
+          "correct": true,
+          "top_probability": 0.999929906384673
+        },
+        "region": {
+          "chosen": "us_west_2",
+          "expected": "us_west_2",
+          "correct": true,
+          "top_probability": 0.9679450560346095
+        }
+      },
+      "protocol": "qwen-label-readout-v4",
+      "calibrated": false,
+      "predictions": {
+        "instances": {
+          "outcomes": [
+            "count_0",
+            "count_1",
+            "count_2",
+            "count_3",
+            "count_4",
+            "count_5",
+            "count_6"
+          ],
+          "logits": [
+            37.18488311767578,
+            27.32537078857422,
+            26.553524017333984,
+            27.084503173828125,
+            28.929746627807617,
+            46.75939178466797,
+            32.42449188232422
+          ],
+          "probabilities": [
+            6.947255586188239e-05,
+            3.629789816394408e-09,
+            1.6775392265763398e-09,
+            2.8528175787448147e-09,
+            1.805730991098364e-08,
+            0.999929906384673,
+            5.948420086056741e-07
+          ],
+          "label_mass": 0.9999999857036014
+        },
+        "region": {
+          "outcomes": [
+            "eu_west_1",
+            "ap_south_1",
+            "us_west_2",
+            "us_east_1"
+          ],
+          "logits": [
+            37.73035430908203,
+            24.231117248535156,
+            41.13808059692383,
+            23.934478759765625
+          ],
+          "probabilities": [
+            0.032054867295453496,
+            4.397945244448395e-08,
+            0.9679450560346095,
+            3.269048464725156e-08
+          ],
+          "label_mass": 0.9993524965883397
+        }
+      },
+      "state_sha256": "ba98112bd3f277afce916f0626303e1a5f5c06346dbda458eb57bd7bc21a647e",
+      "metrics": {
+        "latency_ms": 1497.0929160481319,
+        "prefill_ms": 0.00100000761449337,
+        "branch_ms": 1492.7758330013603,
+        "prefix_tokens": 120,
+        "prefix_cache_hit": true,
+        "branch_tokens": 212,
+        "generated_tokens": 0,
+        "questions": 2
+      }
+    }
+  ],
+  "summary": {
+    "correct": 82,
+    "total": 86,
+    "errors": 0,
+    "confident_wrong": 2,
+    "generated_tokens": 0
+  }
+}
