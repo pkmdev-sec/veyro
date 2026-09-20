@@ -3,7 +3,8 @@
 For current procedures and recovery, use the [operator guide](supervision-operator-guide.md).
 For the dated cross-provider checks, see [verification results](supervision-verification.md).
 
-SUP-012 targets **Codex 0.154.0**. Pi and Claude Code are outside the supervision roadmap.
+This bridge targets **Codex 0.154.0**. Pi and Claude Code have no existing-session
+supervision bridge.
 The bridge uses stable native command hooks and the native `codex queue` command.
 It does not start or connect to App Server. Direct Codex usage remains unchanged.
 
@@ -18,7 +19,8 @@ From this repository, use its installed Python environment:
   --executable /opt/homebrew/bin/codex
 ```
 
-The executable must be the native Codex launcher, not a credential/proxy wrapper.
+`/opt/homebrew/bin/codex` is a macOS Homebrew example. Use the verified native
+launcher path for your installation, not a credential/proxy wrapper.
 The listener checks `codex-cli 0.154.0`. It prints a JSON hook configuration with
 an absolute Python executable in isolated mode (`-I`) and a private connection-file path. No token is
 printed. Keep the listener alive while using Codex in that exact repository.
@@ -90,7 +92,7 @@ orchestrator. The executable listener above is observe-only. Existing
 `AuthorizedControlDispatcher` must authorize each queue request; the experimental
 declaration requires current exact-request human approval. The message must also
 pass deterministic boundary policy and any required authoritative LocalJev review.
-This task does not enable autonomous dispatch or add a public control socket.
+The hook listener does not enable autonomous dispatch or expose a public control socket.
 
 The adapter invokes the configured native executable with the exact thread UUID:
 

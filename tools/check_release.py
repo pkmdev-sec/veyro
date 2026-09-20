@@ -83,6 +83,9 @@ def check(wheel: Path, sdist: Path, retired_name: str | None = None) -> dict[str
         "docs/assets/veyro-logo-animated-poster.png",
         "tools/generate_brand_assets.py",
         "tests/conftest.py",
+        "docs/localjev.md",
+        "examples/assess_localjev.py",
+        "examples/failed-verification.json",
         "config/baselines/localjev-qwen3-14b.json",
     }
     if not required <= source_files.keys():

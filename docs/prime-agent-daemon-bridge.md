@@ -30,7 +30,9 @@ The client accepts only a Unix socket owned by the current user with no group or
 
 ## Live canary
 
-The SUP-008 canary connected to the installed default daemon, verified the exact hello above, listed sessions, attached read-only to an idle Prime Agent session, observed one normalized `session_started` event, and detached. It sent no prompt and executed no provider control.
+The [recorded observation checks](supervision-verification.md#recorded-installation-results)
+verified the pinned daemon handshake, session discovery, read-only attachment,
+normalized lifecycle metadata, and detach without native prompts or controls.
 
 Run focused checks with:
 

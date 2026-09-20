@@ -1,13 +1,17 @@
-# Live steering
+# Factory App Server steering
 
-Veyro can send Jev-informed guidance into an active Codex turn before resorting to termination.
+This is the separate `veyro run` factory with explicit `VEYRO_CODEX_BACKEND=app-server`
+opt-in. It is not the existing-session approval protocol. Its default assessor is
+localjev with Qwen3-14B, and its observations can include task text and worker output.
+
+Veyro can send localjev-informed guidance into an active Codex turn before resorting to termination.
 The feature uses Codex App Server because the non-interactive `codex exec` transport has no channel
 for additional input during a turn.
 
 ## Decision flow
 
 1. Veyro builds the same bounded factory observation used for every assessment.
-2. Jev scores `worker_stuck`, `work_off_track`, `meaningful_progress`, and the other dimensions.
+2. localjev asks Qwen3-14B to score `worker_stuck`, `work_off_track`, `meaningful_progress`, and the other dimensions.
 3. The deterministic policy checks safety limits and the worker's steering history.
 4. The first stuck or off-track result at the configured threshold selects `STEER_WORKER`.
 5. Veyro translates the scores into a bounded instruction and calls App Server `turn/steer` with
@@ -15,7 +19,7 @@ for additional input during a turn.
 6. The worker receives a grace period. If the warning remains high afterward, policy stops it and
    uses the existing retry path.
 
-Jev does not directly write the steering prompt or control the process. It supplies probabilities;
+localjev does not directly write the steering prompt or control the process. It supplies probabilities;
 ordinary Python selects an allowed action and deterministically formats the guidance.
 
 ## State and observability

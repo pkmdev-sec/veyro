@@ -8,8 +8,8 @@ OpenCode session. It does not start or resume a native session. The default is
 observe-only. `veyro attach` remains strictly read-only.
 
 Codex hook journals remain available through `veyro attach`; this command does
-not expose a Codex queue channel. Pi and Claude Code are outside the supervision
-roadmap. Their existing native launch commands are unchanged.
+not expose a Codex queue channel. Pi and Claude Code support native launch,
+not existing-session supervision.
 
 ## Choose an operator policy
 
@@ -194,7 +194,7 @@ The existing attachment canaries also run the real `veyro supervise` executable
 in default observe-only mode and check that the original native session remains.
 The disposable Prime control canary explicitly selects approval-required mode,
 uses a private delivery ledger, requests pinned LocalJev assessment, and verifies
-an approved stop without sending a model prompt:
+an approved stop without sending a native-agent work prompt:
 
 ```sh
 .venv/bin/python -m veyro.supervision.prime_canary --repo /path/to/repo \
@@ -220,20 +220,8 @@ roster, and checks that exactly one durable claim was written. Its private files
 and ledger are removed after the subprocess and native fixture are closed. It
 sends no model prompt and does not modify an existing user session.
 
-### Recorded SUP-015 verification
+### Recorded verification
 
-- Final full suite: **488 passed, 1 failed** in the existing
-  `test_noisy_events_are_coalesced` timing race (100 events instead of 50).
-  That failure was reproduced on the unchanged baseline during SUP-014. A prior
-  full run passed all 485 tests before the four transport tests were added.
-  No scheduler code or timing thresholds were changed.
-- Focused policy, delivery, bridge conformance, attachment, and control-loop checks:
-  **256 passed**. Four additional SDK transport regressions passed: loopback
-  proxy routing is disabled, external proxy routing is retained, and TLS
-  certificate verification remains enabled. Ruff and `git diff --check` passed.
-- Prime Agent `0.9.5`: actual executable approval/stdin/claim/terminal-stop canary
-  passed twice. The direct control-loop canary also passed with pinned LocalJev.
-- Prime Agent `0.9.5` and OpenCode `1.18.30`: actual executable default-observe
-  canaries sent no prompts or controls and preserved the selected native sessions.
-- No disposable canary tree remained after cleanup. No installed credentials,
-  native configuration, or global rollout mode were changed.
+[Installation results](supervision-verification.md#recorded-installation-results)
+record native delivery scope, cleanup evidence, and known test failures. They do
+not qualify any pinned adapter for automatic control.

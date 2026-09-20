@@ -1,75 +1,63 @@
-# Theory: semantic supervision
+# Semantic assessment and deterministic control
 
-## The separation
+Veyro separates native execution from local semantic assessment. A coding agent
+keeps its tools, terminal, and permission system. localjev uses Qwen3-14B to assess
+structured evidence at review checkpoints. Veyro, not the model, authorizes controls.
 
-A coding agent and a supervisor solve different problems.
-
-The coding agent has a wide action space. It reads code, forms plans, runs tools, edits files,
-interprets failures, and tries again. This is slow, generative work. Preserving the agent's native
-harness matters because its observations affect its next action.
-
-The supervisor has a narrow action space. It asks questions about the process as a whole:
-
-- Is useful work happening?
-- Is the implementation probably complete?
-- Is the evidence for testing strong enough?
-- Is the worker stuck or drifting?
-- Is an independent check now worthwhile?
-- Does the situation require a person?
-
-Those are semantic state-estimation problems. Their answers are uncertain, but the possible
-interventions are few and can be constrained by ordinary code.
+## Existing-session data flow
 
 ```text
-wide generative loop                     narrow supervisory loop
-
-reason → tool → observe → edit           evidence → probabilities
-   ↑                       │                         │
-   └──────── test ◄────────┘                         ▼
-                                             deterministic policy
-                                                    │
-                                                    ▼
-                                  continue / steer / stop / retry / verify
+Native provider events
+    -> version-pinned bridge
+    -> metadata normalization
+    -> SessionReducer
+    -> deterministic policy and capability checks
+    -> localjev / Qwen3-14B when review is needed
+    -> exact approval and fresh-state checks
+    -> durable no-retry claim
+    -> recheck, then supported native control
 ```
 
-Veyro's central bet is that these loops should be separated and allowed to run concurrently.
-The coding worker keeps its local reasoning loop. Factory events give the supervisor a bounded view
-of what is happening without forcing the worker to yield.
+`SessionReducer` maintains bounded typed state rather than a transcript. Events
+have contiguous local sequence numbers; missing native history remains unknown.
+`CheckpointSelector` recognizes failed verification, completion claims, idle
+sessions, and risky actions. The current CLI evaluates one operator-supplied
+proposal. It is not a background proposal generator or a judge invoked on every event.
 
-## Semantic state, deterministic control
+## The model estimates; policy authorizes
 
-The model does not command processes. It estimates named probabilities. Python owns thresholds,
-resource limits, lifecycle history, and the legal action vocabulary.
+`LocalJevCheckpointAssessor` validates the configured assessor identity and asks
+seven named questions about reduced state. Scores express uncertainty. They do
+not establish task completion or replace evidence from the native provider.
 
-This split is important for three reasons:
+`SupervisionControlLoop` applies rollout policy. Observe-only neither assesses nor
+delivers. Advisory may assess but cannot deliver. Executing modes require the
+necessary capabilities, current evidence, and exact approval. Forbidden actions
+and explicit human denial cannot be overridden by a high score.
 
-1. Uncertainty stays visible rather than being hidden inside a generated instruction.
-2. Safety invariants such as maximum retries and one verifier remain deterministic.
-3. Policy can be calibrated or replaced without changing how evidence is assessed.
+`AuthorizedControlDispatcher` reserves a durable delivery claim before native
+execution. It rechecks approval expiry and the observed cursor after persistence.
+The claim survives failure, cancellation, and uncertainty. This prevents duplicate
+dispatch in the same scope; it does not provide exactly-once native execution.
+The provider does not offer an atomic compare-and-execute transaction.
 
-The architecture resembles a control system, but the state estimator is semantic rather than
-physical. Evidence is partial, delayed, and lossy. The controller therefore needs hysteresis-like
-state—verification history, worker counts, retry counts—and conservative terminal conditions.
+## Native boundaries remain visible
 
-## Why concurrency matters
+Queue acceptance is not model execution. Interrupt is not session stop. Deletion
+is not a substitute for stop. An unsupported capability stays unsupported rather
+than being approximated through terminal scraping or another native operation.
 
-If assessment only happens after a worker exits, the architecture is a serial judge:
+No currently pinned adapter qualifies for automatic delivery. Native tools can
+still act outside Veyro, subject to their own permissions. The
+[operator guide](supervision-operator-guide.md) describes this boundary and recovery.
 
-```text
-run agent → inspect result → run another agent
-```
+## The separate factory loop
 
-Veyro instead consumes start, output, failure, repository, timeout, and completion signals while
-the subprocess is live. Events are coalesced so one noisy stdout stream does not produce one model
-call per line. Important lifecycle events bypass the normal debounce delay.
+`veyro run` starts workers and assesses their progress while they execute.
+`FactoryRuntime` coalesces worker events, `ObservationBuilder` gathers bounded
+state, and `FactoryPolicy` interprets nine model scores with worker/retry limits.
+This loop can persist task text and agent output. It does not have the same
+approval protocol or privacy contract as existing-session supervision.
 
-That makes early intervention possible. A sufficiently strong stuck or off-track signal first sends
-bounded guidance into the active worker turn. If the signal remains high after a grace period,
-Veyro can still stop the worker before its natural timeout. Quiet work continues to receive
-periodic assessment.
-
-## What the theory does not assume
-
-It does not assume the supervisor is always right, that probabilities are calibrated for software
-work, or that more frequent judgment is automatically better. Those are empirical questions. The
-project creates a small runtime in which they can be measured.
+See [factory runtime](runtime.md) for that implementation. Do not infer that its
+simulation results prove live native controls or calibrated Qwen3-14B decisions.

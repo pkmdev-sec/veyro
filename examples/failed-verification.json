@@ -1,0 +1,47 @@
+[
+  {
+    "session": {
+      "veyro_session_id": "example-failed-verification",
+      "provider_id": "synthetic-example",
+      "provider_session_id": null,
+      "repository": "synthetic-example",
+      "bridge_id": "example-metadata",
+      "bridge_version": "1.0",
+      "started_at": "2026-09-01T00:00:00Z"
+    },
+    "sequence": 1,
+    "event_id": "example-1",
+    "occurred_at": "2026-09-01T00:00:01Z",
+    "event_type": "session_started",
+    "payload": {},
+    "provenance": {
+      "source": "process",
+      "native_event_type": "synthetic.session_started",
+      "observed_at": "2026-09-01T00:00:01Z"
+    }
+  },
+  {
+    "session": {
+      "veyro_session_id": "example-failed-verification",
+      "provider_id": "synthetic-example",
+      "provider_session_id": null,
+      "repository": "synthetic-example",
+      "bridge_id": "example-metadata",
+      "bridge_version": "1.0",
+      "started_at": "2026-09-01T00:00:00Z"
+    },
+    "sequence": 2,
+    "event_id": "example-2",
+    "occurred_at": "2026-09-01T00:00:01Z",
+    "event_type": "test_completed",
+    "payload": {
+      "check_id": "unit-tests",
+      "passed": false
+    },
+    "provenance": {
+      "source": "process",
+      "native_event_type": "synthetic.test_completed",
+      "observed_at": "2026-09-01T00:00:01Z"
+    }
+  }
+]

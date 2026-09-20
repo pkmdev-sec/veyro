@@ -16,7 +16,7 @@ Pinned LocalJev/Qwen3 remains the sole authoritative semantic supervisor.
 | Prime Agent `0.9.5` | Loaded sessions on an explicit daemon | Live structured daemon events | Snapshot counts and replay status only; no transcript replay requested |
 | OpenCode `1.18.30` | Sessions on an explicit authenticated server | Live SSE after connection | No history or replay fetched |
 | Codex hooks `0.154.0` | Existing private Veyro hook journals | Local reads and optional follow | Local receipt order, not complete native history |
-| Pi, Claude Code | Outside the supervision roadmap | None | None |
+| Pi, Claude Code | No supervision bridge | None | None |
 
 A Codex journal does not prove Codex or its listener is running. Native liveness
 stays `unknown`, including after a recorded `SessionEnd`. An OpenCode record does
@@ -134,13 +134,6 @@ not model execution, control delivery, or complete native event coverage.
 
 ### Verification evidence
 
-The executable canaries passed against Prime Agent `0.9.5` and OpenCode `1.18.30`.
-Both rediscovered the selected native session after detach, with no prompts or
-controls. The OpenCode fixture used isolated HOME/XDG storage and its port closed
-after cleanup. Codex executable tests used existing hook journals and verified
-unchanged bytes, permissions, and modification times.
-
-The full test run also exposed the existing
-`test_noisy_events_are_coalesced` timing race (100 events instead of 50). The same
-failure was reproduced from committed `43f33c2` in an isolated baseline tree.
-No scheduler code or timing thresholds were changed for this task.
+See [recorded installation results](supervision-verification.md#recorded-installation-results)
+for dated native reports, test coverage, and known failures. Re-run the relevant
+canary against your pinned installation before relying on its behavior.

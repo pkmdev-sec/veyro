@@ -3,7 +3,7 @@
 For current procedures and recovery, use the [operator guide](supervision-operator-guide.md).
 For the dated cross-provider checks, see [verification results](supervision-verification.md).
 
-`SUP-009` proves the complete control path with a disposable Prime Agent session. The canary creates no saved session, sends no prompt, invokes no model through Prime Agent, and writes no repository files.
+The approved-stop canary exercises the control path with a disposable Prime Agent session. The canary creates no saved session, sends no prompt, invokes no model through Prime Agent, and writes no repository files.
 
 ## Proven path
 
@@ -34,7 +34,7 @@ The command rejects a missing `--approve-stop`. It accepts only the pinned Prime
 
 ## Verified result
 
-The live `SUP-009` run produced:
+A recorded live run produced:
 
 ```json
 {

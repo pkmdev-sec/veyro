@@ -104,8 +104,8 @@ observation, and `veyro supervise` for one policy-gated proposal. See the
 | Prime Agent `0.9.5` | Internal daemon protocol 7, schema 29 | Controls require approval; no approval observation/reply |
 | OpenCode `1.18.30` | Authenticated loopback HTTP/SSE | No replay, active-turn steering, or non-destructive stop |
 
-Pi and Claude Code supervision bridges were removed from the roadmap. Native
-launch and the legacy worker mappings below remain available.
+Pi and Claude Code have no existing-session supervision bridge. Their native
+launch and factory worker mappings below remain available.
 
 The control-plane contracts are versioned. Adapter capabilities do not grant
 authorization. Public JSON/NDJSON commands do not require callers to import

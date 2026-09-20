@@ -1,56 +1,71 @@
-# Runtime and event flow
+# Factory runtime and event flow
+
+This reference describes `veyro run`, the separate worker-orchestration interface.
+It is not the existing-session `supervise` command. The factory defaults to localjev
+with Qwen3-14B and Codex `exec`. Its observations and logs can include task text,
+Git diffs, and worker output. See [the control-plane architecture](theory.md) for
+metadata-only existing-session supervision.
 
 ## Components
 
 ```text
-Codex App Server ─events─► FactoryRuntime ─snapshot─► ObservationBuilder
-       ▲                         │                           │
-       │                         │                           ▼
-       └── steer / interrupt ◄── FactoryPolicy ◄─scores─ JevVeyroModel
-                             │
-                             ▼
-                         RunStore
-                    state.json + events.jsonl
+NativeCliWorker / Codex exec -> FactoryRuntime -> ObservationBuilder
+                                  ^                    |
+                                  |                    v
+                            FactoryPolicy <- localjev / Qwen3-14B
+                                  |
+                                  v
+                              RunStore
+                       state.json + events.jsonl
 ```
 
-- `CodexAppServerWorker` owns one App Server subprocess, thread, and active turn.
-- `FactoryRuntime` owns lifecycle state, the event queue, and active worker tasks.
-- `ObservationBuilder` gathers bounded worker, event, and Git evidence concurrently.
-- `JevVeyroModel` is the only module that imports the TypeSafe SDK.
-- `FactoryPolicy` is pure deterministic decision logic.
-- `RunStore` atomically replaces state and appends immutable events.
+- `FactoryRuntime` owns lifecycle state, the event queue, and worker tasks.
+- `ObservationBuilder` gathers bounded worker, event, and Git evidence.
+- `JevVeyroModel` owns TypeSafe SDK requests and score/provenance validation.
+- `FactoryPolicy` applies deterministic thresholds and resource limits.
+- `RunStore` atomically replaces state and appends events.
+- `CodexAppServerWorker` is selected only with `VEYRO_CODEX_BACKEND=app-server`.
+  That experimental backend adds active-turn steering; `exec` is not a fallback.
 
-Simulation classes implement the same model and worker protocols. They exist for the demo and
-offline tests; real runs default to Jev and Codex.
+`veyro demo` uses simulation classes without model services or agent credentials.
+It validates orchestration, not Qwen3-14B accuracy or native-agent isolation.
 
 ## One assessment cycle
 
-1. A worker event enters the `asyncio.Queue`.
-2. The watcher drains adjacent events and applies the minimum assessment interval.
+1. Worker events enter the `asyncio.Queue`.
+2. The watcher coalesces adjacent events and applies the minimum assessment interval.
 3. Completion, failure, and stop events force an immediate cycle.
-4. Git status/diff and current state become one bounded `FactoryObservation`.
-5. The model returns nine probabilities.
-6. Pydantic validates and normalizes the assessment.
-7. Policy returns one legal `Intervention`.
-8. Runtime may steer the active turn, interrupt it, or apply another lifecycle action.
-9. The action and any steering message are persisted before observation continues.
+4. Repository evidence and current state form one bounded `FactoryObservation`.
+5. localjev returns nine named model scores.
+6. Veyro validates and normalizes the assessment.
+7. `FactoryPolicy` selects an `Intervention` within lifecycle and resource limits.
+8. Runtime applies the supported worker action and persists the result.
 
-Veyro-generated events do not feed back into the queue, preventing the observer from triggering
-itself recursively.
+Veyro-generated events do not feed back into the queue. Periodic assessment can
+continue while a worker is active. These mechanics differ from evaluating one
+operator proposal through the existing-session control plane.
 
-## Shutdown
+## Shutdown and steering
 
-Worker timeout, overall timeout, escalation, and cancellation first request `turn/interrupt`.
-If App Server does not complete the turn during the grace period, Veyro terminates the subprocess
-group. Final state and the terminal event are persisted before the runtime closes the model client.
+Workers have bounded execution and process-group cancellation. With the opt-in
+App Server backend, shutdown first requests `turn/interrupt`; after the grace
+period it can terminate the subprocess group. `exec` does not support live steering.
+See [steering](steering.md) for the exact backend and failure behavior.
 
-## Reading the code
+Final state and events are persisted before the model client closes. Local atomic
+file replacement is not a claim of production durability across every filesystem,
+hardware failure, or restore scenario.
 
-Start with these modules:
+## Source map
 
-1. `src/veyro/runtime.py` — concurrency and lifecycle.
-2. `src/veyro/policy.py` — allowed decisions and ordering.
-3. `src/veyro/observation.py` — evidence boundaries.
-4. `src/veyro/veyro/jev.py` — SDK isolation.
-5. `src/veyro/workers/codex_app_server.py` — steerable App Server integration.
-6. `src/veyro/workers/codex.py` — non-steerable `codex exec` fallback.
+| File | Responsibility |
+| --- | --- |
+| `src/veyro/runtime.py` | Concurrency and lifecycle |
+| `src/veyro/policy.py` | Decisions and ordering |
+| `src/veyro/observation.py` | Evidence collection and size bounds |
+| `src/veyro/veyro/jev.py` | localjev SDK integration |
+| `src/veyro/workers/codex.py` | Default non-steerable Codex exec |
+| `src/veyro/workers/codex_app_server.py` | Opt-in steerable App Server |
+
+The factory's environment reference is [`.env.example`](../.env.example).
+`VEYRO_JEV_*` configures this interface, not the pinned `supervise` assessor.

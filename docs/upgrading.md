@@ -43,9 +43,8 @@ Old private journals, connection files, hook commands, and serialized state are
 not automatically upgraded. Do not rewrite their identities or replace historical
 records to make them load. Preserve them for inspection and keep them ignored by
 Git, including any legacy private directory still present in your checkout.
-The migration keeps that legacy directory excluded locally rather than publishing it.
-On other checkouts, add the existing private state directory to `.git/info/exclude`
-before updating. Do not rely on the new default ignore rule to cover old state.
+Add the existing private state directory to `.git/info/exclude` before updating.
+Do not rely on the new default ignore rule to cover old state.
 
 Existing native hooks may still name the previous Python module or executable.
 Retire only the hook definitions you own. Generate the new definitions and use
@@ -75,7 +74,7 @@ uv build --offline
 
 The release checker verifies names, entry points, source inputs, and private-file
 exclusions. `--retired-name NAME` also scans both archives for a previous name.
-[Fresh rename verification](rename-verification.json) records the source digest,
+[Recorded 0.4 release verification](rename-verification.json) records the source digest,
 test results, clean wheel installation and replay, a wheel rebuilt from the source
 archive, and four new native canary results. Historical reports remain labeled as
 pre-rename evidence. The pre-existing noisy-events timing failure is not hidden.

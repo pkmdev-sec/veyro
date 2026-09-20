@@ -1,19 +1,37 @@
 # Veyro documentation
 
-For the implemented existing-session control plane:
+Veyro combines localjev and Qwen3-14B with version-pinned native-agent adapters.
+Start with a synthetic assessment, then connect to a session you own.
 
-- [Operator guide](supervision-operator-guide.md): observe, approve, and recover safely.
-- [Capabilities and privacy](supervision-reference.md): exact pins and evidence limits.
-- [Verification](supervision-verification.md): repeatable checks and dated native results.
+## Start here
 
-These notes define the control plane and explain the experiment behind its current implementation:
+- [Deploy localjev with Qwen3-14B](localjev.md): endpoint, model digest, compatibility, and trust checks.
+- [Run a local assessment](../examples/README.md): a real model call with no agent connection or controls.
+- [Operate existing sessions](supervision-operator-guide.md): discovery, read-only observation, exact approval, and recovery.
+- [Upgrade an installation](upgrading.md): package, configuration, journals, and no-retry ledgers.
 
-- [Product charter](product-charter.md) defines the problem, users, boundaries, and mandatory
-  outcomes for the agent-neutral control plane.
-- [Theory: semantic supervision](theory.md) describes the two-loop architecture.
-- [Why Jev fits](why-jev.md) maps Jev's actual primitives to Veyro's needs.
-- [What Veyro is proving](what-veyro-proves.md) states the hypotheses and evidence boundaries.
-- [Runtime and event flow](runtime.md) is the implementation guide.
-- [Live steering](steering.md) explains how Jev guidance reaches an active Codex turn.
+## Reference
 
-The root [README](../README.md) remains the installation and command reference.
+- [Capabilities, version pins, and privacy](supervision-reference.md).
+- [Control policies and approval protocol](supervision-rollout.md).
+- [Read-only attachment and history limits](existing-session-attachment.md).
+- [Prime daemon bridge](prime-agent-daemon-bridge.md).
+- [OpenCode HTTP/SSE bridge](opencode-server-bridge.md).
+- [Codex hook listener](codex-hooks-bridge.md).
+
+## Architecture and evidence
+
+- [Semantic assessment and deterministic control](theory.md).
+- [How localjev maps Qwen3-14B to typed judgments](why-jev.md).
+- [Verification commands and recorded native checks](supervision-verification.md).
+- [What the evidence establishes](what-veyro-proves.md).
+- [Disposable Prime control check](prime-agent-supervision-canary.md).
+
+## Separate interfaces
+
+- [Native agent launcher](agent-router.md): keep the native terminal and add lifecycle observation.
+- [Factory runtime](runtime.md): worker execution and its separate content-retention contract.
+- [Codex App Server steering](steering.md): experimental, explicit opt-in.
+- [Optional jeff shadow validation](jeff-shadow-canary.md): disabled by default, never a substitute for localjev.
+
+Return to the [project README](../README.md) for installation and a system overview.

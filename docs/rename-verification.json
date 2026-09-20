@@ -84,7 +84,7 @@
       "failed": 0
     }
   },
-  "retired_name_scan": "Zero case-insensitive matches required in final tracked paths and contents; private state and Git history excluded.",
+  "retired_name_scan": "Passed for the 134 tracked release files: zero case-insensitive retired-name matches in paths or contents. Private state and Git history were excluded.",
   "breaking_contract_checks": {
     "new_environment_names_work": true,
     "prior_environment_names_ignored": true,
@@ -108,5 +108,6 @@
     "independent_ffmpeg_decode": true,
     "focused_brand_release_and_docs_tests_passed": 22,
     "visual_preview_limit": "No graphical preview tool was available; geometry and decoded frames were verified."
-  }
+  },
+  "evidence_scope": "Historical Veyro 0.4.0 release verification, recorded before subsequent documentation and branding changes."
 }

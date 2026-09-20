@@ -19,9 +19,9 @@ The full canary record is in
 ## 1. Acquire the weight file
 
 Use an approved internal artifact repository or a security-approved file transfer. Do not disable
-TLS verification, bypass the corporate proxy, or put a credential in a URL. The public Hugging Face
-route is not currently usable on the corporate network: it returns a 22,604-byte HTML block page
-instead of the 2.3 GB object.
+TLS verification, bypass network security controls, or put a credential in a URL.
+If a download returns HTML, a truncated object, or the wrong digest, stop. The
+recorded baseline did not obtain the weights and does not claim live inference.
 
 The import command accepts either a local file or an approved HTTPS URL. It streams the source into
 a temporary file in the model directory, rejects HTML and size or digest mismatches, then publishes
@@ -71,6 +71,10 @@ canary.
 
 ## 3. Start the loopback-only authenticated service
 
+The commands in this section target macOS and the supplied MPS configuration.
+On another platform, use its approved secret manager and validate a separate
+backend configuration; do not assume the macOS baseline applies.
+
 Create a fresh key in macOS Keychain. Do not save it in the repository or shell history:
 
 ```bash
@@ -100,7 +104,7 @@ JEFF_KEYCHAIN_SERVICE=veyro-jeff-shadow
 JEFF_API_KEY="$(security find-generic-password \
   -a "$USER" -s "$JEFF_KEYCHAIN_SERVICE" -w)"
 export JEFF_API_KEY
-curl --fail --silent --show-error http://127.0.0.1:8081/healthz
+curl --noproxy '*' --fail --silent --show-error http://127.0.0.1:8081/healthz
 python - <<'PY'
 import os
 import urllib.request
@@ -109,7 +113,8 @@ request = urllib.request.Request(
     "http://127.0.0.1:8081/v1/models",
     headers={"Authorization": f"Bearer {os.environ['JEFF_API_KEY']}"},
 )
-with urllib.request.urlopen(request) as response:
+opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+with opener.open(request, timeout=10) as response:
     print(response.read().decode())
 PY
 ```

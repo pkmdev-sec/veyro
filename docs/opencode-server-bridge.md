@@ -30,7 +30,10 @@ Veyro rejects:
 
 ## Attach the native TUI
 
-Pass authentication through the environment. Do not use `--password`, because command arguments can be visible to other local processes.
+Pass authentication through the environment. A separate terminal does not inherit
+the server terminal's exports; supply the same username and password through your
+approved secret-handling workflow in each client process. Do not use `--password`,
+because command arguments can be visible to other local processes.
 
 ```bash
 opencode attach http://127.0.0.1:<port> \
@@ -79,7 +82,8 @@ SSE is live-only. A disconnect can create an observation gap. The bridge reports
 .venv/bin/python -m veyro.supervision.opencode_canary
 ```
 
-The canary uses the real `~/.opencode/bin/opencode` binary and requires exactly `1.18.30`. It:
+The canary defaults to `~/.opencode/bin/opencode` and requires exactly `1.18.30`.
+Use `--executable` with your verified native binary if it is installed elsewhere. It:
 
 1. starts a temporary `--pure` server on loopback with random in-memory Basic credentials;
 2. proves an unauthenticated health request returns `401`;

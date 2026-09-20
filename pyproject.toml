@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "veyro-factory"
 version = "0.4.0"
-description = "A semantic supervisory loop for coding agents"
+description = "Local coding-agent supervision with localjev and Qwen3-14B"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -18,6 +18,11 @@ dependencies = [
   "typesafe-sdk>=0.7.0,<1",
   "httpx2>=2,<3",
 ]
+
+[project.urls]
+Homepage = "https://github.com/pkmdev-sec/veyro"
+Documentation = "https://github.com/pkmdev-sec/veyro/blob/main/docs/README.md"
+Issues = "https://github.com/pkmdev-sec/veyro/issues"
 
 [project.optional-dependencies]
 dev = [

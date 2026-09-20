@@ -1,47 +1,47 @@
-# What Veyro is proving
+# What the evidence establishes
 
-“Proving” here means demonstrating architectural feasibility, not proving correctness of generated
-software or superiority over another agent system.
+Veyro's checks cover software contracts and specific native integrations. They do
+not establish that Qwen3-14B is calibrated for arbitrary software tasks or that
+supervision improves task success, cost, latency, or safety.
 
-## The claims this repository can demonstrate
+## Evidence by interface
 
-1. **A coding worker and semantic supervisor can run concurrently.** The test suite records
-   assessments whose observations contain an active worker.
-2. **Noisy process evidence can become bounded model state.** Output, Git evidence, worker history,
-   failures, prior decisions, and elapsed time are compacted before assessment.
-3. **Probabilistic judgments can safely drive a small action vocabulary.** A deterministic policy
-   gates model scores with thresholds, lifecycle history, and resource limits.
-4. **A supervisor can intervene before worker completion.** Jev-informed guidance can enter an
-   active Codex turn; repeated stuckness still reaches stop and retry paths.
-5. **Independent verification can be a policy outcome rather than a hard-coded workflow step.** It
-   starts only when the semantic evidence crosses the verification boundary and cannot loop.
-6. **The experiment can be inspected.** State and an append-only event timeline reconstruct what the
-   supervisor saw and did.
+| Check | Establishes | Does not establish |
+| --- | --- | --- |
+| Contract and policy tests | Typed reduction, capability checks, approval binding, rejection, claim retention | A real provider accepted a control |
+| localjev synthetic example | Qwen3-14B deployment connectivity and valid checkpoint score shape | Calibration, general accuracy, per-response weight identity |
+| Prime read-only canary | Existing-session observation without prompts or controls | Complete history or access to another client's session |
+| Approved disposable Prime stop | CLI approval input, one durable claim, and a later terminal event | Automatic control, active-turn steering, or task completion |
+| OpenCode observation canary | Authenticated HTTP/SSE and preservation of an empty fixture session | Live follow-up, approval reply, or interrupt delivery |
+| Codex native hook canary | Native-approved `SessionEnd` to a metadata helper | Live queue execution or synchronous tool authorization |
+| Codex helper-process tests | Helper publication to the authenticated broker | Native hook loading in every installation |
+| Factory simulation | Worker/model orchestration and local persistence | Live model quality or agent isolation |
 
-The deterministic simulation proves these software properties without depending on Jev or Codex.
-A credentialed end-to-end run is required to demonstrate them with the external systems.
+Use [verification procedures](supervision-verification.md) to reproduce each check.
+The linked JSON reports contain dated observations and explicit limits. A report
+from one pinned installation is not a compatibility claim for another version.
 
-## The hypotheses it enables people to test
+## Model identity and privacy
 
-- Can Jev identify meaningful progress, stuckness, and off-track work early enough to help?
-- Are its scores calibrated on real software jobs?
-- Which observation fields carry useful signal?
-- What assessment frequency balances responsiveness, cost, and noise?
-- Do independent verifier passes improve completion quality?
-- Which threshold ordering minimizes harmful interruptions and premature finishes?
+The configured assessor is `localjev-qwen3-14b` with Ollama tag `qwen3:14b`.
+Readiness and the installed digest check deployment configuration. They do not
+attest the weights behind every response. Model-generated probabilities remain
+uncertain even when their JSON shape is valid.
 
-The JSONL timeline makes these questions measurable. Runs can be labeled after the fact, threshold
-changes can be replayed, and false positive/negative interventions can be counted.
+The existing-session path records normalized metadata and digests, not native
+transcripts or tool contents. Paths and IDs can still be sensitive. The factory
+loop has a separate content-retention contract. Neither interface isolates code
+running as the same OS user.
 
-## Claims this repository does not establish
+## Known limits
 
-- that Jev judgments are accurate for arbitrary repositories;
-- that Veyro improves success rate, latency, cost, or safety;
-- that `FINISH` means the implementation is correct;
-- that local Codex execution is isolated or safe for untrusted code;
-- that the default thresholds are calibrated;
-- that the persistence layer has production durability.
+- No pinned native adapter qualifies for automatic delivery.
+- The CLI evaluates one proposal and does not silently refresh stale evidence.
+- At-most-once reservation is not exactly-once native execution.
+- Native history is incomplete; a clean exit is not proof of task completion.
+- The factory test `test_noisy_events_are_coalesced` has a reproduced timing race.
+  Report it; do not hide it with exclusions or changed thresholds.
 
-A convincing evaluation would need a representative job set, blinded outcome labels, baselines,
-cost and latency measurements, calibration curves for each dimension, and intervention ablations.
-This V1 supplies the runtime and evidence trail for that later work.
+To evaluate model quality, use representative tasks, independent outcome labels,
+calibration measurements, and a no-supervision baseline. Veyro does not publish
+an accuracy or performance claim without that evidence.

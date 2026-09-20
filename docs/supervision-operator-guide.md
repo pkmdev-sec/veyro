@@ -8,11 +8,13 @@ Activate this checkout's environment with `source .venv/bin/activate`, or replac
 `veyro` below with `.venv/bin/veyro`.
 
 Veyro leaves native interfaces, credentials, configuration, and session storage
-with the provider. Pi and Claude Code are outside this supervision roadmap; their
-native launcher support is unchanged.
+with the provider. Pi and Claude Code support native launch, not this existing-session
+control plane.
 
 Check [version pins and authority](supervision-reference.md#compatibility) before
-connecting. LocalJev is not needed for read-only observation.
+connecting. localjev is not needed for read-only observation. Before advisory or
+reviewed controls, complete [localjev/Qwen3-14B setup](localjev.md), including the
+fixed-endpoint and authentication compatibility checks.
 
 ## Select and observe a session
 

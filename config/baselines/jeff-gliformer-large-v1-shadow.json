@@ -70,6 +70,6 @@
     "weights_sha256_verified": false,
     "service_hardened": false,
     "live_canary": "blocked",
-    "blocker": "Corporate CDN policy returns an HTML block page instead of the 2.3 GB weight object."
+    "blocker": "Weight acquisition was blocked in the recorded environment; live inference was not verified."
   }
 }

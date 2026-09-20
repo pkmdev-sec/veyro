@@ -78,7 +78,7 @@ async def run_prime_canary(
             session=bridge.identity,
             command_id="sup009-stop-disposable-session",
             intent=StopSession(
-                reason="Complete and clean up the no-prompt SUP-009 canary session."
+                reason="Complete and clean up the no-prompt approved-stop canary session."
             ),
         )
         action = BoundaryAction(
@@ -191,7 +191,9 @@ def _summary(evidence: ControlLoopEvidence) -> dict[str, object]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the no-prompt SUP-009 Prime Agent canary")
+    parser = argparse.ArgumentParser(
+        description="Run the no-prompt approved-stop Prime Agent canary"
+    )
     parser.add_argument("--socket", type=Path, default=default_socket_path())
     parser.add_argument("--repo", type=Path, default=Path.cwd())
     parser.add_argument("--approved-by", required=True)

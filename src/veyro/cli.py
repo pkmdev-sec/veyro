@@ -32,7 +32,7 @@ from veyro.workers import FakeWorker
 
 app = typer.Typer(
     name="veyro",
-    help="Supervise native coding agents with a fast semantic decision loop.",
+    help="Supervise native coding agents with localjev and Qwen3-14B.",
     no_args_is_help=True,
 )
 console = Console()
@@ -308,7 +308,7 @@ def run(
         typer.Option("--agent", help="Native coding agent (default: configuration or Codex)"),
     ] = None,
 ) -> None:
-    """Launch a native coding agent supervised by TypeSafe AI Jev."""
+    """Launch a native coding agent with localjev and Qwen3-14B supervision."""
 
     load_dotenv(repo / ".env", override=False)
     load_dotenv(override=False)

@@ -27,6 +27,12 @@ attestation. Assessment failure does not select another model. Jeff and other sh
 cannot authorize controls. Do not weaken TLS, native trust, or managed policy to
 make a connection or canary succeed.
 
+The control-plane assessor has a 120-second timeout and a 50,000-character state
+limit. It sends the fixed SDK placeholder `loopback-localjev`, not a configurable
+operator secret. It does not load `.env` for assessor configuration. See
+[localjev deployment and authentication compatibility](localjev.md#which-settings-veyro-reads)
+before enabling reviewed controls.
+
 ## Adapter capabilities
 
 This table records adapter declarations, not authorization or a promise that every

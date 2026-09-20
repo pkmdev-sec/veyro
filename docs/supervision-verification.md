@@ -57,7 +57,7 @@ server for each inference. A passing stop canary does not remove this limitation
    dumps or credentials. Do not enable controls if you cannot establish that trust.
 
 These GET requests send no model prompt. They verify reported readiness and the
-installed tag, not the weights used by a particular response. The SUP-016 probe
+installed tag, not the weights used by a particular response. The recorded deployment probe
 found matching readiness and tag digest, but `/api/ps` listed no loaded models at
 probe time. It therefore does not claim a live loaded-weight or per-response
 attestation. Loading a model just to make this check look stronger is not required.
@@ -90,7 +90,7 @@ only; the canary supplies the exact request-bound evidence through CLI stdin.
 
 Require `status: passed`, `control: executed`, one delivery claim, a terminal
 `verification`, and `native_fixture_removed: true`. The canary uses the actual
-`veyro supervise` subprocess. It sends no model prompt, removes its private
+`veyro supervise` subprocess. It sends no native-agent work prompt, removes its private
 operator files/ledger, and verifies native roster removal. The resident fixture
 allows a separate CLI client to attach without bypassing client-owned access rules.
 This proves approved stop, not active-turn steering, interruption, or automatic
@@ -113,7 +113,9 @@ interrupt, or deletion request. It does not verify live control delivery.
 ## Verify Codex hook delivery
 
 The current isolated canary requires macOS `sandbox-exec`, system Python, and the
-pinned native binary. It uses its own PTY only to drive native trust and exit:
+pinned Apple-Silicon native binary. `--executable` can select another installation
+path, but its SHA-256 must still match the pinned binary; it is not a cross-platform
+compatibility override. It uses its own PTY only to drive native trust and exit:
 
 ```sh
 .venv/bin/python -m veyro.supervision.codex_canary --timeout 30
@@ -129,13 +131,13 @@ The separate `test_codex_hooks.py` helper-process tests prove publication to the
 real authenticated broker. Neither test path proves live queue execution, native
 tool outcomes, task completion, or synchronous policy enforcement.
 
-## Recorded SUP-016 results
+## Recorded installation results
 
 See [machine-readable results](supervision-verification.json) for the tested
-runtime revision, UTC time, and normalized native reports. The SUP-016 record is
+runtime revision, UTC time, and normalized native reports. The September 19, 2026 record is
 pre-rename evidence. Its command spellings were translated to current equivalents;
 they are not the exact commands executed at that historical revision. For the new
-package, see [rename verification](rename-verification.json).
+package, see [recorded 0.4 release checks](rename-verification.json).
 These are observations of the recorded installation, not guarantees after an
 upgrade. No provider was promoted to automatic-control eligibility.
 
@@ -153,6 +155,6 @@ native trust and managed policy while delivering `SessionEnd`.
 
 The repository has a previously reproduced timing race in
 `tests/test_integration.py::test_noisy_events_are_coalesced` (100 output events
-instead of 50), seen on baseline `43f33c2` during SUP-014 and again during SUP-015.
+instead of 50), reproduced on baseline `43f33c2` and later installations.
 Report it if it recurs; do not hide it with exclusions, `xfail`, or larger delays.
-No scheduler implementation or timing thresholds are changed by SUP-016.
+The recorded checks did not change scheduler behavior or timing thresholds.
