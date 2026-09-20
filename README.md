@@ -1,7 +1,6 @@
 <p align="center">
-  <img src="docs/assets/veyro-logo-animated.gif" width="640" height="256" alt="Animated Veyro voxel logo: a pixel eye watches three agent nodes through an amber approval gate">
+  <img src="docs/assets/veyro-supervision.gif" width="1120" alt="Front-facing Veyro workflow: native agents send metadata; read-only is the default; opt-in proposals pass policy, localjev with Qwen3-14B, exact human approval, a durable claim, and freshness checks before supported control">
 </p>
-<p align="center"><a href="docs/assets/veyro-logo-animated-poster.png">Static logo</a></p>
 
 <h1 align="center">Veyro</h1>
 <p align="center"><strong>Local agent supervision with localjev and Qwen3-14B.</strong></p>
@@ -70,20 +69,6 @@ because the native agent stopped talking. See the [example walkthrough](examples
 
 ## From observation to an approved action
 
-```mermaid
-flowchart LR
-    A["Native agent metadata"] --> B["Veyro policy + capabilities"]
-    B -->|review checkpoint| J["localjev<br/>Qwen3-14B · Ollama"]
-    J --> G["Exact approval + fresh evidence"]
-    B -->|observe-only| R["Read-only report"]
-    G --> L["Durable no-retry claim"]
-    L --> C["Recheck, then supported control"]
-    classDef model fill:#143d38,stroke:#5eead4,color:#f1f5f9
-    classDef gate fill:#283042,stroke:#fbbf24,color:#f1f5f9
-    class J model
-    class B,G,L,C gate
-```
-
 **Observe-only is the default.** `sessions` and `attach` do not call localjev or
 send prompts. `supervise` evaluates one operator proposal, not an unattended
 stream of agent-generated actions. Advisory mode can assess but never deliver.
@@ -139,6 +124,7 @@ The separate [factory runtime](docs/runtime.md) defaults to:
 ```sh
 .venv/bin/python -m pytest -q
 .venv/bin/ruff check src tests tools examples
+uv run --script tools/generate_supervision_diagram.py --check
 uv build --offline
 ```
 

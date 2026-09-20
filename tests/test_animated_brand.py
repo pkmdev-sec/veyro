@@ -1,19 +1,27 @@
 """Check animation artifacts with stdlib only; Pillow stays in the build script."""
 
+import colorsys
 import hashlib
+import shutil
 import struct
+import subprocess
 import zlib
 from pathlib import Path
+
+import pytest
 
 ASSETS = Path(__file__).resolve().parents[1] / "docs" / "assets"
 
 
-def read_gif() -> tuple[list[dict], list[tuple[bytes, bytes]], bytes]:
-    data = (ASSETS / "veyro-logo-animated.gif").read_bytes()
+def read_gif(
+    path: Path = ASSETS / "veyro-logo-animated.gif", size: tuple[int, int] = (640, 256)
+) -> tuple[list[dict], list[tuple[bytes, bytes]], bytes]:
+    data = path.read_bytes()
     assert data[:6] == b"GIF89a"
     assert 0 < len(data) < 1024 * 1024
     width, height, packed, background, aspect = struct.unpack_from("<HHBBB", data, 6)
-    assert (width, height, background, aspect) == (640, 256, 0, 0)
+    assert (width, height) == size
+    assert background == aspect == 0
     assert packed & 0x80
     offset = 13 + 3 * 2 ** ((packed & 7) + 1)
     palette = data[13:offset]
@@ -89,7 +97,9 @@ def test_voxel_palette_has_many_colors_and_a_fixed_dark_backdrop() -> None:
     assert tuple(palette[:3]) == (9, 17, 29)
     assert len(colors) >= 80
     assert any(g > r * 1.5 and g > 180 for r, g, b in colors)  # Mint.
-    assert any(b > r * 1.5 and b > 180 for r, g, b in colors)  # Blue.
+    assert any(b > r * 1.5 and g > 150 for r, g, b in colors)  # Teal/cyan.
+    hues = [colorsys.rgb_to_hsv(r / 255, g / 255, b / 255) for r, g, b in colors]
+    assert all(20 / 360 <= h <= 195 / 360 for h, s, v in hues if s > 0.1 and v > 0.25)
     assert any(r > 230 and 140 < g < 220 and b < 130 for r, g, b in colors)  # Amber.
 
 
@@ -113,23 +123,71 @@ def test_poster_is_a_valid_full_size_rgb_png() -> None:
     assert len(raster) == 256 * (640 * 3 + 1)
     assert all(raster[y * (640 * 3 + 1)] <= 4 for y in range(256))
 
-    previous = bytearray(640 * 3)
-    border_heights = {}
-    for y in range(256):
-        start = y * (640 * 3 + 1)
-        filter_type = raster[start]
-        row = bytearray(raster[start + 1 : start + 1 + 640 * 3])
-        for i in range(len(row)):
-            left = row[i - 3] if i >= 3 else 0
-            above = previous[i]
-            corner = previous[i - 3] if i >= 3 else 0
-            prediction = left + above - corner
-            paeth = min((left, above, corner), key=lambda value: abs(prediction - value))
-            predictor = (0, left, above, (left + above) // 2, paeth)[filter_type]
-            row[i] = (row[i] + predictor) & 255
-        for x in (80, 560):
-            if tuple(row[x * 3 : x * 3 + 3]) == (36, 60, 77):
-                border_heights.setdefault(x, y)
-        previous = row
-    assert set(border_heights) == {80, 560}
-    assert border_heights[80] == border_heights[560], "Logo plate must not slope sideways"
+
+def decode_rgb(path: Path) -> bytes:
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        pytest.skip("FFmpeg is required for independent decoded-frame verification")
+    result = subprocess.run(
+        [ffmpeg, "-v", "error", "-i", str(path), "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+        capture_output=True,
+        check=True,
+    )
+    assert not result.stderr, result.stderr.decode()
+    return result.stdout
+
+
+def test_independent_decoder_proves_fixed_wordmark_loop_and_clean_rasters() -> None:
+    data = decode_rgb(ASSETS / "veyro-logo-animated.gif")
+    frame_size = 640 * 256 * 3
+    assert len(data) == 40 * frame_size
+    frames = [data[start : start + frame_size] for start in range(0, len(data), frame_size)]
+    assert len(set(frames)) == 40
+    assert frames[0] == decode_rgb(ASSETS / "veyro-logo-animated-poster.png")
+    static = decode_rgb(ASSETS / "veyro-logo.png")
+    _, _, palette = read_gif()
+    colors = {palette[i : i + 3] for i in range(0, len(palette), 3)}
+    navy = bytes((9, 17, 29))
+    for frame in frames:
+        assert all(frame[i : i + 3] in colors for i in range(0, frame_size, 3))
+        for y in range(256):
+            start, end = (y * 640 + 240) * 3, (y + 1) * 640 * 3
+            assert frame[start:end] == static[start:end], "Wordmark moved, sloped or flickered"
+        assert frame[: 640 * 40 * 3] == navy * (640 * 40)
+        assert frame[216 * 640 * 3 :] == navy * (40 * 640)
+    # A seam must be no larger than an ordinary step, with no harsh pixel flashes.
+    differences = []
+    for first, second in zip(frames, frames[1:] + frames[:1], strict=True):
+        delta = [abs(a - b) for a, b in zip(first, second, strict=True)]
+        assert max(delta) <= 16
+        differences.append(sum(delta))
+    assert min(differences) > 0
+    assert differences[-1] <= max(differences[:-1]) * 1.15
+
+
+def test_animation_generation_is_deterministic_and_check_does_not_write(tmp_path: Path) -> None:
+    uv = shutil.which("uv")
+    if uv is None:
+        pytest.skip("uv is required for the isolated, pinned animation builder")
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    source = ASSETS.parents[1] / "tools"
+    for name in ("generate_brand_assets.py", "generate_animated_logo.py"):
+        shutil.copyfile(source / name, tools / name)
+    command = [uv, "run", "--script", str(tools / "generate_animated_logo.py")]
+    output = tmp_path / "docs" / "assets"
+    expected = {p.name: p.read_bytes() for p in ASSETS.glob("veyro-logo-animated*")}
+    for _ in range(2):
+        subprocess.run(command, capture_output=True, check=True)
+        assert {p.name: p.read_bytes() for p in output.iterdir()} == expected
+    subprocess.run(command + ["--check"], capture_output=True, check=True)
+    gif = output / "veyro-logo-animated.gif"
+    gif.write_bytes(b"stale")
+    before = gif.stat().st_mtime_ns
+    poster = output / "veyro-logo-animated-poster.png"
+    poster.unlink()
+    result = subprocess.run(command + ["--check"], capture_output=True, text=True, check=False)
+    assert result.returncode == 1
+    assert gif.name in result.stdout and poster.name in result.stdout
+    assert gif.read_bytes() == b"stale" and gif.stat().st_mtime_ns == before
+    assert not poster.exists()

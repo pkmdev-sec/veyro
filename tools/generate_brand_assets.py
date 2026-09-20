@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build Veyro's original pixel logo. Run with --check to detect asset drift."""
+"""Build Veyro's sentinel-V logo with stdlib only; --check detects asset drift."""
 
 from __future__ import annotations
 
@@ -8,17 +8,22 @@ import struct
 import zlib
 from pathlib import Path
 
-WIDTH, HEIGHT, SCALE = 104, 40, 8
+WIDTH, HEIGHT, SCALE = 160, 64, 4
 ASSETS = Path(__file__).resolve().parents[1] / "docs" / "assets"
+BACKGROUND = (9, 17, 29)
 PALETTE = {
-    ".": (0, 0, 0, 0),
-    "b": (51, 79, 93, 255),
-    "n": (16, 29, 43, 255),
-    "s": (11, 21, 34, 255),
-    "t": (43, 111, 117, 255),
-    "m": (113, 239, 200, 255),
-    "w": (226, 250, 241, 255),
-    "a": (255, 195, 105, 255),
+    "n": (*BACKGROUND, 255),
+    "w": (220, 246, 236, 255),
+    "a": (247, 185, 81, 255),
+    "e": (68, 179, 176, 255),
+    "0": (79, 207, 177, 255),
+    "1": (94, 219, 185, 255),
+    "2": (113, 232, 198, 255),
+    "3": (135, 239, 212, 255),
+    "4": (48, 167, 170, 255),
+    "5": (56, 184, 181, 255),
+    "6": (72, 200, 190, 255),
+    "7": (91, 216, 201, 255),
 }
 GLYPHS = {
     "V": ("10001", "10001", "10001", "10001", "10001", "01010", "00100"),
@@ -27,64 +32,39 @@ GLYPHS = {
     "R": ("11110", "10001", "10001", "11110", "10100", "10010", "10001"),
     "O": ("01110", "10001", "10001", "10001", "10001", "10001", "01110"),
 }
+ICON_ORIGIN = (12, 11)
+WORD_ORIGIN = (66, 23)
+GLYPH_SCALE, GLYPH_ADVANCE = 3, 17
 
 
 def draw_logo() -> list[list[str]]:
-    pixels = [["."] * WIDTH for _ in range(HEIGHT)]
+    pixels = [["n"] * WIDTH for _ in range(HEIGHT)]
+    ox, oy = ICON_ORIGIN
+    for y in range(42):
+        outside = y * 17 // 42
+        inside = min(21, 10 + y * 11 // 27)
+        for x in range(outside, inside):
+            # Ordered terraces follow the V, not random confetti.
+            tone = (x + y // 3) % 4
+            pixels[oy + y][ox + x] = str(tone)
+            pixels[oy + y][ox + 41 - x] = str(4 + tone)
 
-    def rect(x: int, y: int, width: int, height: int, color: str) -> None:
-        for row in pixels[y : y + height]:
-            row[x : x + width] = [color] * width
+    for y, (left, right) in enumerate(((5, 8), (2, 11), (0, 13), (2, 11), (5, 8))):
+        for x in range(left, right):
+            pixels[22 + y][27 + x] = "e"
+    for y in range(23, 26):
+        for x in range(32, 35):
+            pixels[y][x] = "a"
 
-    # A one-pixel rim keeps the clipped navy plate legible on either page theme.
-    for y in range(HEIGHT):
-        inset = max(0, 4 - min(y, HEIGHT - 1 - y))
-        rect(inset, y, WIDTH - 2 * inset, 1, "b")
-        if 0 < y < HEIGHT - 1:
-            rect(inset + 1, y, WIDTH - 2 * inset - 2, 1, "s" if y >= 36 else "n")
-
-    # The eye feeds one approval gate, then fans out to three native agents.
-    rect(18, 18, 1, 12, "t")
-    rect(8, 30, 21, 1, "t")
-    for x in (8, 18, 28):
-        rect(x, 30, 1, 3, "t")
-        rect(x - 2, 32, 5, 3, "t")
-        rect(x - 1, 32, 3, 2, "m")
-    rect(15, 22, 7, 7, "a")
-    rect(16, 23, 5, 5, "n")
-    for x, y in ((16, 25), (17, 26), (18, 25), (19, 24), (20, 23)):
-        rect(x, y, 1, 1, "a")
-
-    eye_spans = (
-        (9, 16),
-        (6, 19),
-        (4, 21),
-        (2, 23),
-        (1, 24),
-        (0, 25),
-        (1, 24),
-        (2, 23),
-        (4, 21),
-        (6, 19),
-        (9, 16),
-    )
-    for dy, (left, right) in enumerate(eye_spans):
-        rect(6 + left, 7 + dy, right - left, 1, "m")
-        if 1 < dy < 9:
-            rect(8 + left, 7 + dy, right - left - 4, 1, "t")
-    rect(15, 8, 7, 9, "m")
-    rect(17, 10, 3, 5, "n")
-    rect(16, 9, 2, 2, "w")
-
-    # The hand-drawn 5x7 alphabet is geometry, not a font dependency.
     for index, letter in enumerate("VEYRO"):
         for y, row in enumerate(GLYPHS[letter]):
             for x, bit in enumerate(row):
-                if bit == "1":
-                    rect(39 + index * 12 + x * 2, 12 + y * 2, 2, 2, "w")
-    rect(39, 30, 34, 1, "t")
-    rect(76, 30, 14, 1, "m")
-    rect(93, 30, 4, 1, "a")
+                if bit != "1":
+                    continue
+                left = WORD_ORIGIN[0] + index * GLYPH_ADVANCE + x * GLYPH_SCALE
+                top = WORD_ORIGIN[1] + y * GLYPH_SCALE
+                for py in range(top, top + GLYPH_SCALE):
+                    pixels[py][left : left + GLYPH_SCALE] = ["w"] * GLYPH_SCALE
     return pixels
 
 
@@ -94,13 +74,10 @@ def render_svg(pixels: list[list[str]]) -> bytes:
         f'height="{HEIGHT * SCALE}" viewBox="0 0 {WIDTH} {HEIGHT}" '
         'role="img" aria-labelledby="veyro-title veyro-desc" shape-rendering="crispEdges">',
         '  <title id="veyro-title">Veyro</title>',
-        '  <desc id="veyro-desc">Pixel-art watchful eye connected through an amber approval '
-        "gate to three coding-agent nodes, beside the VEYRO wordmark "
-        "on a clipped navy plate.</desc>",
+        '  <desc id="veyro-desc">A mint and teal pixel sentinel V shelters a small amber '
+        'approval beacon, beside a level VEYRO wordmark on deep navy.</desc>',
     ]
     for color, (red, green, blue, _) in PALETTE.items():
-        if color == ".":
-            continue
         lines.append(f'  <g fill="#{red:02x}{green:02x}{blue:02x}">')
         for y, row in enumerate(pixels):
             x = 0

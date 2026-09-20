@@ -68,3 +68,20 @@ def test_localjev_showcase_matches_runtime_and_baseline():
     assert baseline["upstream"]["digest"] in AUTHORITATIVE_MODEL_CHECKPOINT
     explanation = (ROOT / "docs/why-jev.md").read_text()
     assert all(f"`{question}`" in explanation for question in CHECKPOINT_QUESTIONS)
+
+
+def test_readme_uses_animation_without_static_logo_links():
+    readme = (ROOT / "README.md").read_text()
+    assert 'src="docs/assets/veyro-supervision.gif"' in readme
+    assert readme.count("<img ") == 1
+    assert "```mermaid" not in readme
+    for document in DOCUMENTS:
+        text = document.read_text()
+        links = re.findall(r'<a\b[^>]*href="([^"]+)"', text)
+        links += re.findall(r"(?<!!)\[[^\]]*\]\(([^)]+)\)", text)
+        for target in links:
+            path = Path(urlsplit(target).path)
+            assert not (path.name.startswith("veyro-logo") and path.suffix in {".png", ".svg"}), (
+                document.name,
+                target,
+            )
