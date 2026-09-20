@@ -1,403 +1,131 @@
-# Veyro
+<p align="center">
+  <img src="docs/assets/veyro-logo.svg" width="624" alt="Veyro pixel-art logo: an eye watches three agent nodes through an approval gate">
+</p>
 
-Veyro is the new repository name for Foreman. The Python package, distribution,
-and CLI remain `foreman`, `foreman-factory`, and `foreman` respectively in this
-repository-setup phase. A full API and command rename is separate work.
+<h1 align="center">Veyro</h1>
+<p align="center">Supervise coding agents without replacing their native tools.</p>
+<p align="center">
+  <a href="docs/supervision-operator-guide.md">Operator guide</a> ·
+  <a href="docs/supervision-reference.md">Capabilities</a> ·
+  <a href="docs/supervision-verification.md">Verification</a>
+</p>
 
-For existing native sessions, use the [supervision operator guide](docs/supervision-operator-guide.md).
-`foreman sessions` and `foreman attach` are read-only; `foreman supervise` evaluates
-one proposal and defaults to observe-only. These are separate from the legacy
-factory workflow described below.
+Veyro observes existing agent sessions, keeps structured metadata, and checks
+control proposals against policy. You keep the native terminal and permission
+system. Veyro does not scrape terminal output.
 
-Foreman watches the software factory floor with [TypeSafe AI's Jev](https://docs.typesafe.ai/introduction),
-placing a fast decision model above slower coding agents.
+> [!IMPORTANT]
+> The default is **observe-only**. No current native adapter qualifies for
+> automatic delivery. Controls need approval, and unsupported controls stay blocked.
 
-Give it a ticket, specification, bug report, or any free-form software job. A
-[Codex](https://learn.chatgpt.com/docs/developer-commands?surface=cli) worker does the software
-engineering while Foreman independently assesses whether the implementation is complete,
-requirements are satisfied, tests are sufficient, verification is needed, or human input is
-required.
+The CLI is still `foreman`. The Python distribution is `foreman-factory`.
 
-```text
-                         SOFTWARE FACTORY
-             Codex             Codex             Tests
-            worker             worker               │
-               │                  │                  │
-               └──────────────────┼──────────────────┘
-                                  │ factory evidence
-                                  ▼
-                              FOREMAN
-                                Jev
-                                  │
-                                  ▼
-                    implementation_complete  .91
-                    tests_sufficient         .34
-                    requirements_satisfied   .79
-                    worker_stuck             .02
-                    needs_verification       .82
-                    work_off_track           .06
-                    meaningful_progress      .94
-                    ready_to_finish          .21
-                                  │
-                                  ▼
-                    continue / steer / stop / retry
-                         verify / finish
+## What it does
+
+| Feature | What you get |
+| --- | --- |
+| Read-only attachment | Find and observe existing sessions without starting or resuming them. |
+| Provider adapters | Version-pinned Prime Agent, OpenCode, and Codex hook integration. |
+| Policy first | Check declared operations and capabilities before semantic review. |
+| Local assessment | Use LocalJev with the configured Qwen3 checkpoint at meaningful checkpoints. No fallback assessor. |
+| Exact approval | Bind approval to the selected session, command, and complete request. |
+| Fresh evidence | Recheck observations and approval time before delivery. |
+| Duplicate protection | Save a durable claim before dispatch. Do not blindly retry uncertain delivery. |
+
+## How it works
+
+```mermaid
+flowchart TB
+    A["Native sessions<br/>Prime Agent · OpenCode · Codex hooks"]
+    A -->|structured events| B["Version-pinned adapters<br/>Metadata + partial session state"]
+    B --> R["Read-only report"]
+    B -->|operator submits one proposal| P["Policy + capability checks"]
+    P -->|observe-only| R
+    P -->|review needed| J["LocalJev assessment"]
+    J --> G["Authorization<br/>Exact approval + fresh evidence"]
+    P --> G
+    G -->|authorized| L["Save delivery claim<br/>Recheck approval + observations"]
+    L --> C["Prime / OpenCode control"]
+    C -.->|result and later events| B
+    classDef native fill:#172538,stroke:#5eead4,color:#f1f5f9
+    classDef review fill:#283042,stroke:#fbbf24,color:#f1f5f9
+    class A,B,R native
+    class P,J,G,L,C review
 ```
 
-**Generative models work. Foreman watches the work.**
+This diagram shows the existing-session CLI. Codex is observation-only here.
+Forbidden operations stop before model review. Advisory mode can assess but never
+deliver. The CLI evaluates one proposal; it is not an unattended agent.
 
-Foreman is an architectural experiment, not a claim that this design is already better than a
-conventional coding-agent harness.
+## Provider support
 
-## Documentation
+| Provider | Version | Observation | Control through `supervise` |
+| --- | --- | --- | --- |
+| Prime Agent | `0.9.5` | Live daemon events; partial history | Approved follow-up, steer, interrupt, or stop, subject to observed state |
+| OpenCode | `1.18.30` | Authenticated HTTP/SSE; no replay | Approved follow-up, observed approval reply, or interrupt |
+| Codex | `0.154.0` | Local hook journals; native liveness unknown | Not exposed; the opt-in queue adapter has no live delivery proof |
 
-- [Product charter](docs/product-charter.md)
-- [Theory: semantic supervision](docs/theory.md)
-- [Why Jev fits the experiment](docs/why-jev.md)
-- [What Foreman is proving](docs/what-foreman-proves.md)
-- [Runtime and event flow](docs/runtime.md)
-- [Live steering](docs/steering.md)
+The [full matrix](docs/supervision-reference.md#adapter-capabilities) separates
+capability support from permission to act. Pi and Claude Code are outside this
+supervision roadmap. Their native launch support is unchanged.
 
-## What is Foreman?
+## Try read-only observation
 
-Foreman is a native Python `asyncio` runtime with two concurrent loops:
+Use Python 3.11 or later and [uv](https://docs.astral.sh/uv/). From a checkout:
 
-```text
-CODING AGENT LOOP                         FOREMAN LOOP
-reason                                    watch
-  │                                         │
-  ▼                                         ▼
-tool                                      assess
-  │                                         │
-  ▼                                         ▼
-observe ───────── factory events ────────► Jev
-  │                                         │
-  ▼                                         ▼
-edit                                      decide (Python policy)
-  │                                         │
-  ▼                                         ▼
-test ◄──────────── intervention ────────── intervene
-  │
-  └── continue
+```sh
+uv venv --python 3.12
+uv pip install --python .venv/bin/python --editable '.[dev]'
 ```
 
-Foreman does not replace Codex's reason/tool/observe loop and does not choose individual tools or
-files for Codex. Missions stay broad. The important property is that the worker does not have to
-stop working for the factory to think: worker output and lifecycle events flow into an independent,
-debounced observation loop while the subprocess remains active.
+Choose an existing Prime session. Use its real repository and daemon socket:
 
-## Why build this?
+```sh
+.venv/bin/foreman sessions --agent prime-agent --repo /path/to/repo \
+  --socket /path/to/existing/daemon.sock
 
-Coding agents are relatively slow, stateful generative systems. Supervisory questions such as
-“is this worker stuck?” or “does this now need independent verification?” are narrower. Jev is
-interesting here because TypeSafe describes it as accepting structured state and typed questions,
-returning probabilistic decisions, and evaluating multiple questions independently in one parallel
-request. Foreman explores whether that shape supports frequent semantic supervision without
-rebuilding the coding agent itself.
-
-## The factory floor
-
-V1 runs one coding worker at a time. The default Codex backend is `exec`. To use
-experimental App Server steering, explicitly set `FOREMAN_CODEX_BACKEND=app-server`.
-That backend launches a thread and turn over its JSONL protocol:
-
-```text
-codex app-server --listen stdio://
-thread/start → turn/start → turn/steer or turn/interrupt
+.venv/bin/foreman attach --agent prime-agent --repo /path/to/repo \
+  --socket /path/to/existing/daemon.sock --session ACTIVE_ID --watch-seconds 30
 ```
 
-The App Server transport keeps the active Codex thread addressable, allowing Foreman to send a
-supervisory update into an in-flight turn. App Server notifications and stderr are bounded in
-memory, persisted as factory events, and made visible to Foreman before the worker exits. A verifier
-is another Codex worker with an independent, deterministic verification mission. The default stable
-`codex exec` transport cannot accept live steering. There is no implicit promotion
-to App Server when steering is unavailable.
+Copy `ACTIVE_ID` from discovery. These commands send no prompts or controls and do
+not need LocalJev. See the [operator guide](docs/supervision-operator-guide.md) for
+OpenCode credentials, Codex hooks, proposal files, and the approval stdin protocol.
 
-The worker implementation is replaceable; the runtime depends on a small worker protocol rather
-than Codex-specific types.
+## Safety limits
 
-## What Foreman watches
+- History is partial. A clean exit or a queue receipt does not prove task completion.
+- Gates cover Veyro-issued controls, not every native tool action. Keep native permissions enabled.
+- Normalized evidence omits content and credentials. Paths, IDs, and digests can still be sensitive.
+- Native content can enter adapter memory before filtering. Native storage follows provider policy.
+- The Qwen checkpoint is a configured identity, not per-response weight attestation. [Check the deployment](docs/supervision-verification.md#check-the-assessor-deployment).
+- Preserve delivery claims after a timeout or disconnect. Inspect the native session before any new action.
 
-Each observation is compact and bounded. It contains:
+## Other interfaces
 
-- the original job and current factory status;
-- active worker summaries, recent worker history, output tails, exit status, and elapsed time;
-- `git status`, a bounded diff, and changed file names;
-- verification results and recent persisted events;
-- the prior assessment and intervention;
-- attempt/failure counts and elapsed factory time.
+`foreman agent` launches a native interface with a lifecycle/workspace sidecar.
+`foreman run` is the separate legacy factory loop. Its logs can contain task text
+and agent output; it does not share the metadata-only privacy contract above.
 
-Foreman never dumps the repository into Jev. Defaults are a 20,000-character diff, 12,000
-characters per captured output tail, 30 recent events, and 10 workers of history. The limits live in
-`FactoryConfig` and can be changed for experiments.
+| Legacy setting | Default | Purpose |
+| --- | --- | --- |
+| `FOREMAN_CODEX_BACKEND` | `exec` | Explicit `app-server` opt-in enables experimental steering. |
 
-## What Foreman assesses
+See [native routing](docs/agent-router.md) and [factory runtime](docs/runtime.md).
+The [proposed product charter](docs/product-charter.md) describes future scope,
+not a list of shipped features.
 
-The first five dimensions describe the **overall job**:
+## Verify
 
-- `implementation_complete`: probability that required implementation work is complete.
-- `tests_sufficient`: probability that relevant coverage and passing verification are sufficient.
-- `requirements_satisfied`: probability that the repository satisfies the free-form request as a
-  whole, which is broader than code completion.
-- `needs_verification`: probability that an independent verification pass is warranted.
-- `ready_to_finish`: probability that the factory should consider the job complete.
-
-The remaining four describe the **factory floor now**:
-
-- `meaningful_progress`: probability that the current or latest worker is advancing the job.
-- `worker_stuck`: probability that the worker is looping, repeatedly failing, or unable to advance.
-- `work_off_track`: probability that work is drifting from the original job or is unrelated.
-- `needs_human`: probability that judgment, credentials, clarification, or permission is needed.
-
-Every dimension is one Jev `Noul` question, whose result is the probability of “yes.” All nine are
-sent in one request. Values are validated, normalized to `[0, 1]`, stored in `state.json`, and
-recorded in the event timeline.
-
-## What Foreman can do
-
-Jev only assesses. A deterministic Python policy decides which action is permitted:
-
-- `CONTINUE`: let an active worker keep working.
-- `START_WORKER`: begin a coding pass because work remains.
-- `START_VERIFIER`: launch one independent verification pass.
-- `STEER_WORKER`: send Jev-informed guidance into the active Codex turn.
-- `STOP_WORKER`: gracefully terminate a stuck or off-track process.
-- `RETRY_WORKER`: launch a fresh coding worker after a stopped attempt.
-- `FINISH`: declare the job complete.
-- `ESCALATE`: stop autonomous work and request human attention.
-
-The ordering is safety-first: human need, iteration bounds, off-track/stuck workers, retry handling,
-completion, verification, then continued work. A worker that crosses the stuck or off-track
-threshold is steered once by default. It receives a grace period before a repeated high score causes
-Foreman to stop it. State tracks steering and verification so policy does not oscillate.
-
-Default policy thresholds are:
-
-| Decision input | Threshold |
-| --- | ---: |
-| needs human | 0.80 |
-| off track | 0.80 |
-| worker stuck | 0.80 |
-| needs verification | 0.65 |
-| implementation before verification | 0.75 |
-| ready to finish | 0.85 |
-| requirements satisfied | 0.80 |
-| tests sufficient | 0.75 |
-
-## Why Jev?
-
-The integration follows TypeSafe's current official Python SDK:
-
-- package: [`typesafe-sdk`](https://docs.typesafe.ai/sdk/python);
-- async client: `AsyncTypeSafeClient`;
-- authentication: an endpoint-scoped key read through `FOREMAN_JEV_API_KEY_ENV`;
-- model: `jev-latest`;
-- call: `await client.system_one(state=..., questions=...)`;
-- question types: `Noul`, `Choice`, and `Score`;
-- timeout: configurable per client/call (the SDK default is 10 seconds);
-- errors: typed API, authentication, rate-limit, connection, timeout, and response-validation
-  exceptions;
-- retries: the SDK supports status-aware backoff and `Retry-After`; Foreman retries 429 and
-  transient 5xx failures within its assessment timeout.
-
-[TypeSafe's primitives documentation](https://docs.typesafe.ai/primitives) says questions in a
-single call are evaluated independently and in parallel. Noul is the right primitive for these nine
-yes/no probabilities; Choice and Score remain available for future experiments. The public docs
-describe HTTP 429 handling but do not publish a single numeric rate limit, so Foreman does not
-invent one. Its minimum assessment interval defaults to five seconds and is configurable.
-
-## Requirements
-
-- Python 3.11 or newer.
-- The [Codex CLI](https://learn.chatgpt.com/docs/developer-commands?surface=cli) on `PATH`.
-- A Codex CLI version that provides `codex app-server` for live steering.
-- Codex authentication (`codex login`, then verify with `codex login status`).
-- A TypeSafe API key for hosted runs, or a running [LocalJev](https://github.com/githubnext/localjev)
-  endpoint for fully local assessments. The deterministic demo and tests need neither service.
-
-## Installation
-
-From a fresh checkout:
-
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install '.[dev]'
-cp .env.example .env
+```sh
+.venv/bin/python -m pytest -q
+.venv/bin/ruff check src tests
+.venv/bin/python tools/generate_brand_assets.py --check
 ```
 
-Configure the provider and put its key in `.env`:
+[Recorded native checks](docs/supervision-verification.md) cover Prime observation
+and approved stop, OpenCode observation, and Codex hook delivery. They do not prove
+live automatic control, OpenCode control delivery, or Codex queue execution.
+The known `test_noisy_events_are_coalesced` timing failure is documented there.
 
-```dotenv
-TYPESAFE_API_KEY=your-key-here
-FOREMAN_JEV_PROVIDER_ID=hosted-jev
-FOREMAN_JEV_BASE_URL=https://api.typesafe.ai
-FOREMAN_JEV_API_KEY_ENV=TYPESAFE_API_KEY
-FOREMAN_JEV_MODEL=jev-latest
-FOREMAN_JEV_CHECKPOINT=jev-latest
-FOREMAN_JEV_TIMEOUT_SECONDS=10
-```
-
-`.env` is ignored by Git. Foreman configuration contains provider and checkpoint identities, never
-the key.
-
-### Use LocalJev
-
-Foreman can use LocalJev through the same official TypeSafe SDK. With LocalJev running locally,
-configure `.env` as follows:
-
-```dotenv
-TYPESAFE_API_KEY=local
-FOREMAN_JEV_PROVIDER_ID=localjev-qwen3-14b
-FOREMAN_JEV_BASE_URL=http://127.0.0.1:8080
-FOREMAN_JEV_API_KEY_ENV=TYPESAFE_API_KEY
-FOREMAN_JEV_MODEL=jev-latest
-FOREMAN_JEV_CHECKPOINT=qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8
-FOREMAN_JEV_TIMEOUT_SECONDS=180
-```
-
-LocalJev accepts the SDK's model alias and any API-key value unless its own client authentication
-is enabled. The longer timeout accommodates loading a local model after it has been evicted from
-memory. Confirm the endpoint before starting a real Foreman run:
-
-```bash
-curl http://127.0.0.1:8080/ready
-```
-
-### Add an optional shadow provider
-
-Set the `FOREMAN_JEV_SHADOW_*` variables to evaluate a second TypeSafe-compatible endpoint against
-the exact same observation. Foreman stores its result separately. Shadow scores cannot steer, stop,
-escalate, or finish a run. A shadow timeout or error becomes a non-fatal
-`FOREMAN_ASSESSMENT_FAILED` event.
-
-```dotenv
-JEFF_API_KEY=<random-local-secret>
-FOREMAN_JEV_SHADOW_PROVIDER_ID=jeff-gliformer-large-v1
-FOREMAN_JEV_SHADOW_BASE_URL=http://127.0.0.1:8081
-FOREMAN_JEV_SHADOW_API_KEY_ENV=JEFF_API_KEY
-FOREMAN_JEV_SHADOW_MODEL=jev-latest
-FOREMAN_JEV_SHADOW_CHECKPOINT=knowledgator/gliformer-large-v1@d0a4e53d09cebe6bc963dd9be319d4279084bb2d#sha256:f80b29199d66f878669f283703e4dba9fd726755dcc20aba1ed0d24fce4a23f1
-FOREMAN_JEV_SHADOW_TIMEOUT_SECONDS=10
-FOREMAN_JEV_SHADOW_MAX_STATE_CHARS=20000
-FOREMAN_JEV_SHADOW_STATE_FORMAT=kv
-```
-
-Do not enable the jeff example until its model digest is verified and the local service is hardened.
-
-## Running Foreman
-
-```bash
-foreman run \
-  --repo ./my-project \
-  --job "Add rate limiting to the API and make sure it is properly tested."
-```
-
-The terminal shows worker lifecycle messages and grouped job/factory-floor assessments. It makes
-explicit when Codex is working and Foreman is independently watching, without animated noise.
-
-## Deterministic demo
-
-The simulation exercises the same runtime, policy, persistence, event stream, and UI with
-deterministic model and worker implementations:
-
-```bash
-foreman demo --repo .
-```
-
-It needs no API key, network, Codex installation, or external repository. The sequence progresses
-from continued implementation, through independent verification, to `FINISH`.
-
-## Persistence and inspection
-
-Each repository gets local, ignored state:
-
-```text
-.foreman/runs/<run-id>/
-├── state.json
-└── events.jsonl
-```
-
-`state.json` is atomically replaced and contains enough typed state to recover a run.
-`events.jsonl` is an append-only timeline. Inspect either through the CLI:
-
-```bash
-foreman runs --repo ./my-project
-foreman inspect <run-id> --repo ./my-project
-```
-
-## Runtime configuration
-
-The most useful environment overrides are:
-
-| Variable | Default | Meaning |
-| --- | ---: | --- |
-| `FOREMAN_ASSESSMENT_MIN_INTERVAL_SECONDS` | `5` | Debounce/coalescing floor |
-| `FOREMAN_PERIODIC_ASSESSMENT_SECONDS` | `30` | Assessment during quiet work |
-| `FOREMAN_JEV_PROVIDER_ID` | `localjev-qwen3-14b` | Stable provider identity |
-| `FOREMAN_JEV_BASE_URL` | `http://127.0.0.1:8080` | Provider-specific endpoint |
-| `FOREMAN_JEV_API_KEY_ENV` | `TYPESAFE_API_KEY` | Name of the key environment variable |
-| `FOREMAN_JEV_MODEL` | `jev-latest` | Model sent in the System One request |
-| `FOREMAN_JEV_CHECKPOINT` | pinned Qwen digest | Reported underlying checkpoint identity |
-| `FOREMAN_JEV_TIMEOUT_SECONDS` | `10` | Authoritative assessment timeout |
-| `FOREMAN_JEV_SHADOW_PROVIDER_ID` | unset | Enables a non-authoritative provider |
-| `FOREMAN_JEV_SHADOW_BASE_URL` | unset | Shadow provider endpoint |
-| `FOREMAN_JEV_SHADOW_CHECKPOINT` | unset | Shadow checkpoint identity |
-| `FOREMAN_JEV_SHADOW_TIMEOUT_SECONDS` | `10` | Independent shadow timeout |
-| `FOREMAN_JEV_SHADOW_MAX_STATE_CHARS` | unset | Reject oversized evidence before the call |
-| `FOREMAN_JEV_SHADOW_STATE_FORMAT` | `kv` | Provider state serialization used for preflight |
-| `FOREMAN_WORKER_TIMEOUT_SECONDS` | `3600` | Per-worker timeout |
-| `FOREMAN_OVERALL_TIMEOUT_SECONDS` | `7200` | Whole-run timeout |
-| `FOREMAN_MAX_WORKERS` | `3` | Total workers, including verifier |
-| `FOREMAN_MAX_RETRIES` | `1` | Fresh attempts after a stop |
-| `FOREMAN_MAX_ITERATIONS` | `20` | Semantic decision ceiling |
-| `FOREMAN_CODEX_BACKEND` | `exec` | Stable `exec`; explicit `app-server` opt-in for experimental steering |
-| `FOREMAN_STEERING_ENABLED` | `true` | Allow Jev-informed active-turn guidance |
-| `FOREMAN_MAX_STEERS_PER_WORKER` | `1` | Steering attempts before stop/retry |
-| `FOREMAN_STEERING_GRACE_SECONDS` | `30` | Time to recover before another intervention |
-
-Policy thresholds and observation bounds are typed `FactoryConfig` fields and can be configured by
-applications embedding Foreman.
-
-## Tests
-
-```bash
-python -m pytest
-```
-
-The suite is offline: no credentials, network, Codex process, or external repository is required.
-It covers models, serialization, persistence/recovery, Jev translation and failure handling, every
-policy branch, subprocess streaming/termination, concurrent assessments, intervention delivery,
-the complete simulated factory, and a stuck-worker recovery scenario.
-
-## Process safety and security
-
-Foreman enforces steering, worker, retry, iteration, worker-timeout, overall-timeout, and concurrency
-limits. Workers receive only the supplied repository as their working root. Stop requests first
-interrupt the active App Server turn, then terminate the process after a bounded grace period.
-Ctrl-C cancels the run, terminates active workers, and persists a final cancelled state.
-
-Codex still runs with the permissions of the local environment. `workspace-write` is requested, but
-Foreman is not a security sandbox and does not make untrusted repositories safe. Review Codex's
-configuration and the repository before running it.
-
-## Limitations
-
-- Jev assessment accuracy is unproven for this use case and the semantic scores need calibration.
-- False positives can stop useful workers; false negatives can allow bad work to continue.
-- Repository observations are necessarily incomplete and bounded.
-- Codex remains responsible for software-engineering reasoning and tool use.
-- Codex App Server is currently experimental and its protocol may change between CLI releases.
-- V1 runs one coding worker at a time.
-- Local execution is not isolated.
-- Persistence is useful for inspection, not production-grade durable execution.
-- A verifier reports evidence through the same observation channel; there is no formal proof of
-  correctness.
-- This is an architectural experiment, not a production software factory.
-
-## Future experiments
-
-Natural next steps include simultaneous workers, per-worker and factory-wide assessments, alternate
-coding agents or fast decision models, dynamic assessment frequency, calibrated policies, durable
-execution, and isolated worker environments. They are intentionally outside this small V1.
+[SVG logo](docs/assets/veyro-logo.svg) · [PNG logo](docs/assets/veyro-logo.png) · [MIT license](LICENSE)
