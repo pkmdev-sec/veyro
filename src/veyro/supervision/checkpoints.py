@@ -136,6 +136,8 @@ class LocalJevCheckpointAssessor:
             raise ValueError("checkpoint assessor requires the pinned qwen3:14b checkpoint")
         if urlparse(model.base_url).hostname not in {"127.0.0.1", "localhost", "::1"}:
             raise ValueError("checkpoint assessor requires a loopback LocalJev endpoint")
+        if not model.strict_scores:
+            raise ValueError("checkpoint assessor requires strict probability validation")
         self.model = model
 
     async def assess(

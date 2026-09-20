@@ -47,6 +47,8 @@ ASSESSMENT_QUESTIONS: dict[str, str] = {
 def normalize_scores(
     values: Mapping[str, Any],
     question_names: Mapping[str, str] | set[str],
+    *,
+    strict: bool = False,
 ) -> dict[str, float]:
     names = tuple(question_names)
     normalized: dict[str, float] = {}
@@ -60,6 +62,8 @@ def normalize_scores(
         value = float(raw)
         if not isfinite(value):
             raise VeyroModelError(f"Jev answer {name!r} is not finite")
+        if strict and not 0 <= value <= 1:
+            raise VeyroModelError(f"Jev answer {name!r} is outside [0, 1]")
         normalized[name] = min(1.0, max(0.0, value))
     return normalized
 
@@ -67,6 +71,8 @@ def normalize_scores(
 def parse_jev_scores(
     response: Any,
     questions: Mapping[str, str],
+    *,
+    strict: bool = False,
 ) -> dict[str, float]:
     values: dict[str, Any] = {}
     nouls = getattr(response, "nouls", None)
@@ -84,7 +90,7 @@ def parse_jev_scores(
                     values[name] = answer.get("noul")
                 elif answer is not None:
                     values[name] = answer
-    return normalize_scores(values, questions)
+    return normalize_scores(values, questions, strict=strict)
 
 
 def normalize_assessment(values: Mapping[str, Any]) -> FactoryAssessment:
@@ -134,6 +140,7 @@ class JevVeyroModel:
         max_state_characters: int | None = None,
         state_format: Literal["kv", "json", "values"] = "kv",
         client: Any | None = None,
+        strict_scores: bool = False,
     ) -> None:
         if client is None and not api_key:
             raise ValueError("an explicit API key is required for an owned TypeSafe client")
@@ -141,6 +148,7 @@ class JevVeyroModel:
             raise ValueError("max_state_characters must be positive")
         if state_format not in {"kv", "json", "values"}:
             raise ValueError("state_format must be kv, json, or values")
+        self.strict_scores = strict_scores
         self.provider_id = provider_id
         self.base_url = base_url.rstrip("/")
         self.checkpoint = checkpoint
@@ -220,7 +228,7 @@ class JevVeyroModel:
                 ),
                 timeout=self.timeout_seconds + 0.5,
             )
-            values = parse_jev_scores(response, questions)
+            values = parse_jev_scores(response, questions, strict=self.strict_scores)
             provenance = AssessmentProvenance(
                 provider_id=self.provider_id,
                 role=self.role,

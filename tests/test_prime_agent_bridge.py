@@ -373,3 +373,118 @@ def test_normalized_turn_and_tool_events_reduce_without_provider_special_cases()
     assert state.completed_tools == 1
     assert state.failed_tools == 0
     assert state.progress.value == "idle"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "malformed",
+    [
+        b'{"type":"session_event","private":"secret"\n',
+        b'["secret"]\n',
+        b"null\n",
+        b"42\n",
+        b'"\xffsecret"\n',
+    ],
+    ids=["invalid-json", "array", "null", "number", "invalid-utf8"],
+)
+async def test_malformed_wire_frame_closes_observation_and_blocks_controls(tmp_path, malformed):
+    socket_path = Path("/tmp") / f"veyro-prime-{uuid4().hex[:10]}.sock"
+    received = []
+    finished = asyncio.Event()
+    active_session = "active-prime-1"
+
+    async def handle(reader, writer):
+        try:
+            writer.write(
+                json_line(
+                    {
+                        "type": "daemon_hello",
+                        "protocol": {
+                            "name": DAEMON_PROTOCOL_NAME,
+                            "version": DAEMON_PROTOCOL_VERSION,
+                        },
+                        "schemaRevision": DAEMON_SCHEMA_REVISION,
+                        "schemaId": DAEMON_SCHEMA_ID,
+                        "appVersion": PRIME_AGENT_VERSION,
+                    }
+                )
+            )
+            await writer.drain()
+            attach = json_load(await reader.readline())
+            received.append(attach["command"]["type"])
+            writer.write(
+                json_line(
+                    {
+                        "type": "response",
+                        "id": attach["id"],
+                        "success": True,
+                        "data": {
+                            "activeSessionId": active_session,
+                            "snapshot": {"summary": {"cwd": str(tmp_path)}},
+                        },
+                    }
+                )
+            )
+            await writer.drain()
+            pending = json_load(await reader.readline())
+            received.append(pending["command"]["type"])
+            writer.write(
+                malformed
+                + json_line(
+                    {
+                        "type": "session_event",
+                        "activeSessionId": active_session,
+                        "event": {"type": "agent_end"},
+                    }
+                )
+            )
+            await writer.drain()
+            while line := await reader.readline():
+                received.append(json_load(line)["command"]["type"])
+        finally:
+            writer.close()
+            await writer.wait_closed()
+            finished.set()
+
+    server = await asyncio.start_unix_server(handle, socket_path)
+    socket_path.chmod(0o600)
+    client = PrimeDaemonClient(socket_path, timeout=1)
+    adapter = None
+    pending_request = None
+    try:
+        await client.connect()
+        adapter = await PrimeAgentDaemonBridge.attach_connected(
+            client=client,
+            active_session_id=active_session,
+            veyro_session_id="veyro-prime-1",
+            repository=tmp_path,
+        )
+        pending_request = asyncio.create_task(client.request({"type": "get_state"}))
+        stream = adapter.events(after_sequence=1)
+        failure = await asyncio.wait_for(anext(stream), timeout=2)
+        assert failure.event_type is SupervisionEventType.NORMALIZATION_FAILED
+        assert failure.sequence == 2
+        assert "secret" not in failure.model_dump_json()
+        with pytest.raises(StopAsyncIteration):
+            await asyncio.wait_for(anext(stream), timeout=2)
+        with pytest.raises(PrimeDaemonError, match="transport failed") as error:
+            await pending_request
+        assert "secret" not in str(error.value)
+        with pytest.raises(PrimeDaemonError, match="not connected"):
+            await client.request({"type": "kill", "activeSessionId": active_session})
+        assert replay_session(adapter.identity, adapter._events).normalization_failures == 1
+        result = await adapter.execute(
+            request(StopSession(reason="must not send"), session=adapter.identity)
+        )
+        assert result.outcome is ControlOutcome.FAILED
+    finally:
+        await client.close()
+        if adapter is not None:
+            await adapter.close()
+        if pending_request is not None:
+            await asyncio.gather(pending_request, return_exceptions=True)
+        server.close()
+        await server.wait_closed()
+        await asyncio.wait_for(finished.wait(), timeout=2)
+        socket_path.unlink(missing_ok=True)
+    assert received == ["attach", "get_state"]

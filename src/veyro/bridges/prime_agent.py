@@ -224,25 +224,32 @@ class PrimeDaemonClient:
         error = PrimeDaemonError("Prime Agent daemon connection closed")
         try:
             while line := await self._reader.readline():
-                try:
-                    message = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                request_id = message.get("id") if isinstance(message, dict) else None
+                message = json.loads(line)
+                if not isinstance(message, dict):
+                    raise ValueError("daemon message must be a JSON object")
+                request_id = message.get("id")
                 if isinstance(request_id, str) and message.get("type") == "response":
                     pending = self._pending.get(request_id)
                     if pending is not None and not pending.done():
                         pending.set_result(message)
                         continue
-                if isinstance(message, dict):
-                    await self._outbound.put(message)
+                await self._outbound.put(message)
         except (OSError, ValueError) as cause:
-            error = PrimeDaemonError(f"Prime Agent daemon transport failed: {cause}")
+            error = PrimeDaemonError(f"Prime Agent daemon transport failed: {type(cause).__name__}")
         finally:
+            writer = self._writer
+            self._writer = None
+            if writer is not None:
+                writer.close()
             self._outbound.put_nowait(None)
             for pending in self._pending.values():
                 if not pending.done():
                     pending.set_exception(error)
+            if writer is not None:
+                try:
+                    await writer.wait_closed()
+                except OSError:
+                    pass
 
     async def close(self) -> None:
         if self._writer is not None:
@@ -458,6 +465,10 @@ class PrimeAgentDaemonBridge:
             await self._changed.wait()
 
     async def execute(self, request: ControlRequest) -> ControlResult:
+        if self._closed:
+            return self._result(
+                request, ControlOutcome.FAILED, "Prime Agent observation stream is closed"
+            )
         if request.session != self.identity:
             return self._result(
                 request, ControlOutcome.REJECTED, "control belongs to another session"
@@ -539,6 +550,9 @@ class PrimeAgentDaemonBridge:
                 replayed=False,
                 payload={"error_type": type(error).__name__},
             )
+        finally:
+            self._closed = True
+            self._changed.set()
 
     def _normalize(self, message: dict[str, Any]) -> None:
         outer_type = str(message.get("type", "unknown"))

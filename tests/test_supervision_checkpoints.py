@@ -209,6 +209,7 @@ async def test_localjev_assessor_uses_authoritative_checkpoint_questions() -> No
         provider_id="localjev-qwen3-14b",
         checkpoint=AUTHORITATIVE_MODEL_CHECKPOINT,
         role="authoritative",
+        strict_scores=True,
     )
     service = CheckpointAssessmentService(LocalJevCheckpointAssessor(model))
     trigger, state = reduced(SupervisionEventType.SESSION_IDLE)
@@ -250,3 +251,51 @@ def test_localjev_assessor_rejects_unpinned_or_remote_authority() -> None:
                 base_url="https://remote.example",
             )
         )
+
+
+def test_localjev_assessor_requires_strict_model_scores() -> None:
+    model = JevVeyroModel(
+        client=Client(),
+        provider_id="localjev-qwen3-14b",
+        checkpoint=AUTHORITATIVE_MODEL_CHECKPOINT,
+        strict_scores=False,
+    )
+    with pytest.raises(ValueError, match="strict"):
+        LocalJevCheckpointAssessor(model)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("invalid", [-5, 99, float("nan"), float("inf"), True, "0.5", None])
+async def test_authoritative_service_rejects_invalid_scores_without_caching(monkeypatch, invalid):
+    from veyro.supervision.supervisor import authoritative_assessments
+    from veyro.veyro import VeyroModelError
+
+    class Responses:
+        def __init__(self):
+            self.calls = 0
+
+        async def system_one(self, **kwargs):
+            self.calls += 1
+            values = dict.fromkeys(CHECKPOINT_QUESTIONS, 0.5)
+            values["safe_to_continue"] = invalid if self.calls == 1 else 1.0
+            values["needs_human"] = 0.0
+            return SimpleNamespace(
+                nouls={name: SimpleNamespace(noul=value) for name, value in values.items()}
+            )
+
+        async def aclose(self):
+            pass
+
+    client = Responses()
+    monkeypatch.setattr(JevVeyroModel, "_make_client", lambda self: client)
+    service = authoritative_assessments()
+    trigger, state = reduced(SupervisionEventType.SESSION_IDLE)
+    try:
+        with pytest.raises(VeyroModelError):
+            await service.assess_if_needed(trigger, state)
+        assessment = await service.assess_if_needed(trigger, state)
+        assert client.calls == 2
+        assert assessment.safe_to_continue == 1.0
+        assert assessment.needs_human == 0.0
+    finally:
+        await service.close()

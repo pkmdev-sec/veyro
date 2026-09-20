@@ -3,6 +3,12 @@
 Veyro combines localjev and Qwen3-14B with version-pinned native-agent adapters.
 Start with a synthetic assessment, then connect to a session you own.
 
+## Release scope
+
+This release supports read-only observation and explicitly approved controls. No
+adapter qualifies for automatic delivery. Autonomous tasks, local GGUF readout, and
+evaluator/calibration additions are excluded. See [scope and checks](release-scope.md).
+
 ## Start here
 
 - [Deploy localjev with Qwen3-14B](localjev.md): endpoint, model digest, compatibility, and trust checks.
