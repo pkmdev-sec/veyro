@@ -15,6 +15,12 @@ contract and can retain task text and worker output. Its App Server steering and
 shadow options remain experimental, disabled by default, and outside this qualification.
 See the [factory reference](runtime.md) and [capability matrix](supervision-reference.md).
 
+## Model scope
+
+**Qwen3 14B** is the released localjev assessor. **Qwen3 4B Instruct** is an unmerged,
+lower-memory development profile, not an alternate assessor in this release. The
+[model comparison](qwen-models.md) explains their roles and the separate readout path.
+
 ## Excluded additions
 
 The following development additions are not in this release tree or its packages:
