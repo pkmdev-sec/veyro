@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/veyro-supervision.gif" width="1120" alt="Front-facing Veyro workflow: native agents send metadata; read-only is the default; opt-in proposals pass policy, localjev with Qwen3-14B, exact human approval, a durable claim, and freshness checks before supported control">
+  <img src="docs/assets/veyro-relay-logo.svg" width="720" alt="Veyro: an original folded relay-knot mark with an amber checkpoint and a custom level wordmark">
 </p>
 
 <h1 align="center">Veyro</h1>
@@ -19,6 +19,12 @@ Deterministic policy decides what can happen next. Model scores cannot grant per
 
 Your agent keeps its native terminal, tools, and permission system. Veyro uses
 structured events, not terminal scraping.
+
+## How it works
+
+<p align="center">
+  <img src="docs/assets/veyro-supervision.gif" width="1120" alt="Front-facing Veyro workflow: native agents send metadata; read-only is the default; opt-in proposals pass policy, localjev with Qwen3-14B, exact human approval, a durable claim, and freshness checks before supported control">
+</p>
 
 ## Qwen3-14B is the assessor
 
@@ -124,6 +130,7 @@ The separate [factory runtime](docs/runtime.md) defaults to:
 ```sh
 .venv/bin/python -m pytest -q
 .venv/bin/ruff check src tests tools examples
+.venv/bin/python tools/generate_header_logo.py --check
 uv run --script tools/generate_supervision_diagram.py --check
 uv build --offline
 ```

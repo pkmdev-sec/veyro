@@ -70,10 +70,18 @@ def test_localjev_showcase_matches_runtime_and_baseline():
     assert all(f"`{question}`" in explanation for question in CHECKPOINT_QUESTIONS)
 
 
-def test_readme_uses_animation_without_static_logo_links():
+def test_readme_separates_new_logo_introduction_and_animated_diagram():
     readme = (ROOT / "README.md").read_text()
     assert 'src="docs/assets/veyro-supervision.gif"' in readme
-    assert readme.count("<img ") == 1
+    images = re.findall(r'<img\b[^>]*src="([^"]+)"', readme)
+    assert images == ["docs/assets/veyro-relay-logo.svg", "docs/assets/veyro-supervision.gif"]
+    logo = readme.index('src="docs/assets/veyro-relay-logo.svg"')
+    intro_start = readme.index("Veyro observes Prime Agent")
+    intro_end = readme.index("structured events, not terminal scraping.")
+    diagram = readme.index('src="docs/assets/veyro-supervision.gif"')
+    assert logo < intro_start < intro_end < diagram < readme.index("## Qwen3-14B")
+    assert "</p>" in readme[logo:intro_start]
+    assert '<p align="center">' in readme[intro_end:diagram]
     assert "```mermaid" not in readme
     for document in DOCUMENTS:
         text = document.read_text()
@@ -81,7 +89,11 @@ def test_readme_uses_animation_without_static_logo_links():
         links += re.findall(r"(?<!!)\[[^\]]*\]\(([^)]+)\)", text)
         for target in links:
             path = Path(urlsplit(target).path)
-            assert not (path.name.startswith("veyro-logo") and path.suffix in {".png", ".svg"}), (
+            assert not (
+                path.name.startswith("veyro-")
+                and "logo" in path.stem
+                and path.suffix in {".png", ".svg"}
+            ), (
                 document.name,
                 target,
             )

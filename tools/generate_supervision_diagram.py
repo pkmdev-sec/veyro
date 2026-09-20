@@ -13,7 +13,6 @@ from io import BytesIO
 from itertools import pairwise
 from pathlib import Path
 
-from generate_brand_assets import SCALE, WORD_ORIGIN, draw_logo, render_png
 from PIL import Image, ImageDraw, ImageFont
 
 ASSETS = Path(__file__).resolve().parents[1] / "docs" / "assets"
@@ -66,11 +65,8 @@ def build_scene() -> tuple[Image.Image, list[list[tuple[int, int]]]]:
         ]
         draw.polygon([(x, y), *wing], fill=color)
 
-    logo = Image.open(BytesIO(render_png(draw_logo()))).convert("RGBA")
-    icon = logo.crop((0, 0, WORD_ORIGIN[0] * SCALE, logo.height))
-    icon = icon.resize((icon.width // 2, icon.height // 2), Image.Resampling.NEAREST)
-    image.paste(icon, (24, 20), icon)
-    label(174, 44, "VEYRO", 66, WHITE)
+    label(40, 38, "From observation", 42, WHITE)
+    label(40, 94, "to approved control", 34, MUTED)
     label(1080, 38, "localjev + Qwen3-14B", 29, MINT, "ra")
     label(1080, 79, "Keep your agent. Keep control.", 25, MUTED, "ra")
     draw.line((40, 174, 1080, 174), fill=BORDER, width=2)
