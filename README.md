@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/veyro-relay-logo.svg" width="720" alt="Veyro: an original folded relay-knot mark with an amber checkpoint and a custom level wordmark">
+  <img src="docs/assets/veyro-relay-logo.svg" width="720" alt="Veyro: a dimensional tiled aperture with an amber checkpoint beside a custom level ivory wordmark">
 </p>
 
 <h1 align="center">Veyro</h1>

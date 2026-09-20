@@ -12,10 +12,10 @@ DIAGRAM = ROOT / "docs/assets/veyro-supervision.gif"
 
 
 def test_single_diagram_is_bounded_and_loops():
-    frames, applications, _ = read_gif(DIAGRAM, (1120, 1000))
-    assert len(frames) == 64
+    frames, applications, _ = read_gif(DIAGRAM, (1120, 1000), max_bytes=2_000_000)
+    assert len(frames) == 120
     assert frames[0]["bounds"] == (0, 0, 1120, 1000)
-    assert {frame["delay"] for frame in frames} == {10}
+    assert {frame["delay"] for frame in frames} == {4}
     assert applications == [(b"NETSCAPE2.0", b"\x01\x00\x00")]
 
 
@@ -39,16 +39,14 @@ def frame_hashes(filters: str | None = None) -> list[str]:
 
 def test_decoded_diagram_animates_only_connectors_not_text_or_geometry():
     hashes = frame_hashes()
-    assert len(hashes) == len(set(hashes)) == 64
+    assert len(hashes) == len(set(hashes)) == 120
     # Mask just the seven connector corridors. The remaining scene must never move or flicker.
     corridors = [
         (552, 327, 17, 42),
         (684, 406, 92, 17),
         (352, 458, 17, 69),
         (421, 632, 127, 17),
-        (912, 706, 17, 31),
-        (187, 721, 741, 17),
-        (187, 721, 17, 75),
+        (912, 706, 17, 89),
         (347, 834, 62, 17),
         (709, 834, 61, 17),
     ]
@@ -56,7 +54,7 @@ def test_decoded_diagram_animates_only_connectors_not_text_or_geometry():
         f"drawbox=x={x}:y={y}:w={w}:h={h}:color=black:t=fill" for x, y, w, h in corridors
     )
     stable = frame_hashes(filters)
-    assert len(stable) == 64 and len(set(stable)) == 1
+    assert len(stable) == 120 and len(set(stable)) == 1
 
 
 def test_diagram_generator_is_current_and_nonwriting():

@@ -14,11 +14,13 @@ ASSETS = Path(__file__).resolve().parents[1] / "docs" / "assets"
 
 
 def read_gif(
-    path: Path = ASSETS / "veyro-logo-animated.gif", size: tuple[int, int] = (640, 256)
+    path: Path = ASSETS / "veyro-logo-animated.gif",
+    size: tuple[int, int] = (640, 256),
+    max_bytes: int = 1024 * 1024,
 ) -> tuple[list[dict], list[tuple[bytes, bytes]], bytes]:
     data = path.read_bytes()
     assert data[:6] == b"GIF89a"
-    assert 0 < len(data) < 1024 * 1024
+    assert 0 < len(data) < max_bytes
     width, height, packed, background, aspect = struct.unpack_from("<HHBBB", data, 6)
     assert (width, height) == size
     assert background == aspect == 0
