@@ -46,8 +46,7 @@ def render_frame(index: int, pixels: list[list[str]]) -> Image.Image:
 
     def project(x: float, y: float, z: float) -> tuple[int, int]:
         x, y = x - WIDTH / 2, y - HEIGHT / 2
-        depth = -x * sy + z * cy
-        return round(322 + 5.7 * (x * cy + z * sy)), round(126 + 5.7 * (y * ct - depth * st))
+        return round(322 + 5.7 * (x * cy + z * sy)), round(126 + 5.7 * (y * ct - z * cy * st))
 
     image = Image.new("P", SIZE, 0)
     image.putpalette(PALETTE)

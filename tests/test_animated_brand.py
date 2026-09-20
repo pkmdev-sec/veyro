@@ -112,3 +112,24 @@ def test_poster_is_a_valid_full_size_rgb_png() -> None:
     raster = zlib.decompress(b"".join(payload for kind, payload in chunks if kind == b"IDAT"))
     assert len(raster) == 256 * (640 * 3 + 1)
     assert all(raster[y * (640 * 3 + 1)] <= 4 for y in range(256))
+
+    previous = bytearray(640 * 3)
+    border_heights = {}
+    for y in range(256):
+        start = y * (640 * 3 + 1)
+        filter_type = raster[start]
+        row = bytearray(raster[start + 1 : start + 1 + 640 * 3])
+        for i in range(len(row)):
+            left = row[i - 3] if i >= 3 else 0
+            above = previous[i]
+            corner = previous[i - 3] if i >= 3 else 0
+            prediction = left + above - corner
+            paeth = min((left, above, corner), key=lambda value: abs(prediction - value))
+            predictor = (0, left, above, (left + above) // 2, paeth)[filter_type]
+            row[i] = (row[i] + predictor) & 255
+        for x in (80, 560):
+            if tuple(row[x * 3 : x * 3 + 3]) == (36, 60, 77):
+                border_heights.setdefault(x, y)
+        previous = row
+    assert set(border_heights) == {80, 560}
+    assert border_heights[80] == border_heights[560], "Logo plate must not slope sideways"
