@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import asyncio
 from collections import Counter
 
 import pytest
 
 from veyro.config import FactoryConfig
-from veyro.models import EventType, FactoryAssessment, FactoryStatus, WorkerType
+from veyro.models import EventType, FactoryAssessment, FactoryEvent, FactoryStatus, WorkerType
+from veyro.observation import ObservationBuilder
 from veyro.persistence import RunStore
 from veyro.runtime import FactoryRuntime
 from veyro.veyro import FakeVeyroModel
@@ -32,8 +34,9 @@ def config(**updates) -> FactoryConfig:
     values = {
         "assessment_min_interval_seconds": 0.01,
         "periodic_assessment_seconds": 0.05,
-        "worker_timeout_seconds": 2,
-        "overall_timeout_seconds": 5,
+        # These tests exercise lifecycle ordering, not Git/disk latency.
+        "worker_timeout_seconds": 30,
+        "overall_timeout_seconds": 60,
         "max_workers": 3,
         "max_retries": 1,
         "max_iterations": 10,
@@ -43,8 +46,38 @@ def config(**updates) -> FactoryConfig:
     return FactoryConfig(**values)
 
 
+@pytest.fixture(params=[0.0, 1.1])
+def observation_latency(request, monkeypatch):
+    build = ObservationBuilder.build
+
+    async def delayed_build(self, state):
+        if request.param:
+            await asyncio.sleep(request.param)
+        return await build(self, state)
+
+    monkeypatch.setattr(ObservationBuilder, "build", delayed_build)
+
+
 @pytest.mark.asyncio
-async def test_full_simulated_factory_assesses_live_and_verifies(tmp_path) -> None:
+async def test_full_simulated_factory_assesses_live_and_verifies(
+    tmp_path, observation_latency
+) -> None:
+    first_assessed = asyncio.Event()
+    second_assessed = asyncio.Event()
+
+    async def synchronize_phases(event: FactoryEvent) -> None:
+        if event.event_type is EventType.VEYRO_ASSESSED:
+            if event.payload["iteration"] == 1:
+                first_assessed.set()
+            elif event.payload["iteration"] == 2:
+                second_assessed.set()
+        elif event.event_type is EventType.WORKER_OUTPUT:
+            # Output callbacks run inside FakeWorker's worker timeout.
+            if event.payload["line"] == "editing":
+                await first_assessed.wait()
+            elif event.payload["line"] == "testing":
+                await second_assessed.wait()
+
     model = FakeVeyroModel(
         [
             score(implementation_complete=0.31, meaningful_progress=0.88),
@@ -81,6 +114,7 @@ async def test_full_simulated_factory_assesses_live_and_verifies(tmp_path) -> No
             periodic_assessment_seconds=1.0,
         ),
         worker_factory=workers,
+        event_sink=synchronize_phases,
     )
     state = await runtime.run()
     assert state.status is FactoryStatus.FINISHED
@@ -98,7 +132,9 @@ async def test_full_simulated_factory_assesses_live_and_verifies(tmp_path) -> No
 
 
 @pytest.mark.asyncio
-async def test_stuck_worker_is_steered_stopped_retried_verified_and_finished(tmp_path) -> None:
+async def test_stuck_worker_is_steered_stopped_retried_verified_and_finished(
+    tmp_path, observation_latency
+) -> None:
     model = FakeVeyroModel(
         [
             score(meaningful_progress=0.8),
@@ -159,7 +195,16 @@ async def test_stuck_worker_is_steered_stopped_retried_verified_and_finished(tmp
 
 
 @pytest.mark.asyncio
-async def test_noisy_events_are_coalesced(tmp_path) -> None:
+@pytest.mark.parametrize("output_delay", [0, 0.01])
+async def test_noisy_events_are_coalesced(tmp_path, output_delay) -> None:
+    first_assessed = asyncio.Event()
+
+    async def synchronize_phases(event: FactoryEvent) -> None:
+        if event.event_type is EventType.VEYRO_ASSESSED:
+            first_assessed.set()
+        elif event.event_type is EventType.WORKER_OUTPUT:
+            await first_assessed.wait()
+
     ready = score(
         implementation_complete=0.99,
         tests_sufficient=0.99,
@@ -172,10 +217,12 @@ async def test_noisy_events_are_coalesced(tmp_path) -> None:
         repository=tmp_path,
         job="Small job",
         model=model,
-        config=config(assessment_min_interval_seconds=0.1),
+        # Output stays inside the debounce window; completion must force the next assessment.
+        config=config(assessment_min_interval_seconds=60, periodic_assessment_seconds=60),
         worker_factory=lambda _: FakeWorker(
-            output_lines=[str(number) for number in range(50)], delay_seconds=0
+            output_lines=[str(number) for number in range(50)], delay_seconds=output_delay
         ),
+        event_sink=synchronize_phases,
     )
     state = await runtime.run()
     output_events = [

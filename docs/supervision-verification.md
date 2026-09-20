@@ -153,8 +153,20 @@ expected stop evidence, not a failed assessment. OpenCode preserved its fixture
 through attachment and removed its isolated server afterward. Codex preserved
 native trust and managed policy while delivering `SessionEnd`.
 
-The repository has a previously reproduced timing race in
-`tests/test_integration.py::test_noisy_events_are_coalesced` (100 output events
-instead of 50), reproduced on baseline `43f33c2` and later installations.
-Report it if it recurs; do not hide it with exclusions, `xfail`, or larger delays.
-The recorded checks did not change scheduler behavior or timing thresholds.
+Historical runs reproduced a timing race in
+`tests/test_integration.py::test_noisy_events_are_coalesced` on baseline `43f33c2`.
+Later integration runs also expired their short worker budgets during real Git and
+disk I/O. These are lifecycle tests, not latency benchmarks.
+
+The fixtures now synchronize simulated phases, allow slow observations within test-only
+budgets, and keep each output stream inside its configured debounce window. Completion
+must still force the second assessment. Assertions still require all 50 output events,
+exactly two assessments, and the expected completion, retry, and verification states.
+Slow-observation and delayed-output cases exercise those contracts explicitly.
+Production timeouts and debounce defaults are unchanged. No tests are skipped or marked
+`xfail`; these checks do not establish a production latency target.
+
+Checkpoint supervision requires strict probability validation. Missing, nonnumeric,
+nonfinite, or out-of-range scores reject the assessment. They are not clamped into valid
+probabilities or cached as usable evidence. The checkpoint tests cover rejection and a
+subsequent valid response for the same checkpoint.

@@ -104,7 +104,7 @@ def build_scene() -> tuple[Image.Image, list[list[tuple[int, int]]]]:
         BLUE,
         step="02",
     )
-    card((770, 364, 1080, 464), "Read-only", "The default: no controls", MINT)
+    card((770, 364, 1080, 464), "Read-only", "No calls. No controls.", MINT)
     arrow([(560, 335), (560, 362)], BLUE)
     arrow([(692, 414), (768, 414)], MINT)
 
@@ -195,7 +195,9 @@ def render_assets() -> dict[str, bytes]:
         disposal=1,
         optimize=False,
     )
-    return {"veyro-supervision.gif": data.getvalue()}
+    still = BytesIO()
+    base.save(still, format="PNG")
+    return {"veyro-supervision.gif": data.getvalue(), "veyro-supervision.png": still.getvalue()}
 
 
 def main() -> int:
@@ -212,12 +214,12 @@ def main() -> int:
         if stale:
             print("Diagram needs regeneration: " + ", ".join(stale))
             return 1
-        print("Animated diagram is current.")
+        print("Supervision diagrams are current.")
         return 0
     ASSETS.mkdir(parents=True, exist_ok=True)
     for name, data in assets.items():
         (ASSETS / name).write_bytes(data)
-        print(f"Generated {name}: {SIZE[0]}x{SIZE[1]}, {FRAMES} frames, {len(data):,} bytes.")
+        print(f"Generated {name}: {len(data):,} bytes.")
     return 0
 
 

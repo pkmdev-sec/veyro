@@ -136,6 +136,7 @@ def authoritative_assessments() -> CheckpointAssessmentService:
         timeout_seconds=120,
         max_state_characters=50000,
         state_format="json",
+        strict_scores=True,
     )
     return CheckpointAssessmentService(LocalJevCheckpointAssessor(model))
 

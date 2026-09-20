@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+import struct
 import subprocess
 from pathlib import Path
 
@@ -61,11 +62,19 @@ def test_diagram_generator_is_current_and_nonwriting():
     uv = shutil.which("uv")
     if uv is None:
         pytest.skip("uv is required for the isolated diagram builder")
-    before = (DIAGRAM.read_bytes(), DIAGRAM.stat().st_mtime_ns)
+    assets = [DIAGRAM, DIAGRAM.with_suffix(".png")]
+    before = [(asset.read_bytes(), asset.stat().st_mtime_ns) for asset in assets]
     subprocess.run(
         [uv, "run", "--script", str(ROOT / "tools/generate_supervision_diagram.py"), "--check"],
         capture_output=True,
         check=True,
         timeout=60,
     )
-    assert (DIAGRAM.read_bytes(), DIAGRAM.stat().st_mtime_ns) == before
+    assert [(asset.read_bytes(), asset.stat().st_mtime_ns) for asset in assets] == before
+
+
+def test_still_diagram_has_expected_dimensions():
+    data = DIAGRAM.with_suffix(".png").read_bytes()
+    assert data[:8] == b"\x89PNG\r\n\x1a\n"
+    assert data[12:16] == b"IHDR"
+    assert struct.unpack(">II", data[16:24]) == (1120, 1000)

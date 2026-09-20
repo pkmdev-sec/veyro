@@ -28,6 +28,18 @@ Normalized events contain event kind, tool name, error state, replay state, nati
 
 The client accepts only a Unix socket owned by the current user with no group or other permissions. JSONL records are bounded to 4 MiB. Attach uses chunked and slim snapshots.
 
+## Observation transport failures
+
+Malformed JSON, invalid text encoding, and non-object JSON frames close the daemon
+connection. Veyro does not skip the frame and continue with stale observations.
+Pending requests fail, the bridge emits `NORMALIZATION_FAILED`, and its observation
+stream ends. Further controls are refused on that bridge.
+
+Error reports include the exception type, not the malformed frame's contents. Do not
+retry a control after a transport failure unless you have checked its native outcome.
+Start a new attachment and obtain fresh evidence and approval before sending another
+control.
+
 ## Live canary
 
 The [recorded observation checks](supervision-verification.md#recorded-installation-results)

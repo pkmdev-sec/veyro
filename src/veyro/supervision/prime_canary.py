@@ -106,6 +106,7 @@ async def run_prime_canary(
             timeout_seconds=180,
             max_state_characters=50_000,
             state_format="json",
+            strict_scores=True,
         )
         assessments = CheckpointAssessmentService(LocalJevCheckpointAssessor(model))
         loop = SupervisionControlLoop(

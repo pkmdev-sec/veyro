@@ -20,11 +20,37 @@ Deterministic policy decides what can happen next. Model scores cannot grant per
 Your agent keeps its native terminal, tools, and permission system. Veyro uses
 structured events, not terminal scraping.
 
+## Release scope
+
+This release covers existing-session observation and explicitly approved controls.
+**Observe-only is the default. No native adapter qualifies for automatic delivery.**
+Model scores do not prove task completion or grant permission.
+
+The native autonomous-task, local GGUF readout, and evaluator/calibration additions
+are not included in this release. Their task-reliability and independent-calibration
+qualification is incomplete. See [release scope and checks](docs/release-scope.md).
+
 ## How it works
+
+Choose the interface that matches your task:
+
+| Goal | Commands | What Veyro does |
+| --- | --- | --- |
+| Open a native terminal | `agents`, `agent` | Lists installed agents or launches one with a lifecycle sidecar |
+| Inspect an existing session | `sessions`, `attach` | Reads metadata without a model call or control |
+| Review one proposed action | `supervise` | Checks policy, gets local assessment, and requires exact approval for supported controls |
+| Run separate worker orchestration | `run`, `demo`, `runs`, `inspect` | Uses the factory runtime and its own content-bearing logs |
+
+The diagram shows the existing-session review path. The factory runtime is separate.
 
 <p align="center">
   <img src="docs/assets/veyro-supervision.gif" width="1120" alt="Front-facing Veyro workflow: native agents send metadata; read-only is the default; opt-in proposals pass policy, localjev with Qwen3-14B, exact human approval, a durable claim, and freshness checks before supported control">
 </p>
+
+[Open the still diagram](docs/assets/veyro-supervision.png) if you prefer no animation.
+
+Observation is read-only. An approved control passes policy and local assessment, then
+requires human approval for the exact request, a durable dispatch claim, and a freshness check.
 
 ## Qwen3-14B is the assessor
 
@@ -43,7 +69,7 @@ explains how to check them. localjev returns model-generated probability estimat
 not calibrated guarantees or direct token-logit measurements. The checkpoint label
 records configuration; it does not attest the weights used for each response.
 
-There is one authoritative assessor. No cloud fallback, alternate-model routing,
+For existing-session supervision, there is one authoritative assessor. No cloud fallback, alternate-model routing,
 or shadow voting participates in the existing-session control plane. Native coding
 agents can still use their own remote services.
 
@@ -72,6 +98,17 @@ Veyro does not install a model or start an inference server for you.
 The response includes seven named scores, configured model provenance, and
 `controls_enabled: false`. A failed test does not become a completion claim just
 because the native agent stopped talking. See the [example walkthrough](examples/README.md).
+
+## Keep your native terminal
+
+```sh
+veyro agents --json
+veyro agent prime-agent --repo . --prompt "Inspect the failing tests"
+```
+
+The agent must already be installed and configured. Veyro keeps its native terminal,
+tools, and permission system. The launch sidecar records lifecycle observations; it
+does not add an autonomous completion loop. See the [native launcher guide](docs/agent-router.md).
 
 ## From observation to an approved action
 
@@ -114,7 +151,10 @@ promise that any installed release will work.
 | [`config/baselines/localjev-qwen3-14b.json`](config/baselines/localjev-qwen3-14b.json) | Exact model identity and recorded deployment settings |
 | [`src/veyro/bridges/`](src/veyro/bridges/) | Native provider adapters |
 | [`src/veyro/supervision/`](src/veyro/supervision/) | State reduction, checkpoints, authorization, delivery |
+| [`src/veyro/native_session.py`](src/veyro/native_session.py) | Native launch and lifecycle sidecar |
+| [`src/veyro/runtime.py`](src/veyro/runtime.py) | Separate factory worker lifecycle |
 | [`docs/`](docs/README.md) | Deployment, operation, architecture, and verification |
+| [`docs/release-scope.md`](docs/release-scope.md) | Included interfaces and excluded experimental additions |
 | [`tests/`](tests/) | Contract, privacy, replay, approval, and packaging checks |
 
 The CLI/import package is `veyro`; the distribution is `veyro-factory`.
@@ -132,12 +172,15 @@ The separate [factory runtime](docs/runtime.md) defaults to:
 .venv/bin/ruff check src tests tools examples
 .venv/bin/python tools/generate_header_logo.py --check
 uv run --script tools/generate_supervision_diagram.py --check
-uv build --offline
+uv build --offline --out-dir dist
+.venv/bin/python tools/check_release.py dist/veyro_factory-0.4.0-py3-none-any.whl dist/veyro_factory-0.4.0.tar.gz
 ```
 
 [Verification procedures and evidence](docs/supervision-verification.md) cover
 native observation, one approved disposable Prime stop, and Codex hook delivery.
 They do not establish general task accuracy or automatic control safety.
-The known `test_noisy_events_are_coalesced` timing failure is documented, not suppressed.
+The build command needs cached build dependencies with `--offline`; omit that flag if
+they need to be downloaded. Use your build's artifact filenames for a different version.
+Read the [release scope](docs/release-scope.md) before enabling controls.
 
 [MIT license](LICENSE) · [Architecture](docs/theory.md) · [Evidence limits](docs/what-veyro-proves.md)

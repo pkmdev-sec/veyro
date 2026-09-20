@@ -39,8 +39,8 @@ running as the same OS user.
 - The CLI evaluates one proposal and does not silently refresh stale evidence.
 - At-most-once reservation is not exactly-once native execution.
 - Native history is incomplete; a clean exit is not proof of task completion.
-- The factory test `test_noisy_events_are_coalesced` has a reproduced timing race.
-  Report it; do not hide it with exclusions or changed thresholds.
+- Factory integration tests cover lifecycle ordering and coalescing, not a wall-clock
+  latency guarantee. See the [historical timing failures and fixture changes](supervision-verification.md).
 
 To evaluate model quality, use representative tasks, independent outcome labels,
 calibration measurements, and a no-supervision baseline. Veyro does not publish
