@@ -1,0 +1,26 @@
+{
+  "laya": {
+    "id": "laya",
+    "kind": "laya",
+    "python": "/opt/homebrew/bin/python3",
+    "python_sha256": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634",
+    "runtime_root": "~/.local/share/laya/runtime-site",
+    "runtime_sha256": "518720be4fc490c416a87088f97781852f0dea80a97aa6503a1cfaad27f98d05",
+    "runtime_layout_sha256": "5f976b7a58445d74c8feff06c92b6cb1fd14262d25b5c3f9695acb18f77f0d9c",
+    "launcher": "~/.local/bin/laya-local",
+    "launcher_sha256": "d3fc60a2fcd9db1f12610e65d8f82582c06c37dd5b10ca6794522f43ac531dde",
+    "model_root": "~/.local/share/laya/current",
+    "checkpoint": "typed-decisions",
+    "revision": "1c5edc17a7acd8701df6fc341c0d179f1c62c982",
+    "device": "cpu",
+    "files": {
+      "rl_agent_api.py": "be3b46819c9999c3ef88e0f2ecf6d3ab1cdfed1d9a8b466fc89811e34d44031b",
+      "rl_common.py": "8d83611d480c971d640a7b7d3aa2f2219c5e8455e9cc2329fd073681bd8be23e",
+      "typed-decisions/model.safetensors": "4fa56de72383a9d3efa9cfa78955733c81b9fc8067a587ca4beb82c78107a24e",
+      "typed-decisions/rl_agent_config.json": "ebf0cd524d92342a6be5e48e9fca3d7c2babfb5a56ccd79d2171ef5d8c7f7be8",
+      "typed-decisions/encoder/config.json": "5268d24ad3b77c8151de5dcb0762ba4391619aad9ab0bda33e36fb083cfeae6d",
+      "typed-decisions/tokenizer/tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+      "typed-decisions/tokenizer/tokenizer_config.json": "08d4cf3ac4dca381759441b85b91a6d40e688471dcd33d15d6649eb0a9a854d1"
+    }
+  }
+}

@@ -15,7 +15,7 @@ supervision improves task success, cost, latency, or safety.
 | OpenCode observation canary | Authenticated HTTP/SSE and preservation of an empty fixture session | Live follow-up, approval reply, or interrupt delivery |
 | Codex native hook canary | Native-approved `SessionEnd` to a metadata helper | Live queue execution or synchronous tool authorization |
 | Codex helper-process tests | Helper publication to the authenticated broker | Native hook loading in every installation |
-| Factory simulation | Worker/model orchestration and local persistence | Live model quality or agent isolation |
+| Factory simulation | Worker/model harness loop and local persistence | Live model quality or agent isolation |
 
 Use [verification procedures](supervision-verification.md) to reproduce each check.
 The linked JSON reports contain dated observations and explicit limits. A report

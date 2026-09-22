@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools==80.9.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,8 +8,18 @@ version = "0.4.0"
 description = "Local coding-agent supervision with localjev and Qwen3-14B"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "MIT"
 authors = [{ name = "Veyro contributors" }]
+keywords = ["coding-agents", "supervision", "evaluation", "localjev", "opencode", "codex", "qwen"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
   "pydantic>=2.7,<3",
   "python-dotenv>=1.0,<2",
@@ -21,10 +31,13 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/pkmdev-sec/veyro"
+Repository = "https://github.com/pkmdev-sec/veyro.git"
+"Release status" = "https://github.com/pkmdev-sec/veyro/blob/main/GATES.md"
 Documentation = "https://github.com/pkmdev-sec/veyro/blob/main/docs/README.md"
 Issues = "https://github.com/pkmdev-sec/veyro/issues"
 
 [project.optional-dependencies]
+local = ["llama-cpp-python==0.3.35"]
 dev = [
   "pytest>=8.2,<10",
   "pytest-asyncio>=0.23,<2",
@@ -47,3 +60,9 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.setuptools.package-data]
+veyro = ["integrations/*.mjs"]
+
+[tool.setuptools.data-files]
+"share/veyro" = ["config/model-profiles.json", "config/laya-profiles.json"]

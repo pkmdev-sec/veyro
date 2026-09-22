@@ -116,10 +116,10 @@ service's authentication enabled and use read-only observation instead; do not
 replace a real secret with the placeholder. Loopback access is not isolation from
 other programs running as the same OS user.
 
-The separate `veyro run` factory loads the `VEYRO_JEV_*` settings in
-[`.env.example`](../.env.example), including `VEYRO_JEV_API_KEY_ENV`. Its default
-provider is also localjev/Qwen3-14B, but it has a separate runtime and privacy
-contract. Do not interpret those environment settings as control-plane overrides.
+The internal experimental factory runtime can read the `VEYRO_JEV_*` settings in
+[`.env.example`](../.env.example), including `VEYRO_JEV_API_KEY_ENV`. It has a separate runtime
+and privacy contract and is not exposed as a top-level command. Do not interpret those environment
+settings as control-plane overrides.
 
 ## Interpret the scores
 

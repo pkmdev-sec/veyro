@@ -30,4 +30,3 @@ def state(tmp_path) -> FactoryState:
         repository=str(tmp_path),
         started_at=datetime.now(UTC),
     )
-

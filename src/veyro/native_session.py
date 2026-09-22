@@ -115,6 +115,7 @@ class ManagedNativeResult:
     session_id: str
     record_path: Path
     exit_code: int
+    autonomy_directory: Path | None = None
 
 
 class ManagedNativeSession:
@@ -131,6 +132,10 @@ class ManagedNativeSession:
         prompt: str | None,
         snapshot_interval_seconds: float = 2.0,
         on_started: Callable[[NativeSessionRecord], None] | None = None,
+        environment: dict[str, str] | None = None,
+        timeout_seconds: float | None = None,
+        completion_check: Callable[[], bool] | None = None,
+        termination_grace_seconds: float = 2.0,
     ) -> None:
         self.definition = definition
         self.repository = repository.resolve()
@@ -139,6 +144,12 @@ class ManagedNativeSession:
         self.agent_version = agent_version
         self.snapshot_interval_seconds = snapshot_interval_seconds
         self.on_started = on_started
+        self.environment = environment or {}
+        self.timeout_seconds = timeout_seconds
+        self.completion_check = completion_check
+        self.termination_grace_seconds = termination_grace_seconds
+        self._timed_out = False
+        self._kill_timer: threading.Timer | None = None
         session_id = uuid4().hex[:12]
         now = _now()
         self.record = NativeSessionRecord(
@@ -190,6 +201,23 @@ class ManagedNativeSession:
         except ProcessLookupError:
             pass
 
+    def _kill_after_timeout(self) -> None:
+        process = self._process
+        if process is not None and process.returncode is None:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
+    def _deadline_reached(self) -> None:
+        if self.completion_check is not None and self.completion_check():
+            return
+        self._timed_out = True
+        self._forward_signal(signal.SIGTERM, None)
+        self._kill_timer = threading.Timer(self.termination_grace_seconds, self._kill_after_timeout)
+        self._kill_timer.daemon = True
+        self._kill_timer.start()
+
     def _wait_with_terminal(self, process: subprocess.Popen[Any], terminal_fd: int) -> int:
         parent_group = os.getpgrp()
         previous_ttou = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
@@ -220,6 +248,7 @@ class ManagedNativeSession:
             popen_options = {"process_group": 0}
         try:
             child_environment = os.environ.copy()
+            child_environment.update(self.environment)
             child_environment.update(
                 {
                     "VEYRO_SESSION_ID": self.record.session_id,
@@ -266,6 +295,11 @@ class ManagedNativeSession:
         previous_handlers = {
             signum: signal.signal(signum, self._forward_signal) for signum in watched_signals
         }
+        deadline = None
+        if self.timeout_seconds is not None:
+            deadline = threading.Timer(self.timeout_seconds, self._deadline_reached)
+            deadline.daemon = True
+            deadline.start()
         try:
             exit_code = (
                 self._wait_with_terminal(process, terminal_fd)
@@ -273,11 +307,18 @@ class ManagedNativeSession:
                 else process.wait()
             )
         finally:
+            if deadline is not None:
+                deadline.cancel()
+                deadline.join()
+            if self._kill_timer is not None:
+                self._kill_timer.cancel()
             for signum, handler in previous_handlers.items():
                 signal.signal(signum, handler)
             self._stop_monitor.set()
             monitor.join(timeout=max(1.0, self.snapshot_interval_seconds + 0.5))
 
+        if self._timed_out:
+            exit_code = 124
         self.record.exit_code = exit_code
         self.record.finished_at = _now()
         if self._received_signal is not None:

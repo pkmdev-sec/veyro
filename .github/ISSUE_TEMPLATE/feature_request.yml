@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose a focused capability or workflow improvement
+title: "feature: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem cannot be solved with the current supported or experimental commands?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable behavior, not an implementation.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Existing-session observation
+        - Policy-gated controls
+        - Experimental native tasks
+        - Local evaluation
+        - Packaging and release
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Trust-boundary impact
+      description: Explain any effect on privacy, native permissions, model authority, approval, or delivery recovery.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What existing command or workflow did you try?

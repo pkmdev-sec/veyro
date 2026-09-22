@@ -55,9 +55,7 @@ Keep the same authoritative delivery ledger for an existing delivery scope.
 An explicit `--ledger-dir` does not change just because the package name changed.
 Claims still bind repository, provider, native session, and command ID. Do not
 move to an empty or cloned ledger, delete claims, or mint IDs to retry uncertainty.
-A new package name is not permission to repeat a native control. The experimental
-Codex queue seam also has private intent records; do not enable it on a fresh
-journal for an old session until the operator reconciles all prior queue attempts.
+A new package name is not permission to repeat a native control.
 
 Observe-only is still the default. No pinned native adapter qualifies for automatic
 delivery. Start with read-only discovery and attachment, inspect the reported
@@ -66,15 +64,19 @@ history limits, and follow the [operator guide](supervision-operator-guide.md).
 ## Verify the renamed build
 
 ```sh
-uv build --offline
+uv build --offline --out-dir dist
 .venv/bin/python tools/check_release.py \
-  dist/veyro_factory-0.4.0-py3-none-any.whl dist/veyro_factory-0.4.0.tar.gz
+  dist/veyro_factory-0.4.0-py3-none-any.whl dist/veyro_factory-0.4.0.tar.gz \
+  > dist/release-receipt.json
 .venv/bin/python -m pytest -q
 ```
 
-The release checker verifies names, entry points, source inputs, and private-file
-exclusions. `--retired-name NAME` also scans both archives for a previous name.
-[Recorded 0.4 release verification](rename-verification.json) records the source digest,
-test results, clean wheel installation and replay, a wheel rebuilt from the source
-archive, and four new native canary results. Historical reports remain labeled as
-pre-rename evidence. The pre-existing noisy-events timing failure is not hidden.
+The release checker validates names, entry points, required source inputs, private-file exclusions,
+materialized-sdist documentation, and wheel-to-sdist Python payload identity. The deterministic
+receipt binds both artifact hashes and a canonical manifest of every sdist source. It has
+`authority: artifact_only` and `production_qualified: false`; it does not close G4, G6, or any
+provider qualification. `--retired-name NAME` also scans both archives for a previous name.
+
+[Recorded 0.4 release verification](rename-verification.json) is historical evidence for an earlier
+artifact. It records source and installation checks from that run; it is not the current receipt and
+does not qualify the current dirty tree or its model behavior.

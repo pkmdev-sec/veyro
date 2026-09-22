@@ -4,18 +4,18 @@ import asyncio
 from collections.abc import Awaitable, Callable
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, computed_field, model_validator
 
 from veyro.bridges.base import AgentBridge
 from veyro.models import (
     AuthorizationOutcome,
-    AuthorizationReason,
     AuthorizedControlResult,
     BoundaryAction,
     BoundaryDecision,
-    BoundaryDisposition,
     ControlAction,
     ControlAuthorization,
+    ControlEffect,
+    ControlEffectStatus,
     ControlOutcome,
     ControlRequest,
     HumanApprovalEvidence,
@@ -25,7 +25,7 @@ from veyro.models import (
     SupervisionEventType,
     SupervisionSessionState,
 )
-from veyro.models.rollout import RolloutMode, RolloutPolicy
+from veyro.models.rollout import RolloutPolicy
 from veyro.supervision.authorization import (
     AuthorizedControlDispatcher,
     ControlAuthorizationGate,
@@ -52,6 +52,11 @@ class ControlLoopEvidence(BaseModel):
     assessment: SupervisionAssessment | None = None
     control: AuthorizedControlResult
     verification_event: SupervisionEvent | None = None
+
+    @computed_field
+    @property
+    def effect(self) -> ControlEffect:
+        return self.control.effect
 
     @model_validator(mode="after")
     def evidence_is_bound_to_one_decision(self) -> Self:
@@ -86,20 +91,39 @@ class ControlLoopEvidence(BaseModel):
             or self.verification_event.sequence <= self.trigger_event.sequence
         ):
             raise ValueError("provider verification is stale or belongs to another session")
+        terminal_verification = (
+            self.verification_event is not None
+            and self.verification_event.event_type
+            in {
+                SupervisionEventType.SESSION_COMPLETED,
+                SupervisionEventType.SESSION_FAILED,
+            }
+        )
+        if self.control.effect.status is ControlEffectStatus.VERIFIED and not (
+            self.request.intent.action is ControlAction.STOP_SESSION
+            and self.control.result is not None
+            and self.control.result.outcome is ControlOutcome.EXECUTED
+            and terminal_verification
+        ):
+            raise ValueError("verified effects require an executed stop and terminal event")
+        if (
+            self.control.effect.status is ControlEffectStatus.VERIFIED
+            and self.verification_event is not None
+            and self.control.effect.native_event is not self.verification_event.event_type
+        ):
+            raise ValueError("effect evidence does not match the terminal provider event")
+        if (
+            self.verification_event is not None
+            and self.control.effect.status is not ControlEffectStatus.VERIFIED
+        ):
+            raise ValueError("terminal verification must classify the effect as verified")
         if (
             self.request.intent.action is ControlAction.STOP_SESSION
             and self.control.result is not None
             and self.control.result.outcome is ControlOutcome.EXECUTED
-            and (
-                self.verification_event is None
-                or self.verification_event.event_type
-                not in {
-                    SupervisionEventType.SESSION_COMPLETED,
-                    SupervisionEventType.SESSION_FAILED,
-                }
-            )
+            and self.control.effect.status is ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED
         ):
-            raise ValueError("executed session stops require a terminal provider event")
+            raise ValueError("control-loop stop evidence must finalize acknowledged delivery")
         return self
 
 
@@ -122,6 +146,7 @@ class SupervisionControlLoop:
         gate = ControlAuthorizationGate(policy)
         self.boundary_policy = boundary_policy or gate.boundary_policy
         self.dispatcher = AuthorizedControlDispatcher(bridge, gate, ledger=ledger)
+        self.ledger = ledger
         self._lock = asyncio.Lock()
 
     async def run_control(
@@ -148,39 +173,8 @@ class SupervisionControlLoop:
 
             state = self.reducer.apply(event)
             boundary = self.boundary_policy.classify(boundary_action)
-            preflight = self.dispatcher.gate.authorize(
-                request,
-                capabilities=self.bridge.capabilities,
-                bridge_identity=self.bridge.identity,
-                state=state,
-                boundary=boundary,
-                human_approval=human_approval,
-            )
             checkpoint = None
             assessment = None
-            if (
-                self.dispatcher.gate.policy.mode is not RolloutMode.OBSERVE_ONLY
-                and boundary.disposition is not BoundaryDisposition.FORBIDDEN
-                and (
-                    preflight.outcome is not AuthorizationOutcome.DENIED
-                    or preflight.reason
-                    in {
-                        AuthorizationReason.SEMANTIC_EVIDENCE_REQUIRED,
-                        AuthorizationReason.ADVISORY_ONLY,
-                    }
-                )
-            ):
-                if self.assessments is None:
-                    raise ControlLoopError("an authoritative assessment service is required")
-                checkpoint = self.assessments.selector.select(
-                    event, state, boundary_decision=boundary
-                )
-                assessment = await self.assessments.assess_if_needed(
-                    event,
-                    state,
-                    boundary_decision=boundary,
-                    task_context=task_context,
-                )
             control = await self.dispatcher.dispatch(
                 request,
                 state=state,
@@ -210,10 +204,30 @@ class SupervisionControlLoop:
                 and control.result.outcome is ControlOutcome.EXECUTED
                 and request.intent.action is ControlAction.STOP_SESSION
             ):
-                verification_event = await self._wait_for_stopped_session(
-                    after_sequence=event.sequence,
-                    timeout_seconds=verification_timeout,
-                )
+                try:
+                    verification_event = await self._wait_for_stopped_session(
+                        after_sequence=event.sequence,
+                        timeout_seconds=verification_timeout,
+                    )
+                except ControlLoopError:
+                    effect = ControlEffect(status=ControlEffectStatus.UNKNOWN)
+                    control = control.model_copy(update={"effect": effect})
+                    await self._commit_final_effect(request, effect)
+                except BaseException:
+                    effect = ControlEffect(status=ControlEffectStatus.UNKNOWN)
+                    receipt = asyncio.create_task(self._commit_final_effect(request, effect))
+                    try:
+                        await asyncio.shield(receipt)
+                    except asyncio.CancelledError:
+                        await receipt
+                    raise
+                else:
+                    effect = ControlEffect(
+                        status=ControlEffectStatus.VERIFIED,
+                        native_event=verification_event.event_type,
+                    )
+                    control = control.model_copy(update={"effect": effect})
+                    await self._commit_final_effect(request, effect)
             return ControlLoopEvidence(
                 trigger_event=event,
                 reduced_state=state,
@@ -224,6 +238,19 @@ class SupervisionControlLoop:
                 control=control,
                 verification_event=verification_event,
             )
+
+    async def _commit_final_effect(
+        self, request: ControlRequest, effect: ControlEffect
+    ) -> None:
+        if self.ledger is None:
+            raise ControlLoopError("executed control has no delivery ledger")
+        await asyncio.to_thread(
+            self.ledger.commit_final_effect,
+            session=request.session,
+            command_id=request.command_id,
+            effect=effect.status,
+            native_event=effect.native_event,
+        )
 
     async def _wait_for_stopped_session(
         self,

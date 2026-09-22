@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-09-20T07:34:19.973987+00:00",
+  "platform": "Darwin",
+  "python": "3.12.12",
+  "result": {
+    "kind": "live_native_tui",
+    "native_cleanup": {
+      "success": true
+    },
+    "agent": "opencode",
+    "native_executable": "~/.opencode/bin/opencode",
+    "version": "1.18.31",
+    "model": "qwen3:14b",
+    "model_manifest_digest": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "model_requests": [
+      {
+        "timestamp": 1789889666460,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      },
+      {
+        "timestamp": 1789889927796,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      },
+      {
+        "timestamp": 1789889944222,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      },
+      {
+        "timestamp": 1789889958346,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      },
+      {
+        "timestamp": 1789889993219,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      },
+      {
+        "timestamp": 1789890011485,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      },
+      {
+        "timestamp": 1789890066492,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      },
+      {
+        "timestamp": 1789890083499,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      },
+      {
+        "timestamp": 1789890089125,
+        "provider": "veyro-local",
+        "model": "qwen3:14b",
+        "endpoint": "http://127.0.0.1:11434/v1",
+        "purpose": "build"
+      }
+    ],
+    "local_profile": "14b",
+    "phase": "completed",
+    "adapter_error": null,
+    "judge_enabled": true,
+    "judge_result": {
+      "protocol": "native-rubric-v3",
+      "readout_protocol": "qwen-label-readout-v1",
+      "status": "passed",
+      "scores": {
+        "docstring_present": 0.9999999999085585,
+        "implementation_present": 0.9999999999905229
+      },
+      "calibrated": false,
+      "pass_threshold": 0.9,
+      "rubric_version": "local-native-canary-v1",
+      "rubric_sha256": "716032f3b0709d9466a10a3edd853840b39b60db2a7023b8adc884771f903dac",
+      "task_sha256": "72ecb7d0b496ec7e7bd8cf75a5099898b457a1098f204543365183f43d159fcd",
+      "evidence_sha256": "59658f2cdefcaa20548f849619c5a9af3f8af88021e422e02e3a773e9be5b1b4",
+      "provenance": {
+        "docstring_present": {
+          "provider": "local-readout",
+          "profile": "14b",
+          "model": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+          "source": "uncalibrated_label_logits",
+          "calibration_schema_sha256": "c7bec85d38612a8f637a620eaed3a8359f708ccb5fea24c938578e02f51d45e7",
+          "calibration_sha256": null
+        },
+        "implementation_present": {
+          "provider": "local-readout",
+          "profile": "14b",
+          "model": "qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+          "source": "uncalibrated_label_logits",
+          "calibration_schema_sha256": "04e34bbe5338aa28ff30cc6b759c3deaf7e190d32b20f671a07c96559924b4c3",
+          "calibration_sha256": null
+        }
+      },
+      "metrics": {
+        "latency_ms": 8129.1320829768665,
+        "prefill_ms": 6640.566666028462,
+        "branch_ms": 1412.466416019015,
+        "prefix_tokens": 305,
+        "prefix_cache_hit": false,
+        "branch_tokens": 101,
+        "generated_tokens": 0,
+        "questions": 2
+      },
+      "latency_ms": 8209.47745803278,
+      "process_latency_ms": 8959.24495899817
+    },
+    "elapsed_seconds": 479.5464259170112,
+    "assertions_passed": 8,
+    "assertions_total": 8,
+    "accuracy": 1.0,
+    "verifier_unchanged": true,
+    "transitions": [
+      "plan_ready",
+      "checks_and_judge_passed"
+    ],
+    "checkpoint_latency_ms": [
+      3.363916010130197,
+      9100.11833300814
+    ],
+    "artifact_directory": "/var/folders/mg/wdx8vj9d419dcvk_v8_xs82c0000gn/T/veyro-live-opencode-g7slbtf0",
+    "human_task_inputs": 0,
+    "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout."
+  }
+}

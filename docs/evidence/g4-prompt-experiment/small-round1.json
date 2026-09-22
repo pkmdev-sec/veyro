@@ -1,0 +1,248 @@
+[
+ {
+  "variant": "A-current-baseline",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 2,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "def slug(text):\n    \"\"\"\n    Convert text to a slug by replacing runs of non-ASCII letters and digits with hyphens,\n    and trimming leading and trailing hyphens.\n    \n    Args:\n        text (str): Input text to convert\n        \n    Returns:\n        str: Slug in lowercase with only ASCII letters, digits, and hyphens\n    \"\"\"\n    result = \"\"\n    for char in text:\n        if char.isascii() and char.isalnum():\n            result += char.lower()\n        else:\n            if result and result[-1] != '-':\n                result += '-'\n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    return result if result else ''"
+ },
+ {
+  "variant": "A-current-baseline",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 1,
+  "passed": 7,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ]
+  ],
+  "code": "def slug(text):\n    \"\"\"Convert text to slug: lowercase ASCII letters and digits, replace runs of other characters with hyphens, trim hyphens.\"\"\"\n    result = \"\"\n    for char in text:\n        if char.isalnum():\n            result += char.lower()\n        else:\n            if result and result[-1] != '-':\n                result += '-'\n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    return result"
+ },
+ {
+  "variant": "A-current-baseline",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 3,
+  "passed": 7,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ]
+  ],
+  "code": "def slug(text):\n    \"\"\"\n    Convert text to a slug: lowercase ASCII letters and digits,\n    replace each run of other characters with one hyphen,\n    and trim leading and trailing hyphens.\n    \"\"\"\n    result = \"\"\n    for char in text:\n        if char.isalnum():\n            result += char.lower()\n        else:\n            if result and result[-1] != '-':\n                result += '-'\n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    return result"
+ },
+ {
+  "variant": "B-explicit-nonascii",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 1,
+  "passed": 5,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    \"\"\"\n    Convert text to a slug by replacing non-ASCII letters and digits with hyphens,\n    and trimming leading/trailing hyphens.\n    \n    Args:\n        text (str): Input text to convert\n        \n    Returns:\n        str: Slug in lowercase ASCII letters and digits, with hyphens replacing runs\n             of non-ASCII or non-alphanumeric characters\n    \"\"\"\n    result = \"\"\n    for char in text:\n        if char.isascii() and char.isalpha():\n            result += char.lower()\n        elif char.isdigit():\n            result += char\n        else:\n            # Non-ASCII or non-alphanumeric character - replace with hyphen\n            result += \"-\"\n    \n    # Trim leading and trailing hyphens\n    result = result.strip(\"-\")\n    \n    return result"
+ },
+ {
+  "variant": "B-explicit-nonascii",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 2,
+  "passed": 5,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    \"\"\"\n    Convert text to a slug by replacing non-ASCII letters and digits with hyphens,\n    ensuring only lowercase ASCII letters and digits remain.\n    \"\"\"\n    result = \"\"\n    for char in text:\n        if char.isascii() and char.isalpha():\n            if char.islower():\n                result += char\n            else:\n                result += char.lower()\n        elif char.isdigit():\n            result += char\n        else:\n            result += '-'\n    \n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    \n    return result"
+ },
+ {
+  "variant": "B-explicit-nonascii",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 3,
+  "passed": 5,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    " Hello, World! ",
+    "ello-orld",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "",
+    "a-b-c"
+   ],
+   [
+    "CAF\u00c9",
+    "",
+    "caf"
+   ]
+  ],
+  "code": "def slug(text):\n    \"\"\"\n    Convert text to a slug: lowercase ASCII letters and digits, \n    replace each run of other characters with one hyphen, and trim hyphens.\n    \n    Args:\n        text (str): Input text to convert\n        \n    Returns:\n        str: Slug representation of the input text\n    \"\"\"\n    result = []\n    i = 0\n    while i < len(text):\n        char = text[i]\n        if char.isascii() and char.islower() and char.isalpha():\n            result.append(char)\n        elif char.isdigit():\n            result.append(char)\n        else:\n            # For any non-ASCII or non-lowercase-alphabet or non-digit character\n            # Replace with a hyphen\n            if len(result) > 0 and result[-1] == '-':\n                # If previous character was '-', we don't need to add another\n                pass\n            else:\n                result.append('-')\n        i += 1\n    \n    # Join the result list into a string\n    slug_str = ''.join(result)\n    \n    # Trim leading and trailing hyphens\n    slug_str = slug_str.strip('-')\n    \n    return slug_str"
+ },
+ {
+  "variant": "C-warn-regex-class",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 1,
+  "passed": 5,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    result = \"\"\n    for char in text:\n        if char.isascii() and char.isalnum():\n            result += char.lower()\n        elif char.isascii() and char == ' ':\n            result += '-'\n        else:\n            result += '-'\n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    return result"
+ },
+ {
+  "variant": "C-warn-regex-class",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 2,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "def slug(text):\n    result = \"\"\n    for char in text:\n        if char.isascii() and char.isalnum():\n            result += char.lower()\n        elif char.isascii() and not char.isalnum():\n            if result and result[-1] != '-':\n                result += '-'\n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    return result"
+ },
+ {
+  "variant": "C-warn-regex-class",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 3,
+  "passed": 5,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    result = \"\"\n    for char in text:\n        if char.isascii() and char.isalnum():\n            result += char.lower()\n        elif char == ' ':\n            result += '-'\n        else:\n            result += '-'\n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    return result"
+ },
+ {
+  "variant": "D-worked-example",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 1,
+  "passed": 8,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [],
+  "code": "def slug(text):\n    \"\"\"\n    Convert text to a slug: lowercase ASCII letters and digits,\n    replace each run of other characters with a single hyphen,\n    and trim leading and trailing hyphens.\n    \n    Args:\n        text (str): Input string to convert\n        \n    Returns:\n        str: Slug representation of the input text\n    \"\"\"\n    # Convert to lowercase\n    text = text.lower()\n    \n    # Replace runs of non-ASCII letters/digits with hyphens\n    result = \"\"\n    i = 0\n    while i < len(text):\n        char = text[i]\n        if char.isascii() and char.isalnum():\n            result += char\n            i += 1\n        else:\n            # Found non-alphanumeric ASCII character\n            # Skip all consecutive non-alphanum characters\n            # Replace with a single hyphen\n            if result and result[-1] != '-':\n                result += '-'\n            i += 1\n    \n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    \n    return result"
+ },
+ {
+  "variant": "D-worked-example",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 2,
+  "passed": 5,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": true,
+  "fails": [
+   [
+    " Hello, World! ",
+    "hello--world",
+    "hello-world"
+   ],
+   [
+    "A___B---C",
+    "a---b---c",
+    "a-b-c"
+   ],
+   [
+    "a  -- !! b",
+    "a--------b",
+    "a-b"
+   ]
+  ],
+  "code": "def slug(text):\n    # Replace each run of non-ASCII letters and digits with a hyphen\n    result = \"\"\n    for char in text:\n        if char.isascii() and char.isalnum():\n            result += char.lower()\n        else:\n            result += '-'\n    \n    # Trim leading and trailing hyphens\n    result = result.strip('-')\n    \n    return result"
+ },
+ {
+  "variant": "D-worked-example",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "seed": 3,
+  "passed": 7,
+  "error": null,
+  "uses_\\\\W": false,
+  "unicode_ok": false,
+  "fails": [
+   [
+    "CAF\u00c9",
+    "caf\u00e9",
+    "caf"
+   ]
+  ],
+  "code": "def slug(text):\n    result = \"\"\n    for char in text:\n        if char.islower() or char.isdigit():\n            result += char\n        elif char.isalpha():\n            result += char.lower()\n        else:\n            if result and result[-1] != '-':\n                result += '-'\n    # Remove leading and trailing hyphens\n    result = result.strip('-')\n    return result"
+ }
+]

@@ -24,12 +24,11 @@ from veyro.models import (
     ControlRequest,
     HumanApprovalEvidence,
 )
-from veyro.models.rollout import RolloutMode, RolloutPolicy
+from veyro.models.rollout import RolloutPolicy
 from veyro.models.supervision import ContractModel
 from veyro.supervision.authorization import control_request_sha256
 from veyro.supervision.checkpoints import (
     AUTHORITATIVE_MODEL_CHECKPOINT,
-    AUTHORITATIVE_PROVIDER_ID,
     CheckpointAssessmentService,
     LocalJevCheckpointAssessor,
 )
@@ -125,16 +124,18 @@ async def connect_bridge(
     )
 
 
+
+
 def authoritative_assessments() -> CheckpointAssessmentService:
     model = JevVeyroModel(
-        provider_id=AUTHORITATIVE_PROVIDER_ID,
+        provider_id="localjev-qwen3-14b",
         base_url="http://127.0.0.1:8080",
         api_key="loopback-localjev",
         model="jev-latest",
         checkpoint=AUTHORITATIVE_MODEL_CHECKPOINT,
         role="authoritative",
-        timeout_seconds=120,
-        max_state_characters=50000,
+        timeout_seconds=180,
+        max_state_characters=50_000,
         state_format="json",
         strict_scores=True,
     )
@@ -154,17 +155,13 @@ async def supervise_proposal(
     ledger_directory: Path | None = None,
     approval_reader: Callable[[], Awaitable[HumanApprovalEvidence]] = read_approval,
 ) -> None:
-    executing_mode = policy.mode in {RolloutMode.APPROVAL_REQUIRED, RolloutMode.AUTOMATIC}
-    if executing_mode and ledger_directory is None:
-        raise ValueError("executing modes require an explicit persistent ledger directory")
-    ledger = DeliveryLedger(ledger_directory) if executing_mode else None
+    if ledger_directory is None:
+        raise ValueError("supervision requires an explicit persistent ledger directory")
+    ledger = DeliveryLedger(ledger_directory)
     bridge = None
-    assessments = None
     try:
         bridge = await connect_bridge(provider, repository, selector, socket=socket, server=server)
-        if policy.mode is not RolloutMode.OBSERVE_ONLY:
-            assessments = authoritative_assessments()
-        loop = SupervisionControlLoop(bridge, assessments, policy=policy, ledger=ledger)
+        loop = SupervisionControlLoop(bridge, None, policy=policy, ledger=ledger)
         await asyncio.sleep(0)
         events = bridge.events()
         try:
@@ -222,6 +219,7 @@ async def supervise_proposal(
                     if result is not None
                     else None
                 ),
+                "effect": evidence.effect.model_dump(mode="json"),
                 "checkpoint_id": evidence.checkpoint.checkpoint_id if evidence.checkpoint else None,
                 "verification": (
                     evidence.verification_event.event_type.value
@@ -231,9 +229,5 @@ async def supervise_proposal(
             }
         )
     finally:
-        try:
-            if bridge is not None:
-                await bridge.close()
-        finally:
-            if assessments is not None:
-                await assessments.close()
+        if bridge is not None:
+            await bridge.close()

@@ -6,10 +6,11 @@ structured evidence at review checkpoints. Veyro, not the model, authorizes cont
 
 ## Model sizes and release status
 
-**Qwen3 14B** is the pinned assessor in the released path below. **Qwen3 4B Instruct**
-is a lower-memory development profile; it is not merged into `main` and has no edge in
-this control flow. The separate local GGUF readout experiments are unmerged for both
-sizes. See the [model comparison](qwen-models.md) for tags, use cases, and limits.
+**Qwen3 14B** remains the historical pinned localjev assessor in the existing-session path below.
+The separate strict-local autonomous task path uses **Qwen3 Coder 30B** through OpenCode,
+authoritative executable checks, then optional **Laya typed-decisions** evaluation. That task path does not grant
+model scores control authority. G4 native-task qualification and G6 calibration remain
+open. See the [model-role guide](qwen-models.md) for tags, boundaries, and limits.
 
 ## Existing-session data flow
 
@@ -60,7 +61,9 @@ still act outside Veyro, subject to their own permissions. The
 
 ## The separate factory loop
 
-`veyro run` starts workers and assesses their progress while they execute.
+The top-level `run` command is unavailable because its workers cannot enforce pinned
+loopback-only inference. The retained internal factory architecture historically started workers
+and assessed their progress while they executed.
 `FactoryRuntime` coalesces worker events, `ObservationBuilder` gathers bounded
 state, and `FactoryPolicy` interprets nine model scores with worker/retry limits.
 This loop can persist task text and agent output. It does not have the same

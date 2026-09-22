@@ -21,6 +21,9 @@ from veyro.models import (
     CapabilitySet,
     ControlAction,
     ControlAuthorization,
+    ControlEffect,
+    ControlEffectStatus,
+    ControlOutcome,
     ControlRequest,
     ControlResult,
     HumanApprovalEvidence,
@@ -32,17 +35,19 @@ from veyro.models import (
 from veyro.models.rollout import RolloutMode, RolloutPolicy
 from veyro.models.supervision_state import SessionProgress
 from veyro.supervision.boundary_policy import BoundaryPolicy
-from veyro.supervision.checkpoints import (
-    AUTHORITATIVE_MODEL_CHECKPOINT,
-    AUTHORITATIVE_PROVIDER_ID,
-    CHECKPOINT_QUESTIONS_VERSION,
-)
-from veyro.supervision.delivery import DeliveryError, DeliveryLedger
+from veyro.supervision.delivery import DeliveryClaim, DeliveryError, DeliveryLedger
 
 
 def control_request_sha256(request: ControlRequest) -> str:
     payload = json.dumps(
         request.model_dump(mode="json"), separators=(",", ":"), sort_keys=True
+    ).encode()
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _evidence_sha256(value: ControlAuthorization | ControlResult) -> str:
+    payload = json.dumps(
+        value.model_dump(mode="json"), separators=(",", ":"), sort_keys=True
     ).encode()
     return hashlib.sha256(payload).hexdigest()
 
@@ -57,7 +62,9 @@ class ExecutableBridge(Protocol):
     @property
     def capabilities(self) -> CapabilitySet: ...
 
-    async def execute(self, request: ControlRequest) -> ControlResult: ...
+    async def execute_if_current(
+        self, request: ControlRequest, *, expected_sequence: int
+    ) -> ControlResult | None: ...
 
 
 class ControlAuthorizationGate:
@@ -228,28 +235,23 @@ class ControlAuthorizationGate:
                     approval_id=human_approval.approval_id,
                 )
 
-        semantic_valid = self._semantic_evidence_valid(
-            request, state, boundary, checkpoint, assessment
-        )
-        if boundary.disposition is BoundaryDisposition.REVIEW_REQUIRED and assessment is None:
-            return result(
-                AuthorizationOutcome.DENIED,
-                AuthorizationReason.SEMANTIC_EVIDENCE_REQUIRED,
-                "review-required actions need a current authoritative checkpoint assessment",
-            )
-        if (checkpoint is not None or assessment is not None) and not semantic_valid:
-            return result(
-                AuthorizationOutcome.DENIED,
-                AuthorizationReason.SEMANTIC_EVIDENCE_INVALID,
-                "semantic evidence is stale, mismatched, or not authoritative",
-            )
-
         if self.policy.mode is RolloutMode.ADVISORY:
             return result(
                 AuthorizationOutcome.DENIED,
                 AuthorizationReason.ADVISORY_ONLY,
                 "advisory mode reports a recommendation but never delivers controls",
-                checkpoint_id=assessment.checkpoint_id if assessment else None,
+            )
+        if checkpoint is not None or assessment is not None:
+            return result(
+                AuthorizationOutcome.DENIED,
+                AuthorizationReason.SEMANTIC_EVIDENCE_INVALID,
+                "configured assessment labels do not prove authoritative semantic evidence",
+            )
+        if boundary.disposition is BoundaryDisposition.REVIEW_REQUIRED:
+            return result(
+                AuthorizationOutcome.DENIED,
+                AuthorizationReason.SEMANTIC_EVIDENCE_REQUIRED,
+                "review-required actions need qualified semantic evidence",
             )
         intent = request.intent
         automatically_allowed = (
@@ -260,16 +262,11 @@ class ControlAuthorizationGate:
         )
         human_required = (
             not automatically_allowed
-            or boundary.disposition is BoundaryDisposition.REVIEW_REQUIRED
             or stability is not BridgeStability.STABLE
             or intent.action in {ControlAction.INTERRUPT_TURN, ControlAction.STOP_SESSION}
             or (
                 intent.action is ControlAction.REPLY_TO_APPROVAL
                 and intent.decision is ApprovalDecision.APPROVE
-            )
-            or (
-                assessment is not None
-                and (assessment.needs_human >= 0.8 or assessment.safe_to_continue < 0.2)
             )
         )
         if not human_required:
@@ -277,7 +274,6 @@ class ControlAuthorizationGate:
                 AuthorizationOutcome.AUTHORIZED,
                 AuthorizationReason.AUTHORIZED,
                 "stable supported low-risk control is authorized",
-                checkpoint_id=assessment.checkpoint_id if assessment else None,
             )
 
         if human_approval is None:
@@ -285,46 +281,14 @@ class ControlAuthorizationGate:
                 AuthorizationOutcome.HUMAN_APPROVAL_REQUIRED,
                 AuthorizationReason.HUMAN_APPROVAL_REQUIRED,
                 "this control requires explicit human approval",
-                checkpoint_id=assessment.checkpoint_id if assessment else None,
             )
         return result(
             AuthorizationOutcome.AUTHORIZED,
             AuthorizationReason.AUTHORIZED,
             "control is authorized with current human approval",
-            checkpoint_id=assessment.checkpoint_id if assessment else None,
             approval_id=human_approval.approval_id,
         )
 
-    @staticmethod
-    def _semantic_evidence_valid(
-        request: ControlRequest,
-        state: SupervisionSessionState,
-        boundary: BoundaryDecision,
-        checkpoint: SupervisionCheckpoint | None,
-        assessment: SupervisionAssessment | None,
-    ) -> bool:
-        if checkpoint is None and assessment is None:
-            return True
-        if checkpoint is None or assessment is None:
-            return False
-        provenance = assessment.provenance
-        return (
-            checkpoint.session == request.session
-            and checkpoint.sequence == state.last_sequence
-            and (
-                checkpoint.boundary_decision == boundary
-                if boundary.disposition is BoundaryDisposition.REVIEW_REQUIRED
-                else (
-                    checkpoint.boundary_decision is None or checkpoint.boundary_decision == boundary
-                )
-            )
-            and assessment.checkpoint_id == checkpoint.checkpoint_id
-            and assessment.checkpoint_sequence == checkpoint.sequence
-            and provenance.role == "authoritative"
-            and provenance.provider_id == AUTHORITATIVE_PROVIDER_ID
-            and provenance.checkpoint == AUTHORITATIVE_MODEL_CHECKPOINT
-            and provenance.question_version == CHECKPOINT_QUESTIONS_VERSION
-        )
 
 
 class AuthorizedControlDispatcher:
@@ -359,16 +323,21 @@ class AuthorizedControlDispatcher:
                     "detail": "native observations advanced; reassess before another proposal",
                 }
             )
+        await self._record_authorization(request, authorization)
         if authorization.outcome is not AuthorizationOutcome.AUTHORIZED:
-            return AuthorizedControlResult(authorization=authorization)
+            return AuthorizedControlResult(
+                authorization=authorization,
+                effect=ControlEffect(status=ControlEffectStatus.NOT_APPLICABLE),
+            )
         reason = None
+        claim = None
         if self.bridge.last_event_sequence != evidence["state"].last_sequence:
             reason = AuthorizationReason.STALE_OBSERVATION
         elif self.ledger is None:
             reason = AuthorizationReason.DELIVERY_UNAVAILABLE
         else:
             try:
-                await asyncio.to_thread(
+                claim = await asyncio.to_thread(
                     self.ledger.claim,
                     session=request.session,
                     command_id=request.command_id,
@@ -384,23 +353,138 @@ class AuthorizedControlDispatcher:
                     "detail": "stale observation or unavailable delivery claim; no control sent",
                 }
             )
-            return AuthorizedControlResult(authorization=authorization)
-        authorization = self.gate.authorize(
-            request,
-            capabilities=self.bridge.capabilities,
-            bridge_identity=self.bridge.identity,
-            **{**evidence, "now": datetime.now(UTC)},
-        )
-        if self.bridge.last_event_sequence != evidence["state"].last_sequence:
+            await self._record_authorization(request, authorization)
+            return AuthorizedControlResult(
+                authorization=authorization,
+                effect=ControlEffect(status=ControlEffectStatus.NOT_APPLICABLE),
+            )
+        if claim is None or self.ledger is None:
+            raise DeliveryError("delivery claim is unavailable")
+        claimed_authorization = authorization
+        try:
+            authorization = self.gate.authorize(
+                request,
+                capabilities=self.bridge.capabilities,
+                bridge_identity=self.bridge.identity,
+                **{**evidence, "now": datetime.now(UTC)},
+            )
+            if self.bridge.last_event_sequence != evidence["state"].last_sequence:
+                authorization = authorization.model_copy(
+                    update={
+                        "outcome": AuthorizationOutcome.DENIED,
+                        "reason": AuthorizationReason.STALE_OBSERVATION,
+                        "detail": (
+                            "observation changed during persistence; "
+                            "claim retained; no delivery"
+                        ),
+                    }
+                )
+            await self._record_authorization(request, authorization)
+            if (
+                authorization.outcome is AuthorizationOutcome.AUTHORIZED
+                and self.bridge.last_event_sequence != evidence["state"].last_sequence
+            ):
+                authorization = authorization.model_copy(
+                    update={
+                        "outcome": AuthorizationOutcome.DENIED,
+                        "reason": AuthorizationReason.STALE_OBSERVATION,
+                        "detail": (
+                            "observation changed after authorization persistence; "
+                            "claim retained; no delivery"
+                        ),
+                    }
+                )
+                await self._record_authorization(request, authorization)
+        except BaseException:
+            await self._commit_unknown_attempt(claim, claimed_authorization)
+            raise
+        if authorization.outcome is not AuthorizationOutcome.AUTHORIZED:
+            await asyncio.to_thread(
+                self.ledger.commit_attempt,
+                claim,
+                authorization_sha256=_evidence_sha256(authorization),
+                result_sha256=None,
+                effect=ControlEffectStatus.NOT_APPLICABLE,
+            )
+            return AuthorizedControlResult(
+                authorization=authorization,
+                effect=ControlEffect(status=ControlEffectStatus.NOT_APPLICABLE),
+            )
+        try:
+            control_result = await self.bridge.execute_if_current(
+                request, expected_sequence=evidence["state"].last_sequence
+            )
+            if control_result is not None:
+                validate_control_result(request, control_result, self.bridge.capabilities)
+        except BaseException:
+            await self._commit_unknown_attempt(claim, authorization)
+            raise
+        if control_result is None:
             authorization = authorization.model_copy(
                 update={
                     "outcome": AuthorizationOutcome.DENIED,
                     "reason": AuthorizationReason.STALE_OBSERVATION,
-                    "detail": "observation changed during persistence; claim retained; no delivery",
+                    "detail": "observation changed at delivery boundary; no control sent",
                 }
             )
-        if authorization.outcome is not AuthorizationOutcome.AUTHORIZED:
-            return AuthorizedControlResult(authorization=authorization)
-        control_result = await self.bridge.execute(request)
-        validate_control_result(request, control_result, self.bridge.capabilities)
-        return AuthorizedControlResult(authorization=authorization, result=control_result)
+            await self._record_authorization(request, authorization)
+            await asyncio.to_thread(
+                self.ledger.commit_attempt,
+                claim,
+                authorization_sha256=_evidence_sha256(authorization),
+                result_sha256=None,
+                effect=ControlEffectStatus.NOT_APPLICABLE,
+            )
+            return AuthorizedControlResult(
+                authorization=authorization,
+                effect=ControlEffect(status=ControlEffectStatus.NOT_APPLICABLE),
+            )
+        effect_status = (
+            ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED
+            if control_result.outcome is ControlOutcome.EXECUTED
+            else ControlEffectStatus.FAILED
+        )
+        await asyncio.to_thread(
+            self.ledger.commit_attempt,
+            claim,
+            authorization_sha256=_evidence_sha256(authorization),
+            result_sha256=_evidence_sha256(control_result),
+            effect=effect_status,
+        )
+        return AuthorizedControlResult(
+            authorization=authorization,
+            result=control_result,
+            effect=ControlEffect(status=effect_status),
+        )
+
+    async def _record_authorization(
+        self, request: ControlRequest, authorization: ControlAuthorization
+    ) -> None:
+        if self.ledger is None:
+            raise DeliveryError("delivery ledger is unavailable")
+        await asyncio.to_thread(
+            self.ledger.record_authorization,
+            session=request.session,
+            authorization_sha256=_evidence_sha256(authorization),
+            outcome=authorization.outcome,
+            reason=authorization.reason,
+        )
+
+    async def _commit_unknown_attempt(
+        self, claim: DeliveryClaim, authorization: ControlAuthorization
+    ) -> None:
+        if self.ledger is None:
+            raise DeliveryError("delivery ledger is unavailable")
+        receipt = asyncio.create_task(
+            asyncio.to_thread(
+                self.ledger.commit_attempt,
+                claim,
+                authorization_sha256=_evidence_sha256(authorization),
+                result_sha256=None,
+                effect=ControlEffectStatus.UNKNOWN,
+            )
+        )
+        try:
+            await asyncio.shield(receipt)
+        except asyncio.CancelledError:
+            await receipt

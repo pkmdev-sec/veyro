@@ -63,6 +63,11 @@ def test_jev_provider_rejects_invalid_boundaries(field, value) -> None:
         JevProviderConfig(**{field: value})
 
 
+def test_jev_provider_rejects_remote_endpoint() -> None:
+    with pytest.raises(ValueError, match="loopback"):
+        JevProviderConfig(base_url="https://remote.example")
+
+
 def clear_shadow_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in (
         "VEYRO_JEV_SHADOW_PROVIDER_ID",

@@ -230,86 +230,6 @@ async def test_unsupported_controls_are_honest(listener):
         assert answer.outcome is ControlOutcome.UNSUPPORTED
 
 
-async def queue_bridge(listener):
-    listener.capabilities = codex.codex_hook_capabilities(allow_queue=True)
-    event = listener._ingest(codex.sanitize_hook(native_hook(listener.repository)))
-    return listener.bridges[event.session.provider_session_id]
-
-
-async def test_queue_ack_is_exact_and_durable_at_most_once(listener, monkeypatch):
-    bridge = await queue_bridge(listener)
-    calls = []
-    queue_id = str(uuid4())
-
-    async def run(executable, args, **kwargs):
-        calls.append(args)
-        return (
-            0,
-            (
-                f"Queued message {queue_id} for thread {bridge.identity.provider_session_id}.\n"
-            ).encode(),
-        )
-
-    monkeypatch.setattr(codex, "_run_native", run)
-    request = ControlRequest(
-        session=bridge.identity, command_id="queue-1", intent=QueueFollowUp(message="SECRET")
-    )
-    result = await bridge.execute(request)
-    assert result.outcome is ControlOutcome.EXECUTED
-    validate_control_result(request, result, bridge.capabilities)
-    assert await bridge.execute(request) == result
-    assert len(calls) == 1
-    assert calls[0][1:3] == ["--thread", bridge.identity.provider_session_id]
-    for file in bridge.store.directory.glob("queue-*"):
-        assert "SECRET" not in file.read_text()
-    changed = request.model_copy(update={"intent": QueueFollowUp(message="different")})
-    assert (await bridge.execute(changed)).outcome is ControlOutcome.REJECTED
-    restarted = codex.CodexHookBridge(bridge.store, bridge.executable, bridge.codex_home)
-    assert await restarted.execute(request) == result
-    assert len(calls) == 1
-
-
-@pytest.mark.parametrize("failure", ["timeout", "bad-ack", "wrong-session", "exit"])
-async def test_uncertain_queue_is_not_retried(listener, monkeypatch, failure):
-    bridge = await queue_bridge(listener)
-    calls = []
-
-    async def run(*args, **kwargs):
-        calls.append(True)
-        if failure == "timeout":
-            raise TimeoutError
-        if failure == "wrong-session":
-            return 0, f"Queued message {uuid4()} for thread {uuid4()}.\n".encode()
-        return (1 if failure == "exit" else 0), b"SECRET"
-
-    monkeypatch.setattr(codex, "_run_native", run)
-    request = ControlRequest(
-        session=bridge.identity, command_id="queue", intent=QueueFollowUp(message="SECRET")
-    )
-    result = await bridge.execute(request)
-    assert result.outcome is ControlOutcome.FAILED
-    assert "uncertain" in result.detail
-    assert await bridge.execute(request) == result
-    assert len(calls) == 1
-    assert "SECRET" not in result.model_dump_json()
-
-
-async def test_pending_queue_claim_is_not_retried(listener, monkeypatch):
-    bridge = await queue_bridge(listener)
-
-    async def cancelled(*args, **kwargs):
-        raise asyncio.CancelledError
-
-    monkeypatch.setattr(codex, "_run_native", cancelled)
-    request = ControlRequest(
-        session=bridge.identity, command_id="queue", intent=QueueFollowUp(message="hello")
-    )
-    with pytest.raises(asyncio.CancelledError):
-        await bridge.execute(request)
-    answer = await bridge.execute(request)
-    assert answer.outcome is ControlOutcome.FAILED
-    assert "uncertain" in answer.detail
-
 
 async def test_unknown_native_version_fails_closed(tmp_path, monkeypatch):
     async def run(*args, **kwargs):
@@ -344,43 +264,6 @@ async def test_two_listeners_cannot_write_one_session(listener):
         await other.close()
 
 
-async def test_approval_gate_prevents_unapproved_queue(listener, monkeypatch):
-    from veyro.models import AuthorizationOutcome, BoundaryAction, BoundaryOperation
-    from veyro.models.rollout import RolloutPolicy
-    from veyro.supervision.authorization import (
-        AuthorizedControlDispatcher,
-        ControlAuthorizationGate,
-        control_request_sha256,
-    )
-    from veyro.supervision.boundary_policy import BoundaryPolicy
-
-    bridge = await queue_bridge(listener)
-    request = ControlRequest(
-        session=bridge.identity,
-        command_id="approval",
-        intent=QueueFollowUp(message="Run tests"),
-    )
-    boundary = BoundaryPolicy().classify(
-        BoundaryAction(
-            session=bridge.identity,
-            action_id=request.command_id,
-            operation=BoundaryOperation.READ_REPOSITORY,
-            target_sha256=control_request_sha256(request),
-        )
-    )
-    state = replay_session(bridge.identity, bridge.store.replay_events())
-
-    async def forbidden(*args, **kwargs):
-        pytest.fail("unapproved native command executed")
-
-    monkeypatch.setattr(codex, "_run_native", forbidden)
-    result = await AuthorizedControlDispatcher(
-        bridge,
-        ControlAuthorizationGate(RolloutPolicy(mode="approval_required")),
-    ).dispatch(request, state=state, boundary=boundary)
-    assert result.authorization.outcome is AuthorizationOutcome.HUMAN_APPROVAL_REQUIRED
-    assert result.result is None
-    assert not list(bridge.store.directory.glob("queue-*"))
 
 
 async def test_generated_hook_ignores_project_python_and_environment(listener, tmp_path):
@@ -405,44 +288,22 @@ async def test_generated_hook_ignores_project_python_and_environment(listener, t
     assert len(listener.bridges) == 1
 
 
-async def test_queue_opt_in_and_opt_out_preserve_observation_history(listener):
+async def test_restart_preserves_observation_history_and_observation_only_capabilities(listener):
     raw = native_hook(listener.repository)
     first = listener._ingest(codex.sanitize_hook(raw))
     await listener.close()
-    for sequence, enabled in [(2, True), (3, False)]:
+    for sequence in (2, 3):
         other = codex.CodexHookListener(
             listener.repository,
             listener.codex_home,
             listener.executable,
-            allow_queue=enabled,
         )
         await other.start()
         try:
             event = other._ingest(codex.sanitize_hook(raw))
             assert event.session == first.session and event.sequence == sequence
             bridge = other.bridges[event.session.provider_session_id]
-            assert bridge.capabilities.supports(BridgeCapability.QUEUE_FOLLOW_UP) is enabled
-            assert bridge.store.capabilities.supports(BridgeCapability.QUEUE_FOLLOW_UP) is enabled
+            assert not bridge.capabilities.supports(BridgeCapability.QUEUE_FOLLOW_UP)
+            assert not bridge.store.capabilities.supports(BridgeCapability.QUEUE_FOLLOW_UP)
         finally:
             await other.close()
-
-
-@pytest.mark.parametrize("message", ["--help", "- Fix this", "Normal message"])
-async def test_queue_message_is_one_option_value(listener, monkeypatch, message):
-    bridge = await queue_bridge(listener)
-    calls = []
-
-    async def run(executable, args, **kwargs):
-        calls.append(args)
-        return 0, (
-            f"Queued message {uuid4()} for thread {bridge.identity.provider_session_id}.\n"
-        ).encode()
-
-    monkeypatch.setattr(codex, "_run_native", run)
-    request = ControlRequest(
-        session=bridge.identity,
-        command_id="hyphen",
-        intent=QueueFollowUp(message=message),
-    )
-    assert (await bridge.execute(request)).outcome is ControlOutcome.EXECUTED
-    assert calls[0][-1] == f"--message={message}"

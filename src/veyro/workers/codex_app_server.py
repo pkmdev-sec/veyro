@@ -118,9 +118,7 @@ class CodexAppServerWorker:
         self._delta_buffers[key] = buffer
 
     async def _flush_item_output(self, item_id: str | None = None) -> None:
-        keys = [
-            key for key in self._delta_buffers if item_id is None or key[0] == item_id
-        ]
+        keys = [key for key in self._delta_buffers if item_id is None or key[0] == item_id]
         for key in keys:
             text = self._delta_buffers.pop(key)
             if text:

@@ -191,7 +191,5 @@ async def test_shadow_scores_cannot_drive_policy_and_partial_failures_are_report
     assert runtime.state.latest_assessment is authoritative
     assert runtime.state.assessment_history == [authoritative, shadow]
     assert [event.event_type for event in sink].count(EventType.VEYRO_ASSESSED) == 2
-    failure = next(
-        event for event in sink if event.event_type is EventType.VEYRO_ASSESSMENT_FAILED
-    )
+    failure = next(event for event in sink if event.event_type is EventType.VEYRO_ASSESSMENT_FAILED)
     assert failure.payload["provider_id"] == "other-shadow"

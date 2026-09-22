@@ -101,6 +101,13 @@ class FakeBridge:
             detail="" if supported else "control is unsupported",
         )
 
+    async def execute_if_current(
+        self, request: ControlRequest, *, expected_sequence: int
+    ) -> ControlResult | None:
+        if self.last_event_sequence != expected_sequence:
+            return None
+        return await self.execute(request)
+
     async def close(self) -> None:
         self.closed = True
 

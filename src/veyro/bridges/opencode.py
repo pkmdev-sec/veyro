@@ -367,6 +367,7 @@ class OpenCodeServerBridge:
         self._active_tools: set[str] = set()
         self._active_turn_id: str | None = None
         self._changed = asyncio.Event()
+        self._dispatch_lock = asyncio.Lock()
         self._closed = False
         self._pump: asyncio.Task[None] | None = None
         self._observing = asyncio.Event()
@@ -472,6 +473,34 @@ class OpenCodeServerBridge:
             await self._changed.wait()
 
     async def execute(self, request: ControlRequest) -> ControlResult:
+        async with self._dispatch_lock:
+            return await self._execute_settled(request)
+
+    async def execute_if_current(
+        self, request: ControlRequest, *, expected_sequence: int
+    ) -> ControlResult | None:
+        async with self._dispatch_lock:
+            if self.last_event_sequence != expected_sequence:
+                return None
+            return await self._execute_settled(request)
+
+    async def _execute_settled(self, request: ControlRequest) -> ControlResult:
+        delivery = asyncio.create_task(self._execute(request))
+        try:
+            return await asyncio.shield(delivery)
+        except asyncio.CancelledError:
+            while not delivery.done():
+                try:
+                    await asyncio.shield(delivery)
+                except asyncio.CancelledError:
+                    continue
+            try:
+                delivery.result()
+            except BaseException:
+                pass
+            raise
+
+    async def _execute(self, request: ControlRequest) -> ControlResult:
         if request.session != self.identity:
             return self._result(
                 request, ControlOutcome.REJECTED, "control belongs to another session"
@@ -562,19 +591,21 @@ class OpenCodeServerBridge:
         try:
             async for native in self._client.events(directory=self._repository):
                 self._observing.set()
-                self._normalize(native)
+                async with self._dispatch_lock:
+                    self._normalize(native)
             raise OpenCodeError("OpenCode observation stream ended")
         except asyncio.CancelledError:
             raise
         except Exception as error:
-            self._observation_failed = True
-            self._observing.set()
-            self._append_event(
-                native_type="bridge.error",
-                event_type=SupervisionEventType.NORMALIZATION_FAILED,
-                raw={"error_type": type(error).__name__},
-                payload={"error_type": type(error).__name__},
-            )
+            async with self._dispatch_lock:
+                self._observation_failed = True
+                self._observing.set()
+                self._append_event(
+                    native_type="bridge.error",
+                    event_type=SupervisionEventType.NORMALIZATION_FAILED,
+                    raw={"error_type": type(error).__name__},
+                    payload={"error_type": type(error).__name__},
+                )
 
     def _normalize(self, native: dict[str, Any]) -> None:
         if _native_session_id(native) != self.identity.provider_session_id:

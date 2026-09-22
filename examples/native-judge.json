@@ -1,0 +1,15 @@
+{
+  "rubric_version": "slug-contract-v1",
+  "criteria": {
+    "contract_documented": "The slug function has a docstring explaining all three rules: lowercase ASCII letters and digits; replace each run of other characters with one hyphen; trim leading and trailing hyphens.",
+    "implementation_present": "The module contains a real implementation of slug normalization, not a placeholder, TODO, or unconditional fixed return."
+  },
+  "evidence_files": [
+    "slug.py"
+  ],
+  "pass_threshold": 0.9,
+  "provider": {
+    "timeout_seconds": 30.0,
+    "max_state_characters": 12000
+  }
+}

@@ -6,7 +6,6 @@ import hashlib
 import hmac
 import json
 import os
-import re
 import secrets
 import shlex
 import signal
@@ -22,7 +21,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from veyro.bridges.base import BridgeContractError, capability_for
+from veyro.bridges.base import BridgeContractError, validate_control_result
 from veyro.models import (
     BridgeCapability,
     BridgeSource,
@@ -34,7 +33,6 @@ from veyro.models import (
     ControlRequest,
     ControlResult,
     EventProvenance,
-    QueueFollowUp,
     SessionIdentity,
     SupervisionEvent,
     SupervisionEventType,
@@ -136,7 +134,7 @@ def sanitize_hook(raw: bytes) -> HookMetadata:
     )
 
 
-def codex_hook_capabilities(*, allow_queue: bool = False) -> CapabilitySet:
+def codex_hook_capabilities() -> CapabilitySet:
     observed = {
         BridgeCapability.OBSERVE_LIFECYCLE,
         BridgeCapability.OBSERVE_MESSAGES,
@@ -154,21 +152,14 @@ def codex_hook_capabilities(*, allow_queue: bool = False) -> CapabilitySet:
                 availability=(
                     CapabilityAvailability.SUPPORTED
                     if capability in observed
-                    or (capability is BridgeCapability.QUEUE_FOLLOW_UP and allow_queue)
                     else CapabilityAvailability.UNSUPPORTED
                 ),
-                stability=(
-                    BridgeStability.EXPERIMENTAL
-                    if capability is BridgeCapability.QUEUE_FOLLOW_UP
-                    else BridgeStability.STABLE
-                ),
-                evidence="Codex 0.154.0 hook schemas/implementations and codex queue --help",
+                stability=BridgeStability.STABLE,
+                evidence="Codex 0.154.0 hook schemas and implementations",
                 detail=(
-                    "Opt-in native CLI queue; may start an idle turn. Requires human approval; "
-                    "text is visible in local process argv; acknowledgment is not model execution."
-                    if capability is BridgeCapability.QUEUE_FOLLOW_UP
-                    else "Hook boundaries only, not execution outcomes or complete history. "
-                    "No arbitrary steering, cancellation, approval replies, or App Server RPC."
+                    "Hook boundaries only, not execution outcomes or complete history. "
+                    "No follow-up delivery, arbitrary steering, cancellation, approval replies, "
+                    "or App Server RPC."
                 ),
             )
             for capability in BridgeCapability
@@ -221,12 +212,10 @@ async def verify_codex(executable: Path, repository: Path, codex_home: Path) -> 
 
 
 class CodexHookBridge:
-    def __init__(self, store: BrokerStore, executable: Path, codex_home: Path) -> None:
+    def __init__(self, store: BrokerStore) -> None:
         self.store = store
         self.identity = store.identity
         self.capabilities = store.capabilities
-        self.executable = executable
-        self.codex_home = codex_home
         self.closed = False
         self._changed = asyncio.Event()
 
@@ -285,70 +274,25 @@ class CodexHookBridge:
             await self._changed.wait()
 
     async def execute(self, request: ControlRequest) -> ControlResult:
-        def result(outcome: ControlOutcome, detail: str, queue_id: str | None = None):
-            return ControlResult(
-                veyro_session_id=request.session.veyro_session_id,
-                provider_id=request.session.provider_id,
-                command_id=request.command_id,
-                action=request.intent.action,
-                outcome=outcome,
-                detail=detail,
-                provider_command_id=queue_id,
-            )
-
         if request.session != self.identity:
             raise BridgeContractError("control session does not match bridge")
-        if not self.capabilities.supports(capability_for(request.intent)):
-            return result(ControlOutcome.UNSUPPORTED, "control is not enabled by this hooks bridge")
-        if self.closed:
-            return result(ControlOutcome.REJECTED, "bridge is closed")
-        assert isinstance(request.intent, QueueFollowUp)
-        digest = hashlib.sha256(request.model_dump_json(exclude={"issued_at"}).encode()).hexdigest()
-        name = hashlib.sha256(request.command_id.encode()).hexdigest()
-        pending = self.store.directory / f"queue-{name}.pending"
-        completed = self.store.directory / f"queue-{name}.json"
-        # Exclusive durable intent prevents duplicate submission after timeout, crash or restart.
-        if pending.exists():
-            if _read_private_file(pending).decode() != digest:
-                return result(
-                    ControlOutcome.REJECTED, "command id was used for a different request"
-                )
-            if completed.exists():
-                return ControlResult.model_validate_json(_read_private_file(completed))
-            return result(ControlOutcome.FAILED, "queue delivery uncertain; do not retry")
-        try:
-            _create_private_file(pending, digest.encode())
-        except RuntimeError:
-            return result(ControlOutcome.REJECTED, "queue command already claimed")
-        answer = result(ControlOutcome.FAILED, "queue delivery uncertain; do not retry")
-        try:
-            await verify_codex(self.executable, Path(self.identity.repository), self.codex_home)
-            status, output = await _run_native(
-                self.executable,
-                [
-                    "queue",
-                    "--thread",
-                    str(self.identity.provider_session_id),
-                    f"--message={request.intent.message}",
-                ],
-                cwd=Path(self.identity.repository),
-                codex_home=self.codex_home,
-            )
-            match = re.fullmatch(
-                rb"Queued message ([0-9a-f-]{36}) for thread ([0-9a-f-]{36})\.\s*",
-                output,
-            )
-            if status == 0 and match and match[2].decode() == self.identity.provider_session_id:
-                queue_id = str(UUID(match[1].decode()))
-                answer = result(
-                    ControlOutcome.EXECUTED,
-                    "native queue acknowledged; not turn completion",
-                    queue_id,
-                )
-        except (OSError, ValueError, CodexHookError, TimeoutError):
-            pass
-        _replace_private_file(completed, answer.model_dump_json().encode())
-        return answer
+        result = ControlResult(
+            veyro_session_id=request.session.veyro_session_id,
+            provider_id=request.session.provider_id,
+            command_id=request.command_id,
+            action=request.intent.action,
+            outcome=ControlOutcome.UNSUPPORTED,
+            detail="Codex hook supervision is observation-only",
+        )
+        validate_control_result(request, result, self.capabilities)
+        return result
+
+    async def execute_if_current(
+        self, request: ControlRequest, *, expected_sequence: int
+    ) -> ControlResult | None:
+        if self.last_event_sequence != expected_sequence:
+            return None
+        return await self.execute(request)
 
     async def close(self) -> None:
         self.closed = True
@@ -356,11 +300,11 @@ class CodexHookBridge:
 
 
 class CodexHookListener:
-    def __init__(self, repository: Path, codex_home: Path, executable: Path, *, allow_queue=False):
+    def __init__(self, repository: Path, codex_home: Path, executable: Path):
         self.repository = repository.resolve()
         self.codex_home = codex_home.resolve()
         self.executable = executable.resolve()
-        self.capabilities = codex_hook_capabilities(allow_queue=allow_queue)
+        self.capabilities = codex_hook_capabilities()
         self.bridges: dict[str, CodexHookBridge] = {}
         self._temporary: tempfile.TemporaryDirectory | None = None
         self._server: asyncio.AbstractServer | None = None
@@ -464,7 +408,7 @@ class CodexHookListener:
                 os.close(descriptor)
                 raise
             self._writer_locks.append(descriptor)
-            self.bridges[native_id] = CodexHookBridge(store, self.executable, self.codex_home)
+            self.bridges[native_id] = CodexHookBridge(store)
         return self.bridges[native_id].ingest(metadata)
 
     async def _handle(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:

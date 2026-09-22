@@ -143,9 +143,7 @@ def test_finish_after_successful_verification_only_worker(state, assessment) -> 
 
 def test_escalate(state, assessment) -> None:
     state.iteration = 1
-    result = FactoryPolicy(FactoryConfig()).decide(
-        state, with_scores(assessment, needs_human=0.95)
-    )
+    result = FactoryPolicy(FactoryConfig()).decide(state, with_scores(assessment, needs_human=0.95))
     assert result.action is InterventionType.ESCALATE
 
 
@@ -157,17 +155,19 @@ def test_maximum_retries(state, assessment) -> None:
         reason="stuck",
         assessment_iteration=1,
     )
-    assert FactoryPolicy(FactoryConfig(max_retries=1)).decide(
-        state, assessment
-    ).action is InterventionType.ESCALATE
+    assert (
+        FactoryPolicy(FactoryConfig(max_retries=1)).decide(state, assessment).action
+        is InterventionType.ESCALATE
+    )
 
 
 def test_maximum_workers(state, assessment) -> None:
     state.iteration = 1
     state.workers.append(WorkerRecord(worker_id="w", worker_type=WorkerType.CODING, mission="x"))
-    assert FactoryPolicy(FactoryConfig(max_workers=1)).decide(
-        state, assessment
-    ).action is InterventionType.ESCALATE
+    assert (
+        FactoryPolicy(FactoryConfig(max_workers=1)).decide(state, assessment).action
+        is InterventionType.ESCALATE
+    )
 
 
 def test_verification_already_performed_is_not_repeated(state, assessment) -> None:
@@ -183,6 +183,6 @@ def test_verification_already_performed_is_not_repeated(state, assessment) -> No
 
 def test_maximum_iterations(state, assessment) -> None:
     state.iteration = state.max_iterations
-    assert FactoryPolicy(FactoryConfig()).decide(
-        state, assessment
-    ).action is InterventionType.ESCALATE
+    assert (
+        FactoryPolicy(FactoryConfig()).decide(state, assessment).action is InterventionType.ESCALATE
+    )

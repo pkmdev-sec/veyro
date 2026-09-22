@@ -74,7 +74,7 @@ The command emits newline-delimited JSON:
 
 Provider capabilities describe the adapter, not authorization to use controls.
 This command exposes no control channel, even when the adapter supports queueing,
-interruption, steering, or stop. It never changes a recorded queue opt-in.
+interruption, steering, or stop. It never changes adapter capabilities.
 
 Without `--watch-seconds`, Prime and OpenCode connect, report, and detach. Codex
 reads existing journal records. A positive duration follows metadata for at most

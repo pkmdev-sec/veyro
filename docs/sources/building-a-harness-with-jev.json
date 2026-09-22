@@ -1,0 +1,963 @@
+{
+  "provenance": {
+    "article_url": "https://x.com/i/article/2100744524951932928",
+    "linking_tweet_url": "https://x.com/sydneyrunkle/status/2100754364545761643",
+    "retrieved_from": "https://api.fxtwitter.com/sydneyrunkle/status/2100754364545761643",
+    "retrieval_method": "Public unauthenticated HTTP GET against the FixTweet API, which returns tweet.article as a Draft.js document. No login, cookies, credentials, or paywall bypass. x.com renders articles client-side, so the article URL, all crawler user-agents, publish.twitter.com/oembed, cdn.syndication.twimg.com, the Wayback Machine, and archive.today all return no body for this URL.",
+    "retrieved_utc": "2026-09-20",
+    "independently_refetched": true,
+    "refetch_note": "Fetched twice from separate processes; title, all 51 block texts, and all 5 code blocks were byte-identical."
+  },
+  "article": {
+    "id": "2100744524951932928",
+    "title": "Building a Harness with Jev",
+    "author": {
+      "name": "Sydney Runkle",
+      "screen_name": "sydneyrunkle",
+      "description": "product + open source @LangChain"
+    },
+    "created_at": "2026-09-18T01:10:45.000Z",
+    "modified_at": "2026-09-18T01:10:45.000Z",
+    "preview_text": "Agents run in a loop: an LLM decides what to do, a tool executes, a model evaluates the results, and then continues in that loop until the task is complete.\nAgents and LLMs were initially difficult to",
+    "cover_image": "https://pbs.twimg.com/media/HSdguxyboAAljJm.jpg",
+    "content": {
+      "blocks": [
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "4t80a",
+          "text": "Agents run in a loop: an LLM decides what to do, a tool executes, a model evaluates the results, and then continues in that loop until the task is complete.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "4a0hn",
+          "text": "Agents and LLMs were initially difficult to integrate into software applications, which depend on structured data and predictable interfaces. Two primitives emerged that made this much easier:",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 0,
+              "length": 12,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [
+            {
+              "length": 12,
+              "offset": 0,
+              "style": "Bold"
+            }
+          ],
+          "key": "f57f",
+          "text": "Tool calling let models make structured requests and receive structured results.",
+          "type": "unordered-list-item"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 1,
+              "length": 18,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [
+            {
+              "length": 18,
+              "offset": 0,
+              "style": "Bold"
+            }
+          ],
+          "key": "cu2iu",
+          "text": "Structured outputs let models return structured results.",
+          "type": "unordered-list-item"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [
+            {
+              "length": 4,
+              "offset": 54,
+              "style": "Bold"
+            },
+            {
+              "length": 6,
+              "offset": 63,
+              "style": "Bold"
+            }
+          ],
+          "key": "dkged",
+          "text": "But even with those in place, the agent loop is still slow and costly: every decision requires another model call.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 2,
+              "length": 25,
+              "offset": 31
+            }
+          ],
+          "inlineStyleRanges": [
+            {
+              "length": 41,
+              "offset": 84,
+              "style": "Bold"
+            }
+          ],
+          "key": "6ni5a",
+          "text": "Enter, Jev. Jev is a new model released from TypeSafe AI. The company reports up to 200x faster inference and 400x lower cost than comparable LLMs on classification tasks.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 3,
+              "length": 1,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "1i58c",
+          "text": " ",
+          "type": "atomic"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "533cb",
+          "text": "This post covers how Jev works, where it fits into the agent loop, and how to use it with LangChain.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "9hjfe",
+          "text": "All about Jev",
+          "type": "header-one"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "923b",
+          "text": "Jev is actually not a traditional LLM, it doesn’t generate text. It’s what the TypeSafe AI team calls a System One model:",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 4,
+              "length": 5,
+              "offset": 149
+            }
+          ],
+          "inlineStyleRanges": [
+            {
+              "length": 5,
+              "offset": 149,
+              "style": "Bold"
+            }
+          ],
+          "key": "c83sf",
+          "text": "📖 System One models are a class of AI models built to make fast, structured decisions that software can use directly. A System One model evaluates a state and returns typed answers and probabilities.",
+          "type": "blockquote"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 5,
+              "length": 54,
+              "offset": 19
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "7sj1d",
+          "text": "It’s trained using reinforcement learning for calibrated decisions (RLCD). Your code uses those results to guide what an agent does next, without a full chat LLM call for each decision.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 6,
+              "length": 10,
+              "offset": 155
+            }
+          ],
+          "inlineStyleRanges": [
+            {
+              "length": 5,
+              "offset": 37,
+              "style": "Bold"
+            },
+            {
+              "length": 9,
+              "offset": 61,
+              "style": "Bold"
+            }
+          ],
+          "key": "7u191",
+          "text": "To invoke a Jev model, you send it a state (the context) and questions about that state. Here’s a single-question version of the support-ticket example in their docs:",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 7,
+              "length": 1,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "4q0cd",
+          "text": " ",
+          "type": "atomic"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "6sk8e",
+          "text": "The docs’ example gives this urgency answer, shown here without the rest of the response:",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 8,
+              "length": 1,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "dufm2",
+          "text": " ",
+          "type": "atomic"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "8tqbg",
+          "text": "That’s a 99.9% probability that the message is urgent, which your application can use to prioritize the ticket.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 9,
+              "length": 9,
+              "offset": 35
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "52ajh",
+          "text": "There are three types of supported questions:",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 10,
+              "length": 1,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "34bjh",
+          "text": " ",
+          "type": "atomic"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [
+            {
+              "length": 7,
+              "offset": 0,
+              "style": "Bold"
+            }
+          ],
+          "key": "bdqki",
+          "text": "Choice: Pick from a set of options. Returns a probability for each option and an overall confidence score.",
+          "type": "unordered-list-item"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [
+            {
+              "length": 6,
+              "offset": 0,
+              "style": "Bold"
+            }
+          ],
+          "key": "c8l8t",
+          "text": "Score: Rate an input against ordered levels, such as low, medium, and high. Returns a continuous score, the underlying distribution, and a confidence value.",
+          "type": "unordered-list-item"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [
+            {
+              "length": 5,
+              "offset": 0,
+              "style": "Bold"
+            }
+          ],
+          "key": "7ndvo",
+          "text": "Noul: Answer a yes-or-no question. Returns the probability that a statement is true.",
+          "type": "unordered-list-item"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "rngf",
+          "text": "One key feature here is that you can ask multiple questions about the same state in one request.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "fo5lf",
+          "text": "💡 System One models evaluate every question in a request in parallel. Adding questions barely changes the response time and costs only the tokens for the extra questions, which are cheap.",
+          "type": "blockquote"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 11,
+              "length": 19,
+              "offset": 76
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "e42jh",
+          "text": "For an example of asking multiple questions about a support ticket, see the TypeSafe Quickstart.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "f5i4r",
+          "text": "In sum, unlike traditional LLMs, Jev is neither constrained by text generation or sequential decision making!",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "7cd0t",
+          "text": "How to Use Jev with LangChain",
+          "type": "header-one"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "friiv",
+          "text": "LangChain's provider agnostic model is well suited for supporting Jev alongside thousands of other integrations and model providers.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 12,
+              "length": 21,
+              "offset": 4
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "clb2u",
+          "text": "The LangChain integration exposes Jev through TypeSafeClassifier. You pass your state and questions to .invoke(), and get classification results rather than a chat response.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "a0vd4",
+          "text": "Install langchain-typesafe and set your TYPESAFE_API_KEY, then make a call:",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 13,
+              "length": 1,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "ebjlk",
+          "text": " ",
+          "type": "atomic"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "7gfok",
+          "text": "The state can be text, structured data, or LangChain messages. That makes it straightforward to call Jev from a node or middleware hook using the context your agent already has.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "8v79r",
+          "text": "You can build this into custom middleware or tools!",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "3i91d",
+          "text": "Use Cases",
+          "type": "header-one"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "3ssoi",
+          "text": "Jev isn’t a drop-in replacement for an LLM. It doesn’t generate text, but it can handle classification tasks we often use LLMs for today, without the same latency and cost. That makes it a promising complement to the model driving your agent: use an LLM for open-ended reasoning and generation, and Jev for fast, structured decisions along the way.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [
+            {
+              "length": 13,
+              "offset": 0,
+              "style": "Bold"
+            }
+          ],
+          "key": "arud0",
+          "text": "Model routing",
+          "type": "header-two"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 14,
+              "length": 24,
+              "offset": 75
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "7dajl",
+          "text": "A simple lookup doesn’t need the same model as a difficult debugging task. Model-routing middleware lets Jev assess the request and choose a model based on criteria you define, so fast and inexpensive for straightforward tasks, more capable for complex ones.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 15,
+              "length": 1,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "cofbt",
+          "text": " ",
+          "type": "atomic"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "41s63",
+          "text": "The router selects a model from the latest user message and uses it throughout the run. The probabilities and confidence remain available in agent state, too.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [
+            {
+              "length": 9,
+              "offset": 0,
+              "style": "Bold"
+            }
+          ],
+          "key": "71pgl",
+          "text": "Auto Mode",
+          "type": "header-two"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "7ifjv",
+          "text": "Agents are still inherently untrustworthy. An agent can receive bad instructions (either naturally or from a motivated enough attacker) which can persuade it into taking actions we didn’t want it to.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [
+            {
+              "length": 6,
+              "offset": 104,
+              "style": "Italic"
+            }
+          ],
+          "key": "166b8",
+          "text": "Coding harnesses like claude, codex, cursor have shipped some kind of way to classify dangerous actions before they’re taken which has slowly helped to build trust in agents. Up until now, this classifier step has been locked away in the closed source parts of the harness.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "efa19",
+          "text": "Now that a cheap and performant classifier model exists, we can take the same pattern and adopt it to all agents!",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 16,
+              "length": 1,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "3apo9",
+          "text": " ",
+          "type": "atomic"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 17,
+              "length": 18,
+              "offset": 0
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "34mue",
+          "text": "AutoModeMiddleware uses Jev to check tool calls for risky decisions it may take, and block calls before the tool executes.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "ampf3",
+          "text": "Get Started!",
+          "type": "header-one"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 18,
+              "length": 10,
+              "offset": 118
+            },
+            {
+              "key": 19,
+              "length": 12,
+              "offset": 202
+            },
+            {
+              "key": 20,
+              "length": 10,
+              "offset": 247
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "a4rtp",
+          "text": "We're pretty thrilled about Jev and the possibilities that come with it. A few cool projects that we’ve seen already: Kyle Jeong from Browserbase is powering browser use agents for fractions of a cent, Jarrod Watts built a live trading agent, and Ryan Vogel is doing email triage at scale.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "bud3f",
+          "text": "New models drop every week at this point, but this one had a pretty outsized response. We’re excited to see what you build with LangChain and Jev.",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [
+            {
+              "key": 21,
+              "length": 5,
+              "offset": 34
+            },
+            {
+              "key": 22,
+              "length": 1,
+              "offset": 51
+            },
+            {
+              "key": 23,
+              "length": 16,
+              "offset": 100
+            }
+          ],
+          "inlineStyleRanges": [],
+          "key": "a6c75",
+          "text": "Let us know what you think on the forum, tag us on X and share what you’re building, or engage with LangChain issues!",
+          "type": "unstyled"
+        },
+        {
+          "data": {},
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "872o0",
+          "text": "Acknowledgements",
+          "type": "header-two"
+        },
+        {
+          "data": {
+            "mentions": [
+              {
+                "fromIndex": 7,
+                "text": "huntlovell",
+                "toIndex": 18
+              },
+              {
+                "fromIndex": 20,
+                "text": "hwchase",
+                "toIndex": 28
+              },
+              {
+                "fromIndex": 30,
+                "text": "ccurme",
+                "toIndex": 37
+              },
+              {
+                "fromIndex": 39,
+                "text": "veryboldbagel",
+                "toIndex": 53
+              }
+            ]
+          },
+          "entityRanges": [],
+          "inlineStyleRanges": [],
+          "key": "4p8d7",
+          "text": "Thanks @huntlovell, @hwchase, @ccurme, @veryboldbagel, and Nathan Drenzer for their thoughtful review and contributions.",
+          "type": "unstyled"
+        }
+      ],
+      "entityMap": [
+        {
+          "key": "12",
+          "value": {
+            "data": {
+              "url": "https://docs.langchain.com/oss/python/integrations/providers/typesafe#quickstart"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "8",
+          "value": {
+            "data": {
+              "markdown": "```json\n{\n  \"is_urgent\": {\n    \"type\": \"noul\",\n    \"noul\": 0.999\n  }\n}\n```"
+            },
+            "mutability": "Mutable",
+            "type": "MARKDOWN"
+          }
+        },
+        {
+          "key": "19",
+          "value": {
+            "data": {
+              "url": "https://x.com/jarrodwatts/status/2100356151468585346"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "23",
+          "value": {
+            "data": {
+              "url": "https://github.com/langchain-ai/langchain"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "4",
+          "value": {
+            "data": {
+              "url": "https://docs.typesafe.ai/concepts/state"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "15",
+          "value": {
+            "data": {
+              "markdown": "```python\nfrom langchain.agents import create_agent\nfrom langchain_typesafe.experimental.middleware import (\n    ModelChoice,\n    ModelRouterMiddleware,\n)\n\nrouter = ModelRouterMiddleware(\n    choices={\n        \"fast\": ModelChoice(\n            model=\"openai:luna\",\n            criteria=\"Direct lookups, extraction, and localized changes.\",\n        ),\n        \"powerful\": ModelChoice(\n            model=\"openai:sol\",\n            criteria=\"Architecture and high-stakes decisions.\",\n        ),\n    },\n    instructions=\"Choose the least costly model that can complete the task.\",\n)\n\nagent = create_agent(\"openai:gpt-5.6-luna\", middleware=[router])\n```"
+            },
+            "mutability": "Mutable",
+            "type": "MARKDOWN"
+          }
+        },
+        {
+          "key": "11",
+          "value": {
+            "data": {
+              "url": "https://docs.typesafe.ai/introduction/quickstart#request-body"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "9",
+          "value": {
+            "data": {
+              "url": "https://www.youtube.com/watch?si=L1qd4LT9W-W67mar&t=216&v=2Bs0Ink_-Uo&feature=youtu.be"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "22",
+          "value": {
+            "data": {
+              "url": "https://x.com/LangChain?lang=en"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "13",
+          "value": {
+            "data": {
+              "markdown": "```python\nfrom langchain_typesafe import Noul, TypeSafeClassifier\n\nclassifier = TypeSafeClassifier()\n\nresponse = classifier.invoke(\n    state=(\n        \"The deploy failed twice and customers are seeing 500s. \"\n        \"Can someone look now?\"\n    ),\n    questions={\n        \"urgent\": Noul(\n            instructions=\"Does this need attention right now?\"\n        ),\n    },\n)\n\nurgency = response.nouls[\"urgent\"].noul\n```"
+            },
+            "mutability": "Mutable",
+            "type": "MARKDOWN"
+          }
+        },
+        {
+          "key": "16",
+          "value": {
+            "data": {
+              "markdown": "```python\nfrom langchain.agents import create_agent\nfrom langchain_typesafe.experimental.middleware import (\n    AutoModeMiddleware,\n)\n\nguardrail = AutoModeMiddleware(tools=[\"bash\"])\n\nagent = create_agent(\"openai:gpt-5.6-luna\", middleware=[guardrail])\n```"
+            },
+            "mutability": "Mutable",
+            "type": "MARKDOWN"
+          }
+        },
+        {
+          "key": "5",
+          "value": {
+            "data": {
+              "url": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "10",
+          "value": {
+            "data": {
+              "entityKey": "3f6c83e5-2abb-4f3c-a9ce-2a3f9d07c0c8",
+              "mediaItems": [
+                {
+                  "localMediaId": "1",
+                  "mediaCategory": "DraftTweetImage",
+                  "mediaId": "2100745832454823936"
+                }
+              ]
+            },
+            "mutability": "Immutable",
+            "type": "MEDIA"
+          }
+        },
+        {
+          "key": "21",
+          "value": {
+            "data": {
+              "url": "https://forum.langchain.com/"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "6",
+          "value": {
+            "data": {
+              "url": "https://docs.typesafe.ai/introduction/quickstart"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "1",
+          "value": {
+            "data": {
+              "url": "https://www.youtube.com/watch?v=yj-wSRJwrrc"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "17",
+          "value": {
+            "data": {
+              "url": "https://docs.langchain.com/oss/python/integrations/providers/typesafe#tool-risk-gating"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "14",
+          "value": {
+            "data": {
+              "url": "https://docs.langchain.com/oss/python/integrations/providers/typesafe#model-routing"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "0",
+          "value": {
+            "data": {
+              "url": "https://openai.com/index/function-calling-and-other-api-updates/"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "20",
+          "value": {
+            "data": {
+              "url": "https://x.com/ryanvogel/status/2100042788851101842"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "2",
+          "value": {
+            "data": {
+              "url": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "18",
+          "value": {
+            "data": {
+              "url": "https://x.com/kylejeong/status/2100622054945095934"
+            },
+            "mutability": "Mutable",
+            "type": "LINK"
+          }
+        },
+        {
+          "key": "7",
+          "value": {
+            "data": {
+              "markdown": "```json\n{\n  \"model\": \"jev-latest\",\n  \"state\": \"Hi, I've been trying to connect my Stripe account for 3 days and it keeps failing. I'm losing sales. Please help ASAP.\",\n  \"questions\": {\n    \"is_urgent\": {\n      \"type\": \"noul\",\n      \"instructions\": \"The message conveys urgency or time-sensitivity\"\n    }\n  }\n}\n```"
+            },
+            "mutability": "Mutable",
+            "type": "MARKDOWN"
+          }
+        },
+        {
+          "key": "3",
+          "value": {
+            "data": {
+              "tweetId": "2099925682726002904"
+            },
+            "mutability": "Immutable",
+            "type": "TWEET"
+          }
+        }
+      ]
+    },
+    "media_entities": [
+      {
+        "id": "QXBpTWVkaWE6DAAFCgABHSdZNFLaIAAKAAIXy5+PotdAAAAA",
+        "media_id": "2100745832454823936",
+        "media_info": {
+          "__typename": "ApiImage",
+          "color_info": {
+            "palette": [
+              {
+                "percentage": 97.59,
+                "rgb": {
+                  "blue": 16,
+                  "green": 7,
+                  "red": 3
+                }
+              },
+              {
+                "percentage": 2.35,
+                "rgb": {
+                  "blue": 132,
+                  "green": 126,
+                  "red": 122
+                }
+              }
+            ]
+          },
+          "original_img_height": 928,
+          "original_img_url": "https://pbs.twimg.com/media/HSdZNFLaIAAuezm.jpg",
+          "original_img_width": 1600
+        },
+        "media_key": "3_2100745832454823936"
+      }
+    ]
+  }
+}

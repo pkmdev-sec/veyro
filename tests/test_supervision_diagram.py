@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from test_animated_brand import read_gif
+from test_animated_brand import canonical_png, encode_png, read_gif
 
 ROOT = Path(__file__).resolve().parents[1]
 DIAGRAM = ROOT / "docs/assets/veyro-supervision.gif"
@@ -58,14 +58,31 @@ def test_decoded_diagram_animates_only_connectors_not_text_or_geometry():
     assert len(stable) == 120 and len(set(stable)) == 1
 
 
-def test_diagram_generator_is_current_and_nonwriting():
+def test_diagram_generator_is_current_and_nonwriting(tmp_path: Path):
     uv = shutil.which("uv")
     if uv is None:
         pytest.skip("uv is required for the isolated diagram builder")
-    assets = [DIAGRAM, DIAGRAM.with_suffix(".png")]
+
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    for name in ("generated_asset_checks.py", "generate_supervision_diagram.py"):
+        shutil.copyfile(ROOT / "tools" / name, tools / name)
+    output = tmp_path / "docs/assets"
+    output.mkdir(parents=True)
+    names = ("veyro-supervision.gif", "veyro-supervision.png", "veyro-task-readout.png")
+    assets = []
+    for name in names:
+        asset = output / name
+        shutil.copyfile(DIAGRAM.parent / name, asset)
+        assets.append(asset)
+    for asset in assets[1:]:
+        encoded = asset.read_bytes()
+        asset.write_bytes(encode_png(canonical_png(encoded)))
+        assert asset.read_bytes() != encoded
+
     before = [(asset.read_bytes(), asset.stat().st_mtime_ns) for asset in assets]
     subprocess.run(
-        [uv, "run", "--script", str(ROOT / "tools/generate_supervision_diagram.py"), "--check"],
+        [uv, "run", "--script", str(tools / "generate_supervision_diagram.py"), "--check"],
         capture_output=True,
         check=True,
         timeout=60,
@@ -73,16 +90,35 @@ def test_diagram_generator_is_current_and_nonwriting():
     assert [(asset.read_bytes(), asset.stat().st_mtime_ns) for asset in assets] == before
 
 
-def test_still_diagram_has_expected_dimensions():
-    data = DIAGRAM.with_suffix(".png").read_bytes()
-    assert data[:8] == b"\x89PNG\r\n\x1a\n"
-    assert data[12:16] == b"IHDR"
-    assert struct.unpack(">II", data[16:24]) == (1120, 1200)
+def test_still_diagrams_have_expected_dimensions():
+    for name, dimensions in [
+        ("veyro-supervision.png", (1120, 1200)),
+        ("veyro-task-readout.png", (1120, 900)),
+    ]:
+        data = (DIAGRAM.parent / name).read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n"
+        assert data[12:16] == b"IHDR"
+        assert struct.unpack(">II", data[16:24]) == dimensions
 
 
-def test_diagram_names_both_qwen_variants_and_release_status():
-    generator = (ROOT / "tools/generate_supervision_diagram.py").read_text()
-    assert '"Qwen3 14B"' in generator
-    assert '"In main: localjev assessor"' in generator
-    assert '"Qwen3 4B Instruct"' in generator
-    assert '"Experimental: not shipped"' in generator
+def test_task_diagram_names_the_checked_task_control_order():
+    source = (ROOT / "tools/generate_supervision_diagram.py").read_text()
+    for label in (
+        "01 / CHECKED TASK LOOP",
+        "Qwen3 Coder 30B",
+        "Run checks",
+        "Authoritative",
+        "Optional Laya",
+        "Human review",
+        "Passing evidence requires review",
+    ):
+        assert label in source
+
+
+def test_supervision_diagram_describes_current_model_roles():
+    source = (ROOT / "tools/generate_supervision_diagram.py").read_text()
+    assert "LOCAL MODEL ROLES / SEPARATE TASK PATH" in source
+    assert "Experimental OpenCode writer" in source
+    assert "Optional advisory evaluation" in source
+    assert "G4 native-task qualification and G6 calibration remain open" in source
+    assert "not shipped" not in source.lower()

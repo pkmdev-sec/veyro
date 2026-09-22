@@ -1,47 +1,102 @@
 # Veyro documentation
 
-Veyro combines localjev and Qwen3-14B with version-pinned native-agent adapters.
-Start with a synthetic assessment, then connect to a session you own.
+Veyro keeps native coding agents in their own terminals and permission systems. It adds
+bounded observation, local assessment, deterministic policy, executable checks, and explicit
+approval boundaries.
 
-## Release scope
-
-This release supports read-only observation and explicitly approved controls. No
-adapter qualifies for automatic delivery. Autonomous tasks, local GGUF readout, and
-evaluator/calibration additions are excluded. See [scope and checks](release-scope.md).
+The package is pre-release. Supported commands are implemented and packaged, but
+[`production_qualified`](../release-status.json) is `false`. G4 autonomous-task reliability
+and G6 evaluator calibration remain open in [`GATES.md`](../GATES.md).
 
 ## Start here
 
+Choose the shortest path for your goal:
+
+| I want to... | Start with |
+| --- | --- |
+| See Veyro without a model or running agent | [Synthetic assessment walkthrough](../examples/README.md) |
+| Review an existing Prime Agent or OpenCode session | [Existing-session operator guide](supervision-operator-guide.md) |
+| Understand supported and experimental commands | [Current release scope](release-scope.md) |
+| Deploy local Qwen3-14B assessment | [localjev deployment](localjev.md) |
+| Try the experimental checked-task loop | [Native autonomous tasks](native-autonomy.md) |
+| Build a typed evaluation experiment | [Local evaluation harness](local-harness.md) |
+| Understand what the evidence proves | [Evidence limits](what-veyro-proves.md) |
+
+For a clean checkout, run:
+
+```sh
+uv sync --frozen --extra dev
+uv run veyro agents
+uv run python examples/assess_localjev.py
+```
+
+These commands inspect local executables and reduce a synthetic fixture. They do not start an
+agent, inference service, or control channel.
+
+## Supported existing-session review
+
+- [Operator guide](supervision-operator-guide.md): discovery, read-only attachment, one exact proposal, and recovery.
+- [Capabilities, versions, and privacy](supervision-reference.md): adapter contracts and retention limits.
+- [Read-only attachment](existing-session-attachment.md): identity, history limits, and bounded output.
+- [Control and approval policy](supervision-rollout.md): fail-closed authorization and no-retry delivery.
+- [Verification record](supervision-verification.md): commands and the limits of recorded native checks.
+- [Upgrade guide](upgrading.md): package changes, journals, and persistent ledgers.
+
+Provider details:
+
+- [Prime Agent daemon bridge](prime-agent-daemon-bridge.md)
+- [OpenCode HTTP/SSE bridge](opencode-server-bridge.md)
+- [Codex hook listener](codex-hooks-bridge.md)
+
+Codex existing-session support is observation-only. Prime Agent and OpenCode controls still
+require policy, current evidence, exact approval, and a durable claim.
+
+## Local assessment
+
 - [Deploy localjev with Qwen3-14B](localjev.md): endpoint, model digest, compatibility, and trust checks.
-- [Run a local assessment](../examples/README.md): a real model call with no agent connection or controls.
-- [Operate existing sessions](supervision-operator-guide.md): discovery, read-only observation, exact approval, and recovery.
-- [Upgrade an installation](upgrading.md): package, configuration, journals, and no-retry ledgers.
+- [Why Veyro uses Jev](why-jev.md): typed checkpoint questions and their limits.
+- [Local model roles](qwen-models.md): Qwen3 Coder 30B, Qwen3-14B assessment, and optional Laya evaluation.
+- [Typed advisory evaluator](native-judge.md): rubric format, evidence selection, and review policy.
 
-## Model variants
+Model output remains advisory. It cannot override failed commands, native permission denials,
+policy, or human approval.
 
-- [Qwen3 4B Instruct and Qwen3 14B](qwen-models.md): sizes, memory tradeoffs, use cases, and release status.
+## Experimental native tasks and evaluation
 
-## Reference
+- [Pinned local agent task](agent-router.md): command boundary and recorded lifecycle evidence.
+- [Native autonomous tasks](native-autonomy.md): checked builds, bounded same-session repair, and G4 limits.
+- [Local evaluation harness](local-harness.md): readout workers, typed evaluators, corrections, and calibration.
+- [Evaluation capture](evaluation-capture.md): development-only provenance receipts for G6 work.
+- [Cross-repository evaluator training](repository-training.md): offline adapter pilot and failed quality result.
+- [Selene grounding and training](selene-grounding-training.md): clause evidence, split custody, offline training, and shadow-only rollout.
+- [Codex App Server steering](steering.md): explicit experimental opt-in.
+- [Optional jeff shadow validation](jeff-shadow-canary.md): disabled by default and non-authoritative.
+- [Internal factory runtime](runtime.md): library-only historical and experimental execution path.
 
-- [Capabilities, version pins, and privacy](supervision-reference.md).
-- [Control policies and approval protocol](supervision-rollout.md).
-- [Read-only attachment and history limits](existing-session-attachment.md).
-- [Prime daemon bridge](prime-agent-daemon-bridge.md).
-- [OpenCode HTTP/SSE bridge](opencode-server-bridge.md).
-- [Codex hook listener](codex-hooks-bridge.md).
+Passing checks and evaluator scores stop experimental tasks for operator review. They do not
+accept the work. Private study custody under `.audit/` is intentionally absent from release
+artifacts.
 
 ## Architecture and evidence
 
-- [Semantic assessment and deterministic control](theory.md).
-- [How localjev maps Qwen3-14B to typed judgments](why-jev.md).
-- [Verification commands and recorded native checks](supervision-verification.md).
-- [What the evidence establishes](what-veyro-proves.md).
-- [Disposable Prime control check](prime-agent-supervision-canary.md).
+- [Architecture and trust model](theory.md)
+- [What Veyro proves](what-veyro-proves.md)
+- [Current release scope](release-scope.md)
+- [Release gates](../GATES.md)
+- [Machine-readable release status](../release-status.json)
+- [Prime Agent disposable control check](prime-agent-supervision-canary.md)
 
-## Separate interfaces
+The README diagrams are generated by `tools/generate_supervision_diagram.py`. Check them before
+committing changes to model roles, task flow, or control delivery:
 
-- [Native agent launcher](agent-router.md): keep the native terminal and add lifecycle observation.
-- [Factory runtime](runtime.md): worker execution and its separate content-retention contract.
-- [Codex App Server steering](steering.md): experimental, explicit opt-in.
-- [Optional jeff shadow validation](jeff-shadow-canary.md): disabled by default, never a substitute for localjev.
+```sh
+uv run --script tools/generate_supervision_diagram.py --check
+```
 
-Return to the [project README](../README.md) for installation and a system overview.
+## Contribute
+
+Read the [contribution guide](../CONTRIBUTING.md) for setup, verification, and pull-request
+expectations. Report vulnerabilities through the private process in the
+[security policy](../SECURITY.md).
+
+Return to the [project README](../README.md) for the quickstart and system overview.

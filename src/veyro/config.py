@@ -4,7 +4,7 @@ import os
 from collections.abc import Callable
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 
 from veyro.agents import AgentId
 
@@ -36,6 +36,13 @@ class JevProviderConfig(BaseModel):
     timeout_seconds: float = Field(default=10.0, gt=0.0)
     max_state_characters: int | None = Field(default=None, gt=0)
     state_format: Literal["kv", "json", "values"] = "kv"
+
+    @field_validator("base_url")
+    @classmethod
+    def loopback_only(cls, value: HttpUrl) -> HttpUrl:
+        if value.host not in {"127.0.0.1", "localhost", "::1"}:
+            raise ValueError("local-only deployment requires a loopback Jev endpoint")
+        return value
 
 
 class FactoryConfig(BaseModel):

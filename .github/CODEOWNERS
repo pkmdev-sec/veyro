@@ -1,0 +1,13 @@
+# Default review ownership
+* @pkmdev-sec
+
+# Release claims and governance
+/release-status.json @pkmdev-sec
+/GATES.md @pkmdev-sec
+/SECURITY.md @pkmdev-sec
+/tools/check_release.py @pkmdev-sec
+
+# Control and autonomous-task trust boundaries
+/src/veyro/supervision/ @pkmdev-sec
+/src/veyro/autonomy_check.py @pkmdev-sec
+/src/veyro/opencode_autonomy.py @pkmdev-sec

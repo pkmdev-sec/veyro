@@ -82,12 +82,13 @@ Ctrl-C detaches the observer; it does not stop the native session.
    ```sh
    veyro supervise --agent prime-agent --repo /path/to/repo \
      --socket /path/to/existing/daemon.sock --session ACTIVE_ID \
-     --proposal /real/private/operator/proposal.json
+     --proposal /real/private/operator/proposal.json \
+     --ledger-dir /real/private/operator/delivery
    ```
 
 For advisory assessment without delivery, use a separate policy file containing
-`{"protocol_version":"1.0","mode":"advisory"}` and pass it with `--policy`.
-Neither observe-only nor advisory mode needs or creates a ledger.
+`{"protocol_version":"1.0","mode":"advisory"}` and pass it with `--policy`. Every mode records
+its decision in the same persistent ledger.
 
 ## Approve one exact control
 
@@ -104,7 +105,7 @@ Neither observe-only nor advisory mode needs or creates a ledger.
    ```
 
    For OpenCode use `--agent opencode --server http://127.0.0.1:PORT` instead of
-   `--socket`. The public command does not provide Codex queue dispatch.
+   `--socket`. Codex supervision is observation-only and unavailable here.
 3. Read the emitted `supervision` and, if present, `approval_required` records.
    Check the identity, action, command ID, policy digest, and request digest.
    In the same process, send one JSON line on stdin using the emitted digest and

@@ -1,0 +1,10 @@
+{
+  "id": "addition-example",
+  "input": {
+    "task": "What is 2 + 3?"
+  },
+  "output": {
+    "answer": "5"
+  },
+  "reference": "5"
+}

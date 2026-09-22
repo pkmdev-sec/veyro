@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-09-20T05:28:59.163625+00:00",
+  "platform": "Darwin",
+  "python": "3.12.12",
+  "result": {
+    "kind": "live_native_tui",
+    "agent": "prime-agent",
+    "version": "0.9.5",
+    "model": null,
+    "local_profile": "small",
+    "phase": "planning",
+    "adapter_error": null,
+    "judge_enabled": true,
+    "judge_result": null,
+    "elapsed_seconds": 0.6377870420110412,
+    "assertions_passed": 2,
+    "assertions_total": 8,
+    "accuracy": 0.25,
+    "verifier_unchanged": true,
+    "transitions": [],
+    "checkpoint_latency_ms": [],
+    "artifact_directory": "/var/folders/mg/wdx8vj9d419dcvk_v8_xs82c0000gn/T/veyro-live-prime-agent-l6guxerx",
+    "human_task_inputs": 0,
+    "limits": "One slug fixture, real provider and PTY; terminal closed only after outcome or timeout."
+  }
+}

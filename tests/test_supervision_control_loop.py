@@ -12,6 +12,7 @@ from veyro.models import (
     AuthorizationOutcome,
     BoundaryAction,
     BoundaryOperation,
+    ControlEffectStatus,
     ControlOutcome,
     ControlRequest,
     ControlResult,
@@ -26,7 +27,7 @@ from veyro.models import (
 )
 from veyro.models.rollout import RolloutPolicy
 from veyro.supervision import CheckpointAssessmentService, control_request_sha256
-from veyro.supervision.control_loop import ControlLoopError, SupervisionControlLoop
+from veyro.supervision.control_loop import SupervisionControlLoop
 from veyro.supervision.delivery import DeliveryLedger
 
 
@@ -136,6 +137,13 @@ class FakePrimeBridge:
             detail="provider control result",
         )
 
+    async def execute_if_current(
+        self, request: ControlRequest, *, expected_sequence: int
+    ) -> ControlResult | None:
+        if self.last_event_sequence != expected_sequence:
+            return None
+        return await self.execute(request)
+
     async def close(self) -> None:
         pass
 
@@ -148,11 +156,14 @@ def request(session: SessionIdentity) -> ControlRequest:
     )
 
 
-def boundary_action(control: ControlRequest) -> BoundaryAction:
+def boundary_action(
+    control: ControlRequest,
+    operation: BoundaryOperation = BoundaryOperation.READ_REPOSITORY,
+) -> BoundaryAction:
     return BoundaryAction(
         action_id=control.command_id,
         session=control.session,
-        operation=BoundaryOperation.UNKNOWN,
+        operation=operation,
         target_sha256=control_request_sha256(control),
     )
 
@@ -170,7 +181,9 @@ def approval(control: ControlRequest, *, now: datetime | None = None) -> HumanAp
 
 
 @pytest.mark.asyncio
-async def test_full_control_loop_assesses_authorizes_dispatches_and_verifies(tmp_path) -> None:
+async def test_full_control_loop_authorizes_dispatches_and_verifies_without_assessment(
+    tmp_path,
+) -> None:
     bridge = FakePrimeBridge(repository=tmp_path.resolve())
     control = request(bridge.identity)
     assessor = FakeAssessor()
@@ -190,17 +203,19 @@ async def test_full_control_loop_assesses_authorizes_dispatches_and_verifies(tmp
     )
 
     assert evidence.reduced_state.last_sequence == 1
-    assert evidence.checkpoint is not None
-    assert evidence.checkpoint.kind.value == "risky_action"
-    assert evidence.assessment is not None
-    assert evidence.assessment.provenance.provider_id == "localjev-qwen3-14b"
+    assert evidence.checkpoint is None
+    assert evidence.assessment is None
     assert evidence.control.authorization.outcome is AuthorizationOutcome.AUTHORIZED
     assert evidence.control.result is not None
     assert evidence.control.result.outcome is ControlOutcome.EXECUTED
+    assert evidence.control.effect.status is ControlEffectStatus.VERIFIED
+    assert evidence.effect.status is ControlEffectStatus.VERIFIED
+    assert evidence.effect.native_event is SupervisionEventType.SESSION_FAILED
     assert evidence.verification_event is not None
     assert evidence.verification_event.payload == {"reason": "killed"}
     assert bridge.executed == [control]
-    assert assessor.calls == 1
+    assert assessor.calls == 0
+    assert len(list((tmp_path / "delivery").iterdir())) == 4
 
 
 @pytest.mark.asyncio
@@ -223,11 +238,14 @@ async def test_missing_human_approval_blocks_prime_daemon_dispatch(tmp_path) -> 
     assert evidence.control.authorization.outcome is AuthorizationOutcome.HUMAN_APPROVAL_REQUIRED
     assert evidence.control.result is None
     assert evidence.verification_event is None
+    assert evidence.effect.status is ControlEffectStatus.NOT_APPLICABLE
     assert bridge.executed == []
+    (decision,) = (tmp_path / "delivery").glob("*.decision.json")
+    assert '"outcome":"human_approval_required"' in decision.read_text()
 
 
 @pytest.mark.asyncio
-async def test_executed_stop_requires_provider_terminal_event(tmp_path) -> None:
+async def test_unverified_stop_returns_unknown_and_persists_final_effect(tmp_path) -> None:
     bridge = FakePrimeBridge(repository=tmp_path.resolve(), verify_stop=False)
     control = request(bridge.identity)
     loop = SupervisionControlLoop(
@@ -237,13 +255,18 @@ async def test_executed_stop_requires_provider_terminal_event(tmp_path) -> None:
         ledger=DeliveryLedger(tmp_path / "delivery"),
     )
 
-    with pytest.raises(ControlLoopError, match="closed before stop verification"):
-        await loop.run_control(
-            event=bridge._events[0],
-            request=control,
-            boundary_action=boundary_action(control),
-            human_approval=approval(control),
-        )
+    evidence = await loop.run_control(
+        event=bridge._events[0],
+        request=control,
+        boundary_action=boundary_action(control),
+        human_approval=approval(control),
+    )
+
+    assert evidence.verification_event is None
+    assert evidence.effect.status is ControlEffectStatus.UNKNOWN
+    receipts = list((tmp_path / "delivery").glob("*.effect.json"))
+    assert len(receipts) == 1
+    assert '"effect":"unknown"' in receipts[0].read_text()
 
 
 @pytest.mark.asyncio
@@ -270,3 +293,4 @@ async def test_rejected_stop_returns_without_waiting_for_terminal_event(tmp_path
     assert evidence.control.result is not None
     assert evidence.control.result.outcome is ControlOutcome.REJECTED
     assert evidence.verification_event is None
+    assert evidence.effect.status is ControlEffectStatus.FAILED

@@ -1,59 +1,82 @@
-# Qwen model variants
+# Local model roles
 
-Veyro has a **14B released assessor** and a **4B experimental development profile**.
-The merge of the scoped supervision release did not include the local model-profile,
-readout, or evaluator stack. Do not treat the two sizes as selectable backends in `main`.
+Veyro's local autonomous harness assigns a generative Qwen coder and a non-generative
+Laya evaluator to different jobs.
+They work in one bounded task loop but run through separate local inference paths.
 
-## Compare the models
+| Role | Profile | Model | Runtime | Authority |
+|---|---|---|---|---|
+| Coding | `coder30` | `qwen3-coder:30b` | OpenCode through a loopback Ollama adapter | Can plan, use tools, and edit files |
+| Typed evaluation | `laya` | `convaiinnovations/laya/typed-decisions` | Pinned offline Safetensors adapter | Can score declared completion criteria |
 
-| | Qwen3 4B Instruct | Qwen3 14B |
-| --- | --- | --- |
-| Ollama tag | `qwen3:4b-instruct-2507-q4_K_M` | `qwen3:14b` |
-| Recorded parameter size | 4.0B | 14.8B |
-| Weight format | Q4_K_M GGUF | Q4_K_M GGUF |
-| Intended use | Lower-memory local coding and finite-label evaluation experiments | Existing-session checkpoint assessment through localjev |
-| Status in `main` | Not shipped; development work remains unmerged | Pinned assessor in the scoped release |
+The 30B writer never approves its own work. Laya cannot generate text or edit the repository.
+Executable checks remain authoritative and always run before typed evaluation.
 
-At the same quantization, 4B needs less memory for weights. Total memory also includes
-context caches and loaded service copies. This does not establish a speed or accuracy
-advantage. The 4B experiments have not qualified it for autonomous task completion.
+## Task flow
 
-The exact **Instruct** tag matters. The experimental `small` profile does not select
-`qwen3:4b`, whose thinking template is unsuitable for that profile's first-answer-position
-label scoring. Installing that tag is not a substitute for the 4B Instruct weights.
+1. OpenCode sends the task to the Qwen3 Coder 30B model.
+2. The native agent plans and edits with its normal tools and permission rules.
+3. Veyro runs every declared executable check.
+4. A failed check returns its bounded output to the same 30B OpenCode session. Laya is not called.
+5. After all checks pass, Veyro asks Laya to score typed completion criteria against only the declared evidence files.
+6. Failed or uncertain criteria return their scores to the same 30B OpenCode session for repair.
+7. Passing checks and typed criteria stop the run for operator review. They do not authorize completion.
 
-## The released 14B path
+Evaluator errors, unavailable services, exhausted limits, and passing scores all leave final acceptance to the operator.
 
-Existing-session supervision uses:
+## Run the pair
 
-**Veyro checkpoints → localjev (`127.0.0.1:8080`) → Ollama (`127.0.0.1:11434`) → Qwen3 14B**
+The Laya checkpoint and launcher must match their pinned hashes. The 30B model must be
+installed in Ollama. Veyro does not download either model.
 
-The [baseline manifest](../config/baselines/localjev-qwen3-14b.json) records the pinned
-weight identity and service settings. `jev-latest` is the SDK request alias; it is not
-the model's weight name. See [localjev setup](localjev.md) for installation checks.
+```sh
+veyro local models
+veyro local warm coder30
 
-localjev returns model-generated estimates. These are not calibrated guarantees or
-direct token-logit measurements. Veyro rejects invalid checkpoint scores. Deterministic
-policy and exact human approval still govern supported controls; a model score cannot
-grant permission.
+veyro agent opencode --repo . --autonomous \
+  --coding-profile coder30 \
+  --evaluation-profile laya \
+  --prompt 'Implement the requested change' \
+  --check '.venv/bin/python -m pytest -q' \
+  --evaluator examples/native-judge.json \
+  --allow-uncalibrated-evaluator
+```
 
-## The unmerged local-profile path
+OpenCode is the only eligible strict-local coding driver. Model selection is launch-scoped. It does not edit global provider settings or remove native
+permission denials.
 
-The development profiles are named `small` and `14b`. They select 4B Instruct and 14B
-weights for local coding through Ollama and a separate GGUF readout worker.
-That readout uses `llama-cpp-python` directly. It does not call localjev.
+The evaluator normally requires a matching calibration artifact for each criterion.
+`--allow-uncalibrated-evaluator` enables a raw-score experiment. It does not establish
+accuracy or completion authority.
 
-This path is distinct even when it uses the same 14B weight tag. It is not included in
-the current release. `veyro local`, `veyro evaluator`, and the autonomous task options
-are not available in `main`. No switching, fallback, or voting between 4B and 14B occurs
-in the released existing-session control plane.
+## Why separate runtimes?
 
-The architecture diagram shows both models with separate status labels. The 4B card
-is a model key, not a connection to the active supervision path.
+Coding uses Ollama's chat API because the native agents need generative tool use. Typed
+evaluation uses the pinned Laya typed-decisions encoder because it needs bounded typed
+probabilities with zero generated answer tokens. Separate processes keep the writer and
+critic independent:
 
-## Qualification limits
+| Service | Default endpoint |
+|---|---|
+| Ollama coding | `127.0.0.1:11434` |
+| `small` readout, when used separately | `127.0.0.1:8081` |
+| `laya` typed evaluator | On-demand offline subprocess; no listening port |
 
-The development task runs have not passed across both native CLIs and both profiles.
-Independent workflow-labelled calibration is also incomplete. Showing both variants
-in documentation does not close those gaps. See the [release scope](release-scope.md)
-and [evidence limits](what-veyro-proves.md).
+The historical `14b` Qwen readout remains available for regression comparison, but it is
+not the default evaluator.
+
+## Provenance and limits
+
+The autonomy snapshot records both profile IDs and pinned model identities under
+`model_roles`. The typed result also records readout profile and model provenance.
+Ollama coding requests identify the configured model tag but do not attest the weight
+digest on every response.
+
+This architecture is implemented and covered by local end-to-end tests. Qwen3 Coder 30B
+passed the structured-tool gate, three direct 8/8 seeds, and a bounded same-session repair
+canary at 8/8. Its unforced native canary passed 7/8. G4 remains open for initial-pass reliability. G6 remains open until
+independent workflow-labelled calibration evidence is complete. See [GATES.md](../GATES.md).
+
+The Jev article supports typed classification and software routing. It does not specify
+this coding, check, evaluation, or repair design. See the stored
+[source boundary](sources/building-a-harness-with-jev.md).

@@ -1,0 +1,49 @@
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 23%]
+........................................................................ [ 30%]
+........................................................................ [ 38%]
+........................................................................ [ 46%]
+........................................................................ [ 53%]
+........................................................................ [ 61%]
+........................................................................ [ 69%]
+........................................................................ [ 76%]
+........................................................................ [ 84%]
+........................................................................ [ 92%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+=============================== warnings summary ===============================
+tests/test_supervision_broker.py::test_authenticated_socket_publishes_and_replays_events
+  <repo>/.venv/lib/python3.12/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10719cf40>
+
+  Traceback (most recent call last):
+    File "~/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/selector_events.py", line 282, in _add_reader
+      key = self._selector.get_key(fd)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "~/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/selectors.py", line 192, in get_key
+      raise KeyError("{!r} is not registered".format(fileobj)) from None
+  KeyError: '25 is not registered'
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "~/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/base_subprocess.py", line 126, in __del__
+      self.close()
+    File "~/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/base_subprocess.py", line 104, in close
+      proto.pipe.close()
+    File "~/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/unix_events.py", line 568, in close
+      self._close(None)
+    File "~/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/unix_events.py", line 592, in _close
+      self._loop.call_soon(self._call_connection_lost, exc)
+    File "~/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/base_events.py", line 799, in call_soon
+      self._check_closed()
+    File "~/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+938 passed, 1 warning in 34.64s

@@ -41,5 +41,4 @@ class CodexWorker(NativeCliWorker):
         ]
 
 
-
 __all__ = ["CodexWorker", "coding_mission", "mission_for", "verification_mission"]

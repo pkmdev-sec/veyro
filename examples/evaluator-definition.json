@@ -1,0 +1,63 @@
+{
+  "version": "1",
+  "name": "answer-quality",
+  "prompt": "Task: {{task}}\nAnswer: {{answer}}\nReference: {{reference}}",
+  "variables": {
+    "task": {
+      "source": "input",
+      "path": [
+        "task"
+      ]
+    },
+    "answer": {
+      "source": "output",
+      "path": [
+        "answer"
+      ]
+    },
+    "reference": {
+      "source": "reference"
+    }
+  },
+  "questions": {
+    "correct": {
+      "type": "noul",
+      "prompt": "Does the answer meet the task and agree with the reference?"
+    },
+    "route": {
+      "type": "choice",
+      "prompt": "What should happen next?",
+      "outcomes": [
+        {
+          "label": "accept",
+          "description": "The answer is complete."
+        },
+        {
+          "label": "revise",
+          "description": "The answer needs a correction."
+        }
+      ]
+    },
+    "quality": {
+      "type": "score",
+      "prompt": "Rate the answer against the task and reference.",
+      "outcomes": [
+        {
+          "label": "poor",
+          "description": "The main requirement is missing.",
+          "value": 0
+        },
+        {
+          "label": "partial",
+          "description": "Some requirements are met.",
+          "value": 1
+        },
+        {
+          "label": "complete",
+          "description": "All requirements are met.",
+          "value": 2
+        }
+      ]
+    }
+  }
+}

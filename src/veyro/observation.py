@@ -73,9 +73,7 @@ def _bounded_worker(worker: WorkerRecord, output_limit: int) -> dict[str, Any]:
         "codex_thread_id": worker.codex_thread_id,
         "codex_turn_id": worker.codex_turn_id,
         "steer_count": worker.steer_count,
-        "last_steered_at": (
-            worker.last_steered_at.isoformat() if worker.last_steered_at else None
-        ),
+        "last_steered_at": (worker.last_steered_at.isoformat() if worker.last_steered_at else None),
         "steering_history": worker.steering_history[-3:],
     }
 
@@ -126,9 +124,7 @@ class ObservationBuilder:
             run_id=state.run_id,
             factory_status=state.status.value,
             iteration=state.iteration,
-            active_workers=[
-                _bounded_worker(worker, self.config.output_limit) for worker in active
-            ],
+            active_workers=[_bounded_worker(worker, self.config.output_limit) for worker in active],
             worker_history=[
                 _bounded_worker(worker, self.config.output_limit) for worker in history
             ],

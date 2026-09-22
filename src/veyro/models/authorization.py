@@ -14,6 +14,9 @@ from veyro.models.supervision import (
     BridgeStability,
     CapabilityAvailability,
     ControlAction,
+    ControlEffect,
+    ControlEffectStatus,
+    ControlOutcome,
     ControlResult,
 )
 
@@ -100,12 +103,36 @@ class ControlAuthorization(AuthorizationModel):
 
 class AuthorizedControlResult(AuthorizationModel):
     authorization: ControlAuthorization
+    effect: ControlEffect
     result: ControlResult | None = None
 
     @model_validator(mode="after")
-    def execution_requires_authorization(self) -> Self:
-        executed = self.result is not None
+    def effect_matches_delivery_evidence(self) -> Self:
         authorized = self.authorization.outcome is AuthorizationOutcome.AUTHORIZED
-        if executed != authorized:
-            raise ValueError("control results require successful authorization")
+        status = self.effect.status
+        if not authorized:
+            if self.result is not None or status is not ControlEffectStatus.NOT_APPLICABLE:
+                raise ValueError("denied controls have no provider effect")
+            return self
+        if status is ControlEffectStatus.NOT_APPLICABLE:
+            raise ValueError("authorized controls require an effect classification")
+        if status in {
+            ControlEffectStatus.VERIFIED,
+            ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED,
+            ControlEffectStatus.FAILED,
+        } and self.result is None:
+            raise ValueError("known provider effects require a validated control result")
+        if self.result is not None:
+            executed = self.result.outcome is ControlOutcome.EXECUTED
+            if executed and status not in {
+                ControlEffectStatus.VERIFIED,
+                ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED,
+                ControlEffectStatus.UNKNOWN,
+            }:
+                raise ValueError("executed control has an incompatible effect classification")
+            if not executed and status in {
+                ControlEffectStatus.VERIFIED,
+                ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED,
+            }:
+                raise ValueError("unsuccessful control cannot have a successful effect")
         return self

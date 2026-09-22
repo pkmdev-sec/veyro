@@ -37,8 +37,8 @@ text. Normalized supervision state excludes native transcripts, tool arguments,
 tool output, credentials, and file contents. It can still include sensitive IDs,
 repository paths, counts, digests, and approval metadata.
 
-The separate factory observation can contain task text, Git diffs, and worker
-output. Do not apply the control plane's metadata-only claim to `veyro run`.
+The internal legacy factory observation can contain task text, Git diffs, and worker
+output. Its top-level command is unavailable; do not apply the control plane's metadata-only claim.
 
 ## Response validation and provenance
 
