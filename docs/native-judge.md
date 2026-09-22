@@ -1,8 +1,12 @@
 # Typed advisory evaluator
 
-## Run a rubric after executable checks
+## Recorded rubric example for a pre-provisioned machine
 
-Add `--evaluator` to an autonomous native launch:
+The `laya` profile is available only on a pre-provisioned maintainer machine whose
+runtime and checkpoint match the pinned profile. This repository does not publish a
+reproducible Laya installation or checkpoint acquisition procedure, and Veyro does
+not download Laya. The following command is a recorded example for an
+already-provisioned maintainer machine. It is not a public setup procedure.
 
 ```sh
 veyro agent opencode --repo . --autonomous --coding-profile coder30 \
@@ -13,10 +17,15 @@ veyro agent opencode --repo . --autonomous --coding-profile coder30 \
   --allow-uncalibrated-evaluator
 ```
 
-The checked-in rubric targets the example `slug.py` task. Copy it and replace its criteria and
-evidence paths for your repository. Adding `--evaluator` explicitly opts in to sending the selected
-artifacts and task to the configured evaluator endpoint. Veyro does not change global agent
-configuration.
+With `--evaluation-profile laya`, the CLI replaces the rubric's provider settings
+with a launch-scoped local provider bound to the selected pinned profile. This path
+does not call a Jev endpoint or read `TYPESAFE_API_KEY`. After every executable check
+passes, Veyro sends the original task, check exit and timeout facts, and only the
+repository files named in `evidence_files` to the pinned offline Laya evaluator.
+The override does not change global agent configuration.
+
+The checked-in rubric targets the example `slug.py` task. Copy it and replace its
+criteria and evidence paths for your repository.
 
 An evaluator rubric has this shape:
 
@@ -27,10 +36,7 @@ An evaluator rubric has this shape:
     "limitations_explained": "The README explains the API's supported inputs, failure modes, and known limitations without claiming unsupported behavior."
   },
   "evidence_files": ["README.md", "src/api.py"],
-  "pass_threshold": 0.9,
-  "provider": {
-    "timeout_seconds": 30
-  }
+  "pass_threshold": 0.9
 }
 ```
 
@@ -38,15 +44,22 @@ Use your actual repository paths and requirements. Prefer executable tests for
 requirements they can establish. Use the typed evaluator for natural-language
 contracts or other evidence that needs interpretation.
 
-Provider defaults reuse Veyro's configured localjev/Qwen3-14B baseline: local
-endpoint `http://127.0.0.1:8080`, request alias `jev-latest`, and
-`TYPESAFE_API_KEY`. The evaluator reads that key from its environment or the target
-repository's `.env`. The key is not copied into Veyro's run configuration or sent
-as evidence. See [localjev setup](localjev.md). A Jev-compatible endpoint can be configured through `provider`, but it must resolve to
-`127.0.0.1`, `localhost`, or `::1`. There is no remote endpoint or automatic provider fallback.
-Endpoint credentials must use the named environment variable, not URL userinfo or query parameters.
+### Direct-library Jev provider
 
-The runnable [slug rubric](../examples/native-judge.json) and
+The `JudgeConfig` library API also supports a separate Jev-compatible provider.
+This provider is not used by the `--evaluation-profile laya` command above. For a
+direct library caller that leaves `provider` unset, the defaults are the local
+endpoint `http://127.0.0.1:8080`, request alias `jev-latest`, and the
+`TYPESAFE_API_KEY` environment variable. The evaluator reads that variable from its
+environment or the target repository's `.env`; it does not copy the key into Veyro's
+run configuration or send it as evidence. See [localjev setup](localjev.md).
+
+A direct caller can configure another Jev-compatible endpoint through `provider`,
+but the endpoint must resolve to `127.0.0.1`, `localhost`, or `::1`. There is no
+remote endpoint or automatic provider fallback. Endpoint credentials must use the
+named environment variable, not URL userinfo or query parameters.
+
+The checked-in [slug rubric](../examples/native-judge.json) and
 [labelled fixture set](../examples/native-judge-cases.json) are examples, not
 universal acceptance tests.
 
@@ -81,25 +94,27 @@ limit; oversized responses are rejected, not interpreted from a diagnostic tail.
 added to every native event or to the default checkpoint path.
 
 `native_judge.py` owns rubric validation, explicit artifact collection, and
-score-to-verdict policy. It reuses `JevVeyroModel.assess_values` and its SDK,
-authentication, retry, timeout, and provenance handling. An opt-in `strict_scores`
-setting rejects finite out-of-range values rather than clamping them to passing
-scores. The existing factory and supervision clients keep their prior behavior.
+score-to-verdict policy. For the local profile selected by the CLI, it calls the
+local evaluator dispatcher, which invokes the pinned profile without the Jev
+client. For the separate Jev provider, it reuses `JevVeyroModel.assess_values` and
+its SDK authentication, retry, timeout, and provenance handling. The native Jev
+path enables `strict_scores`, which rejects finite out-of-range values rather than
+clamping them to passing scores. The existing factory and supervision clients keep
+their prior behavior.
 
-The current `native-rubric-v2` protocol sends independent requests per criterion,
-with shared evidence but no other criterion's answer or rubric in that request.
-Requests can run concurrently. This avoids deliberately conditioning one
-criterion on another's answer; it cannot guarantee neural independence or
-perfect calibration. We chose it after a batched local benchmark showed
-order-sensitive false acceptance. The earlier results are retained, not replaced
-by a success-only report.
+The direct Jev path's `native-rubric-v2` protocol sends independent requests per
+criterion, with shared evidence but no other criterion's answer or rubric in that
+request. Requests can run concurrently. This avoids deliberately conditioning one
+criterion on another's answer; it cannot guarantee neural independence or perfect
+calibration. We chose it after a batched local benchmark showed order-sensitive
+false acceptance. The earlier results are retained, not replaced by a success-only
+report.
 
-Each result records:
-
-- Criterion scores, threshold, and passed/failed/uncertain disposition.
-- Rubric version and task, rubric, and evidence digests.
-- Per-criterion provider/model/checkpoint provenance and SDK latency.
-- Whole-evaluation and child-process latency.
+Both provider paths record criterion scores, the threshold and disposition, and
+task, rubric, and evidence digests. Jev results record per-criterion
+provider/model/checkpoint provenance and SDK latency. Local results record the
+profile, pinned model identity, score source, calibration provenance, and evaluator
+metrics. Both record whole-evaluation latency.
 
 The local Laya profile verifies the launcher, runtime, inference code, tokenizer,
 configuration, and checkpoint hashes before and after each call. These remain

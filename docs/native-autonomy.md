@@ -103,13 +103,16 @@ agent SDK. There is no network call on the default checkpoint path.
 
 The small adapters in `src/veyro/integrations/` translate native events:
 
-| Native API | Prime Agent 0.9.5 | OpenCode 1.18.30 / 1.18.31 |
+| Native API | Prime Agent 0.9.5 | OpenCode 1.18.30 |
 | --- | --- | --- |
 | Load | Explicit `--extension` file | Launch-only `OPENCODE_CONFIG_CONTENT` plugin |
 | Bind session | `before_agent_start` | `chat.message` |
 | Check result | `agent_end` | Completed assistant + `session.idle` |
 | Continue | `sendUserMessage`, `followUp` | New bounded `run --session <id>` process |
 | Cancel | Native abort signal/context | Session error/deletion and SDK abort |
+
+The launcher accepts only OpenCode `1.18.30` for autonomous runs. Recorded `1.18.31`
+canaries are historical evidence only; the current launcher does not accept that version.
 
 The version-1 checker interface is:
 
