@@ -7,9 +7,9 @@ For the dated cross-provider checks, see [verification results](supervision-veri
 OpenCode session. It does not start or resume a native session. The default is
 observe-only. `veyro attach` remains strictly read-only.
 
-Codex hook journals remain available through `veyro attach`; this command does
-not expose a Codex queue channel. Pi and Claude Code support native launch,
-not existing-session supervision.
+Codex hook journals remain available through `veyro attach`; Codex supervision is
+observation-only. Pi and Claude Code support native launch, not existing-session
+supervision.
 
 ## Choose an operator policy
 
@@ -51,10 +51,10 @@ it cannot lower risk or make forbidden operations permissible.
 
 **No currently pinned adapter qualifies for automatic delivery.** Prime controls
 are internal. OpenCode approval replies and follow-ups are experimental; its
-stable interruption is disruptive and still requires approval. Codex's queue seam
-is experimental and is not exposed here. Tests use a deliberately stable test
-adapter to exercise the automatic branch; there is no claim of live automatic
-control validation or capability promotion.
+stable interruption is disruptive and still requires approval. Codex supervision
+is observation-only. Tests use a deliberately stable test adapter to exercise the
+automatic branch; there is no claim of live automatic control validation or
+capability promotion.
 
 Free-text follow-ups and steering, interruption, stop, and approval grants always
 require human approval. A queued follow-up can immediately start an idle native
@@ -87,7 +87,8 @@ Discover the selector with `veyro sessions`, then run:
 ```sh
 veyro supervise --agent prime-agent --repo /path/to/repo \
   --socket /path/to/existing/daemon.sock --session ACTIVE_ID \
-  --proposal /private/path/proposal.json
+  --proposal /private/path/proposal.json \
+  --ledger-dir /real/private/path/delivery
 ```
 
 This default invocation reports a decision and sends no control. For explicit
@@ -104,10 +105,10 @@ For OpenCode, use `--agent opencode --server http://127.0.0.1:PORT` instead of
 `--socket`. Credentials come only from `OPENCODE_SERVER_USERNAME` and
 `OPENCODE_SERVER_PASSWORD`. Loopback credentials do not use environment proxies.
 
-Executing modes require a persistent private ledger directory. Every path
-component must be nonsymlinked. On macOS, use the real path, such as
-`/private/var/...`, not the `/var` or `/tmp` aliases. Veyro creates missing ledger
-directories with owner-only permissions. Observe/advisory modes create no ledger.
+Every mode requires a persistent private ledger directory. Every path component must be
+nonsymlinked. On macOS, use the real path, such as `/private/var/...`, not the `/var` or
+`/tmp/...` aliases. Veyro creates missing ledger directories with owner-only permissions and
+persists every decision before returning it.
 
 ## Approve the exact request
 

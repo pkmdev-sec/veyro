@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -17,6 +18,7 @@ from veyro.models import (
     CapabilityAvailability,
     CapabilityDeclaration,
     CapabilitySet,
+    ControlEffectStatus,
     ControlOutcome,
     ControlRequest,
     ControlResult,
@@ -213,7 +215,7 @@ def test_forbidden_boundary_cannot_be_overridden_by_human_approval() -> None:
     assert result.reason is AuthorizationReason.BOUNDARY_FORBIDDEN
 
 
-def test_review_required_control_needs_current_semantic_and_human_evidence() -> None:
+def test_review_required_control_rejects_unqualified_semantic_labels() -> None:
     session = identity()
     control = request(session)
     trigger, state = context(session)
@@ -227,30 +229,18 @@ def test_review_required_control_needs_current_semantic_and_human_evidence() -> 
     checkpoint = CheckpointSelector().select(trigger, state, boundary_decision=risk)
     assert checkpoint is not None
     semantic = assessment_for(checkpoint)
-    waiting = gate.authorize(
+    supplied = gate.authorize(
         control,
         capabilities=caps,
         state=state,
         boundary=risk,
         checkpoint=checkpoint,
         assessment=semantic,
+        human_approval=approval(control, datetime.now(UTC)),
     )
-    assert waiting.outcome is AuthorizationOutcome.HUMAN_APPROVAL_REQUIRED
-
-    now = datetime.now(UTC)
-    authorized = gate.authorize(
-        control,
-        capabilities=caps,
-        state=state,
-        boundary=risk,
-        checkpoint=checkpoint,
-        assessment=semantic,
-        human_approval=approval(control, now),
-        now=now,
-    )
-    assert authorized.outcome is AuthorizationOutcome.AUTHORIZED
-    assert authorized.checkpoint_id == checkpoint.checkpoint_id
-    assert authorized.human_approval_id == "human-1"
+    assert supplied.outcome is AuthorizationOutcome.DENIED
+    assert supplied.reason is AuthorizationReason.SEMANTIC_EVIDENCE_INVALID
+    assert supplied.checkpoint_id is None
 
 
 def test_disruptive_or_experimental_controls_require_human_approval() -> None:
@@ -318,6 +308,13 @@ class Bridge:
             outcome=ControlOutcome.EXECUTED,
         )
 
+    async def execute_if_current(
+        self, control: ControlRequest, *, expected_sequence: int
+    ) -> ControlResult | None:
+        if self.last_event_sequence != expected_sequence:
+            return None
+        return await self.execute(control)
+
 
 @pytest.mark.asyncio
 async def test_dispatcher_never_calls_bridge_when_gate_denies(tmp_path) -> None:
@@ -337,8 +334,27 @@ async def test_dispatcher_never_calls_bridge_when_gate_denies(tmp_path) -> None:
         boundary=boundary(control, BoundaryOperation.EXPOSE_CREDENTIAL),
     )
     assert denied.result is None
+    assert denied.effect.status is ControlEffectStatus.NOT_APPLICABLE
     assert bridge.calls == 0
+    repeated = await dispatcher.dispatch(
+        control,
+        state=state,
+        boundary=boundary(control, BoundaryOperation.EXPOSE_CREDENTIAL),
+    )
+    assert repeated.authorization == denied.authorization
+    decision_paths = list((tmp_path / "delivery").glob("*.decision.json"))
+    assert len(decision_paths) == 1
+    assert json.loads(decision_paths[0].read_text())["outcome"] == "denied"
+    assert not list((tmp_path / "delivery").glob("*.claim.json"))
 
+    approval_required = await dispatcher.dispatch(
+        control,
+        state=state,
+        boundary=boundary(control, BoundaryOperation.READ_REPOSITORY),
+    )
+    assert approval_required.authorization.outcome is AuthorizationOutcome.HUMAN_APPROVAL_REQUIRED
+    assert approval_required.effect.status is ControlEffectStatus.NOT_APPLICABLE
+    assert not list((tmp_path / "delivery").glob("*.claim.json"))
     allowed = await dispatcher.dispatch(
         control,
         state=state,
@@ -346,7 +362,9 @@ async def test_dispatcher_never_calls_bridge_when_gate_denies(tmp_path) -> None:
         boundary=boundary(control, BoundaryOperation.READ_REPOSITORY),
     )
     assert allowed.result is not None
+    assert allowed.effect.status is ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED
     assert bridge.calls == 1
+    assert len(list((tmp_path / "delivery").glob("*.decision.json"))) == 3
 
 
 def test_human_approval_issued_in_the_future_is_invalid() -> None:

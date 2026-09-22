@@ -197,8 +197,8 @@ def hook_journal(tmp_path):
         bridge_id=BRIDGE_ID,
         bridge_version=BRIDGE_VERSION,
     )
-    store = BrokerStore.create(repository, identity, codex_hook_capabilities(allow_queue=True))
-    bridge = CodexHookBridge(store, Path("/must-not-execute"), repository / "native-home")
+    store = BrokerStore.create(repository, identity, codex_hook_capabilities())
+    bridge = CodexHookBridge(store)
     for name in ["SessionStart", "UserPromptSubmit", "SessionEnd"]:
         bridge.ingest(
             sanitize_hook(
@@ -464,6 +464,7 @@ async def test_prime_eof_reaches_observer_as_metadata_failure(tmp_path, native_e
     bridge._pump.cancel()
     await asyncio.gather(bridge._pump, return_exceptions=True)
     bridge._client = client
+    bridge._closed = False
     if native_event_first:
         client._reader.feed_data(
             json.dumps(
@@ -478,6 +479,7 @@ async def test_prime_eof_reaches_observer_as_metadata_failure(tmp_path, native_e
     client._reader.feed_eof()
     await client._read_messages()
     bridge._pump = asyncio.create_task(bridge._pump_outbound())
+    await bridge._pump
     stream = bridge.events()
     try:
         assert (await anext(stream)).event_type is SupervisionEventType.SESSION_STARTED

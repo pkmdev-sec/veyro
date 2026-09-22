@@ -9,9 +9,9 @@ The small profile must not use `qwen3:4b`. That tag is "Qwen3 4B Thinking 2507":
 template always starts the answer with `<think>`, so scoring a label at the first answer
 position is invalid. The engine now reads the model's own chat template and refuses a
 thinking-only generation prompt instead of returning meaningless scores.
-A fitted temperature is not proof of correctness. Executable checks remain prerequisites
-for autonomous completion. Keep the existing Jev provider configuration if you do not
-want to opt into the new readout.
+A fitted temperature is not proof of correctness. Executable checks provide repair feedback, not
+completion authority. Keep the existing Jev provider configuration if you do not want to opt into
+the new readout.
 
 ## Install and inspect
 
@@ -28,10 +28,12 @@ The runtime is pinned to `llama-cpp-python==0.3.35`.
 
 The bundled profiles are:
 
-| Profile | Ollama model | Quantization |
-|---|---|---|
-| `small` | `qwen3:4b-instruct-2507-q4_K_M` | Q4_K_M |
-| `14b` | `qwen3:14b` | Q4_K_M |
+| Profile | Ollama model | Quantization | Role |
+|---|---|---|---|
+| `small` | `qwen3:4b-instruct-2507-q4_K_M` | Q4_K_M | Rejected coding candidate; compatible readout |
+| `coder14` | `qwen2.5-coder:14b` | Q4_K_M | Rejected coding candidate; tool protocol mismatch |
+| `coder30` | `qwen3-coder:30b` | Q4_K_M | Selected OpenCode coding and repair model |
+| `14b` | `qwen3:14b` | Q4_K_M | Compatible typed readout |
 
 Ollama must already be available on `127.0.0.1:11434` for coding and inventory commands.
 Install missing models through Ollama. Then check `veyro local models`: the manifest
@@ -50,8 +52,8 @@ veyro local status small
 veyro local stop small
 ```
 
-Use `14b` in place of `small` for the other profile. The default readout ports are
-`8081` and `8082`. Both bind only to `127.0.0.1`. Existing services on `8080` and
+Only `small` and `14b` are compatible typed-readout profiles. Their default readout
+ports are `8081` and `8082`. `coder30` is used through Ollama, not the readout service. Both bind only to `127.0.0.1`. Existing services on `8080` and
 `11434` are not restarted or reconfigured.
 
 `ready` means that the model loaded and a real warmup forward pass completed.
@@ -74,44 +76,41 @@ workers can remain resident on every machine.
 
 ## Run the dual-model task harness
 
-Start the 14B readout worker and warm the 4B Ollama coding model. Then launch a
-native autonomous session with both roles explicit:
+Warm the 30B Ollama coding model. Laya loads its pinned typed-decisions checkpoint
+on demand. Then launch a native autonomous session with both roles explicit:
 
 ```sh
-veyro local start 14b
-veyro local status 14b
-veyro local warm small
-veyro agent prime-agent --repo . --autonomous \
-  --coding-profile small \
-  --evaluation-profile 14b \
+veyro local warm coder30
+veyro agent opencode --repo . --autonomous \
+  --coding-profile coder30 \
+  --evaluation-profile laya \
   --prompt 'Implement the requested change' \
   --check 'python verify.py' \
-  --evaluator rubric.json
+  --evaluator examples/native-judge.json \
+  --allow-uncalibrated-evaluator
 ```
 
-Use `opencode` instead of `prime-agent` for OpenCode. Both profile flags are required
-for the local pair. The coding profile binds the native agent to Qwen3 4B through
-Ollama. The evaluation profile snapshots Qwen3 14B into the typed evaluator config.
+Both profile flags are required for the local pair. The coding profile binds OpenCode to Qwen3 Coder 30B through
+Ollama. The evaluation profile snapshots the pinned Laya typed-decisions identity into
+the evaluator config.
 The configuration is launch-scoped. Veyro does not edit global provider settings or
 remove native permission denials.
 
 The control order is fixed:
 
-1. Qwen3 4B plans and edits through the native agent.
-2. Every executable check runs.
-3. Failed checks return to the 4B model. The evaluator is not called.
-4. When checks pass, Qwen3 14B scores the declared typed criteria against the listed evidence.
-5. Failed or uncertain criteria return their scores to the 4B model for bounded repair.
-6. Completion requires both gates to pass within the continuation and time limits.
+1. Qwen3 Coder 30B plans and edits through the native agent.
+2. Every worker-visible check runs.
+3. Failed checks return to the 30B model. The evaluator is not called.
+4. When checks pass, Laya scores the declared typed criteria against the listed evidence.
+5. Failed or uncertain criteria return their scores for bounded repair.
+6. Passing checks and scores stop the run for operator review.
 
-Evaluator errors, unavailable services, and exhausted limits block completion. The 14B
-model cannot override a failed executable check. The 4B model cannot approve its own
-work. See [Qwen3 model roles](qwen-models.md).
+The writer, checks, evaluator, and state run under one OS user. None can authorize completion.
+Use their output as repair evidence only.
 
-Local evaluation requires a matching calibration artifact for every criterion. To run
-a raw-score experiment instead, add `--allow-uncalibrated-evaluator`. This explicitly
-accepts the limitations; it does not make the scores calibrated or reliable. The older
-`--judge` and `--allow-uncalibrated-judge` spellings remain aliases for existing scripts.
+Local evaluation requires a matching calibration artifact for every criterion. To run a raw-score
+experiment instead, add `--allow-uncalibrated-evaluator`. This does not make the scores calibrated,
+reliable, or authoritative.
 
 Local coding uses temperature zero and requests no Qwen thinking through Ollama's
 `reasoning_effort: "none"` plus request-scoped `/no_think` hints. The pinned 4B template
@@ -123,7 +122,7 @@ Default-thinking trials timed out and were also affected by leftover Prime daemo
 they do not isolate the effect of thinking. Ollama rejects the `"low"` effort value for
 Qwen3.
 
-`veyro local warm small` optionally warms the Ollama coding model. Unlike the readout
+`veyro local warm coder30` optionally warms the Ollama coding model. Unlike the readout
 worker's readiness, `veyro local models` reports Ollama residency. The warm command
 refuses a new load when another model is resident, to avoid silently evicting it. Other
 clients can still change Ollama residency after that check.
@@ -191,6 +190,12 @@ veyro evaluator calibrate evaluator.json question_name train.json holdout-ids.js
 veyro evaluator validate-calibration fitted.json holdout-predictions.json
 veyro evaluator run evaluator.json case.json --profile small \
   --calibration question_name=fitted.json
+
+# Multi-feature post-hoc decision head (still requires an independent holdout)
+veyro evaluator fit-decision-head evaluator.json training-features.json holdout-ids.json head.json \
+  --profile 14b --feature preservation_regression --feature placeholder_present \
+  --regularization 0.01
+veyro evaluator validate-decision-head head.json holdout-features-and-labels.json
 ```
 
 Artifacts bind the model manifest identity, profile, complete evaluator, question, and
@@ -365,28 +370,28 @@ state-change check. This is further evidence against using its raw scores as a s
   TypeSafe AI's Jev and its LangChain integration, not a supervisor design, so it does not
   validate Veyro's checkpoint or stopping logic.
 - The readout uses existing LM-head rows, not newly outcome-trained heads or Jev internals.
-- No independent, workflow-labelled production calibration set is available.
+- No independently validated, passing workflow calibration is available; the frozen 18-case G6 decision-head holdout failed its accuracy, Brier, and log-loss gates.
 - The small readout fails quality tests. The 14B workflow still has a held-out false completion.
 - Native denial controls and executable checks remain authoritative. Do not weaken them to
   make a local model appear successful.
 
 ### Native executable selection
 
-On this machine, PATH's `opencode` wrapper refreshes a remote LiteLLM credential even for
-local models. The final local canaries bypassed it using the verified real binary:
+The deployment resolves the verified OpenCode executable, disables model discovery and
+automatic updates, pins the configured Ollama model, and runs the complete process tree in
+a macOS network sandbox that allows loopback only:
 
 ```sh
-PATH="$HOME/.opencode/bin:$PATH" veyro agent opencode --autonomous \
-  --coding-profile 14b --evaluation-profile 14b \
+veyro agent opencode --autonomous \
+  --coding-profile coder30 --evaluation-profile laya \
   --evaluator examples/local-native-canary-judge.json \
-  --allow-uncalibrated-evaluator --check 'python verify.py' --prompt 'Implement the requested task.'
+  --allow-uncalibrated-evaluator --check 'python verify.py' \
+  --prompt 'Implement the requested task.'
 ```
 
-Use the actual native installation path on your machine. Do not bypass a wrapper that
-enforces required permissions. The wrapper here only refreshes a credential and execs
-the binary. No wrapper or global provider configuration was edited. A real
-`opencode debug config` probe confirmed a global build-agent deny survives Veyro's
-launch-scoped overrides. This setup configures local inference; it is not a network sandbox.
+Do not pass a native `--model` argument. Veyro rejects it before launch. Native permission
+denials remain in force. A pinned profile proves model identity; the operating-system
+sandbox prevents accidental cloud fallback or remote discovery during the run.
 
 ### Final verification and cleanup
 

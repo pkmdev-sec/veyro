@@ -1,10 +1,10 @@
-# Factory runtime and event flow
+# Internal experimental factory runtime
 
-This reference describes `veyro run`, the separate worker-harness interface.
-It is not the existing-session `supervise` command. The factory defaults to localjev
-with Qwen3-14B and Codex `exec`. Its observations and logs can include task text,
-Git diffs, and worker output. See [the control-plane architecture](theory.md) for
-metadata-only existing-session supervision.
+This reference describes the legacy `FactoryRuntime` library implementation. The top-level
+`veyro run` command is unavailable. This runtime is separate from the supported existing-session
+`supervise` command and cannot enforce pinned loopback inference for its native workers. Its
+observations and logs can include task text, Git diffs, and worker output. See
+[the control-plane architecture](theory.md) for metadata-only existing-session supervision.
 
 ## Components
 
@@ -27,8 +27,8 @@ NativeCliWorker / Codex exec -> FactoryRuntime -> ObservationBuilder
 - `CodexAppServerWorker` is selected only with `VEYRO_CODEX_BACKEND=app-server`.
   That experimental backend adds active-turn steering; `exec` is not a fallback.
 
-`veyro demo` uses simulation classes without model services or agent credentials.
-It validates the harness lifecycle, not Qwen3-14B accuracy or native-agent isolation.
+Library tests can exercise this runtime with simulation classes and no model service or agent
+credentials. Those tests validate lifecycle mechanics, not a supported CLI or production behavior.
 
 ## One assessment cycle
 
@@ -67,5 +67,5 @@ hardware failure, or restore scenario.
 | `src/veyro/workers/codex.py` | Default non-steerable Codex exec |
 | `src/veyro/workers/codex_app_server.py` | Opt-in steerable App Server |
 
-The factory's environment reference is [`.env.example`](../.env.example).
-`VEYRO_JEV_*` configures this interface, not the pinned `supervise` assessor.
+The factory's historical environment reference is [`.env.example`](../.env.example).
+`VEYRO_JEV_*` configures this internal experiment, not the pinned `supervise` assessor.

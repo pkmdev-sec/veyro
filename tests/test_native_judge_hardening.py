@@ -102,9 +102,7 @@ def test_present_but_invalid_judge_is_not_silently_disabled(tmp_path, corrupt_ju
     config = json.loads(config_path.read_text())
     config.update(judge=corrupt_judge, task="Task")
     config_path.write_text(json.dumps(config))
-    (launch.directory / "plan.md").write_text("Plan")
     checkpoint(config_path, "root", "start", claim=True)
-    checkpoint(config_path, "root", "plan")
     result = checkpoint(config_path, "root", "build")
     assert result["action"] == "blocked"
     assert result["reason"] == "judge_error"

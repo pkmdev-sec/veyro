@@ -228,6 +228,31 @@ class ControlOutcome(StrEnum):
     FAILED = "failed"
 
 
+class ControlEffectStatus(StrEnum):
+    VERIFIED = "verified"
+    ACKNOWLEDGED_UNVERIFIED = "acknowledged_unverified"
+    NOT_APPLICABLE = "not_applicable"
+    FAILED = "failed"
+    UNKNOWN = "unknown"
+
+
+class ControlEffect(ContractModel):
+    status: ControlEffectStatus
+    native_event: SupervisionEventType | None = None
+
+    @model_validator(mode="after")
+    def verification_requires_terminal_event(self) -> Self:
+        terminal = self.native_event in {
+            SupervisionEventType.SESSION_COMPLETED,
+            SupervisionEventType.SESSION_FAILED,
+        }
+        if self.status is ControlEffectStatus.VERIFIED and not terminal:
+            raise ValueError("verified effects require a terminal provider event")
+        if self.status is not ControlEffectStatus.VERIFIED and self.native_event is not None:
+            raise ValueError("unverified effects cannot claim a provider verification event")
+        return self
+
+
 class ControlResult(ContractModel):
     protocol_version: Literal["1.0"] = PROTOCOL_VERSION
     veyro_session_id: str = Field(min_length=1, max_length=200)

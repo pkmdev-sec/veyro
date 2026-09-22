@@ -11,16 +11,25 @@ from veyro import autonomy_check, local_evaluation, local_server, native_judge
 from veyro.agents import AgentId
 from veyro.autonomy import AutonomyOptions, HarnessModels, prepare_autonomy
 from veyro.evaluators import CalibrationExample, DistributionCalibrator
-from veyro.local_models import load_profiles
+from veyro.local_models import LocalModels, VerifiedModel, load_profiles
 from veyro.native_judge import JudgeConfig, LocalJudgeProvider
 from veyro.readout import READOUT_PROTOCOL
 
 
 @pytest.fixture(autouse=True)
-def no_remote_or_model_calls(monkeypatch):
+def no_remote_or_model_calls(monkeypatch, tmp_path):
     def forbidden(*args, **kwargs):
         pytest.fail("local judge tests must not use remote credentials or load models")
 
+    def require_resident(_self, profile):
+        return VerifiedModel(
+            profile=profile,
+            blob_path=tmp_path / f"{profile.id}.gguf",
+            manifest_sha256=profile.manifest_sha256,
+            blob_sha256=profile.blob_sha256,
+        )
+
+    monkeypatch.setattr(LocalModels, "require_resident", require_resident)
     monkeypatch.setattr(native_judge, "JevVeyroModel", forbidden)
     monkeypatch.setattr(native_judge, "dotenv_values", forbidden)
     monkeypatch.setattr(local_server, "evaluate_local", forbidden)
@@ -170,8 +179,6 @@ def test_failed_checks_remain_authoritative_with_local_judge(tmp_path, monkeypat
     )
     config = launch.directory / "config.json"
     autonomy_check.checkpoint(config, "root", "start", claim=True)
-    (launch.directory / "plan.md").write_text("Implement then verify.")
-    autonomy_check.checkpoint(config, "root", "plan")
 
     def forbidden(*args, **kwargs):
         pytest.fail("failed executable checks cannot be overruled by a local judge")
@@ -187,27 +194,25 @@ def test_dual_model_harness_repairs_from_typed_evaluation(tmp_path, monkeypatch,
     rubric_path.write_text(json.dumps(rubric))
     (tmp_path / "artifact.txt").write_text("implementation")
     launch = prepare_autonomy(
-        AgentId.PRIME_AGENT,
+        AgentId.OPENCODE,
         tmp_path,
         "Task",
         (),
         AutonomyOptions(
             checks=(shlex.join([sys.executable, "-c", "pass"]),),
             judge_file=rubric_path,
-            models=HarnessModels("small", "14b"),
+            models=HarnessModels("coder30", "laya"),
             allow_uncalibrated_judge=True,
         ),
     )
     config_path = launch.directory / "config.json"
     config = json.loads(config_path.read_text())
-    assert config["model_roles"]["coding"]["profile"] == "small"
-    assert config["model_roles"]["evaluation"]["profile"] == "14b"
-    assert config["judge"]["provider"]["profile"] == "14b"
-    assert "qwen3:4b-instruct-2507-q4_K_M" in (launch.directory / "adapter.mjs").read_text()
+    assert config["model_roles"]["coding"]["profile"] == "coder30"
+    assert config["model_roles"]["evaluation"]["profile"] == "laya"
+    assert config["judge"]["provider"]["profile"] == "laya"
+    assert "qwen3-coder:30b" in (launch.directory / "adapter.mjs").read_text()
 
     autonomy_check.checkpoint(config_path, "root", "start", claim=True)
-    (launch.directory / "plan.md").write_text("Implement then verify.")
-    autonomy_check.checkpoint(config_path, "root", "plan")
     decisions = iter(
         [
             {"status": "failed", "scores": {"done": 0.2}},
@@ -225,6 +230,45 @@ def test_dual_model_harness_repairs_from_typed_evaluation(tmp_path, monkeypatch,
     assert (first["action"], first["reason"]) == ("continue", "judge_failed")
     assert '"scores": {"done": 0.2}' in first["message"]
     second = autonomy_check.checkpoint(config_path, "root", "repair")
-    assert (second["action"], second["reason"]) == ("complete", "checks_and_judge_passed")
-    assert [profile for profile, _, _ in calls] == ["14b", "14b"]
+    assert (second["action"], second["reason"]) == ("blocked", "operator_review_required")
+    assert [profile for profile, _, _ in calls] == ["laya", "laya"]
     assert all(exit_code == 0 and timeout > 0 for _, exit_code, timeout in calls)
+
+
+@pytest.mark.parametrize(
+    "profile_update",
+    [
+        {"revision": "b" * 40},
+        {"runtime_sha256": "b" * 64},
+        {"launcher_sha256": "b" * 64},
+    ],
+)
+def test_launch_pinned_laya_identity_rejects_profile_drift(
+    tmp_path, monkeypatch, rubric, profile_update
+):
+    rubric_path = tmp_path / "rubric.json"
+    rubric_path.write_text(json.dumps(rubric))
+    launch = prepare_autonomy(
+        AgentId.OPENCODE,
+        tmp_path,
+        "Task",
+        (),
+        AutonomyOptions(
+            checks=("true",),
+            judge_file=rubric_path,
+            models=HarnessModels("coder30", "laya"),
+            allow_uncalibrated_judge=True,
+        ),
+    )
+    snapshot = json.loads((launch.directory / "config.json").read_text())
+    config = JudgeConfig.model_validate(snapshot["judge"])
+    original = local_evaluation.load_evaluation_profiles()["laya"]
+    changed = original.model_copy(update=profile_update)
+    monkeypatch.setattr(local_evaluation, "load_evaluation_profiles", lambda: {"laya": changed})
+    monkeypatch.setattr(
+        local_evaluation,
+        "run_evaluator",
+        lambda *args, **kwargs: pytest.fail("identity drift must fail before inference"),
+    )
+    with pytest.raises(ValueError, match="identity changed after launch"):
+        native_judge.evaluate_local_judge(config, "Task", {"artifact.txt": "Done"}, [])

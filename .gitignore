@@ -8,6 +8,11 @@
 .veyro/
 *.log
 
+# Local analysis and audit artifacts
+.agent-map/
+.audit/
+.pr-lens/
+
 # Python environments, bytecode, and build outputs
 .venv/
 venv/

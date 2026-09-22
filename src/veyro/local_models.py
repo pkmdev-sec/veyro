@@ -8,6 +8,7 @@ import math
 import os
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
@@ -25,7 +26,8 @@ class ModelProfile(BaseModel):
 
     id: str = Field(pattern=r"^[a-z0-9][a-z0-9_-]*$")
     ollama_model: str = Field(min_length=1)
-    expected_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    blob_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     parameter_size: str = Field(min_length=1)
     quantization: str = Field(min_length=1)
     model_family: str = Field(min_length=1)
@@ -88,11 +90,11 @@ class ModelStatus(BaseModel):
     profile: ModelProfile
     installed: bool
     resident: bool
-    digest_matches: bool
+    manifest_matches: bool
     metadata_matches: bool
-    resident_digest_matches: bool
-    actual_digest: str | None
-    resident_digest: str | None
+    resident_manifest_matches: bool
+    actual_manifest_sha256: str | None
+    resident_manifest_sha256: str | None
 
     @computed_field
     @property
@@ -100,10 +102,18 @@ class ModelStatus(BaseModel):
         return (
             self.installed
             and self.resident
-            and self.digest_matches
+            and self.manifest_matches
             and self.metadata_matches
-            and self.resident_digest_matches
+            and self.resident_manifest_matches
         )
+
+
+@dataclass(frozen=True, slots=True)
+class VerifiedModel:
+    profile: ModelProfile
+    blob_path: Path
+    manifest_sha256: str
+    blob_sha256: str
 
 
 class _Layer(BaseModel):
@@ -193,17 +203,18 @@ class LocalModels:
             profile=profile,
             installed=installed is not None,
             resident=resident is not None,
-            digest_matches=installed is not None and installed.digest == profile.expected_digest,
+            manifest_matches=installed is not None
+            and installed.digest == profile.manifest_sha256,
             metadata_matches=installed is not None
             and (
                 installed.details.family == profile.model_family
                 and installed.details.parameter_size == profile.parameter_size
                 and installed.details.quantization_level == profile.quantization
             ),
-            resident_digest_matches=resident is not None
-            and (resident.digest == profile.expected_digest),
-            actual_digest=installed.digest if installed else None,
-            resident_digest=resident.digest if resident else None,
+            resident_manifest_matches=resident is not None
+            and resident.digest == profile.manifest_sha256,
+            actual_manifest_sha256=installed.digest if installed else None,
+            resident_manifest_sha256=resident.digest if resident else None,
         )
 
     def warm(self, profile: ModelProfile) -> ModelStatus:
@@ -217,10 +228,10 @@ class LocalModels:
             raise LocalModelError(
                 f"{profile.ollama_model} is not installed; no automatic downloads"
             )
-        if not before.digest_matches or not before.metadata_matches:
+        if not before.manifest_matches or not before.metadata_matches:
             raise LocalModelError(f"{profile.id}: installed identity does not match pinned profile")
-        if before.resident and not before.resident_digest_matches:
-            raise LocalModelError(f"{profile.id}: resident digest does not match pinned profile")
+        if before.resident and not before.resident_manifest_matches:
+            raise LocalModelError(f"{profile.id}: resident manifest does not match pinned profile")
         others = [m.name for m in self._models("/api/ps") if m.name != profile.ollama_model]
         if not before.resident and others:
             raise LocalModelError(
@@ -236,12 +247,8 @@ class LocalModels:
             raise LocalModelError(f"{profile.id}: warm returned without verified pinned residency")
         return after
 
-    def gguf_path(self, profile: ModelProfile) -> Path:
-        """Resolve the model layer, not the manifest digest. Never loads or changes weights.
-
-        Verify manifest SHA-256, model-layer file size, and GGUF header. This is not a
-        full content hash of the multi-GB weight blob.
-        """
+    def verify_model(self, profile: ModelProfile) -> VerifiedModel:
+        """Verify the manifest and every byte of the pinned GGUF model layer."""
         components = profile.ollama_model.split("/")
         name, tag = components[-1].split(":")
         namespace = components[-2] if len(components) >= 2 else "library"
@@ -249,8 +256,9 @@ class LocalModels:
         manifest_path = self.models_dir / "manifests" / registry / namespace / name / tag
         try:
             raw = manifest_path.read_bytes()
-            if hashlib.sha256(raw).hexdigest() != profile.expected_digest:
-                raise LocalModelError(f"{profile.id}: local manifest digest mismatch")
+            observed_manifest_sha256 = hashlib.sha256(raw).hexdigest()
+            if observed_manifest_sha256 != profile.manifest_sha256:
+                raise LocalModelError(f"{profile.id}: local manifest SHA-256 mismatch")
             manifest = _Manifest.model_validate_json(raw)
             if manifest.schemaVersion != 2:
                 raise LocalModelError(f"{profile.id}: unsupported Ollama manifest schema")
@@ -262,12 +270,35 @@ class LocalModels:
             if len(layers) != 1:
                 raise LocalModelError(f"{profile.id}: expected exactly one GGUF model layer")
             layer = layers[0]
-            blob = self.models_dir / "blobs" / layer.digest.replace(":", "-")
+            if layer.digest != f"sha256:{profile.blob_sha256}":
+                raise LocalModelError(f"{profile.id}: manifest model-layer SHA-256 mismatch")
+            blob = self.models_dir / "blobs" / f"sha256-{profile.blob_sha256}"
             if blob.stat().st_size != layer.size:
                 raise LocalModelError(f"{profile.id}: GGUF blob size does not match manifest")
+            digest = hashlib.sha256()
             with blob.open("rb") as stream:
                 if stream.read(4) != b"GGUF":
                     raise LocalModelError(f"{profile.id}: model layer is not a GGUF file")
-            return blob
+                digest.update(b"GGUF")
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(chunk)
+            observed_blob_sha256 = digest.hexdigest()
+            if observed_blob_sha256 != profile.blob_sha256:
+                raise LocalModelError(f"{profile.id}: GGUF blob content SHA-256 mismatch")
+            return VerifiedModel(
+                profile=profile,
+                blob_path=blob,
+                manifest_sha256=observed_manifest_sha256,
+                blob_sha256=observed_blob_sha256,
+            )
         except (OSError, ValueError) as error:
             raise LocalModelError(f"Cannot resolve GGUF for {profile.id}: {error}") from error
+
+    def require_resident(self, profile: ModelProfile) -> VerifiedModel:
+        status = self.status(profile)
+        if not status.ready:
+            raise LocalModelError(f"{profile.id}: selected coding model is not verified resident")
+        return self.verify_model(profile)
+
+    def gguf_path(self, profile: ModelProfile) -> Path:
+        return self.verify_model(profile).blob_path

@@ -19,7 +19,8 @@ def profile():
     return ModelProfile(
         id="small",
         ollama_model="qwen2.5:7b",
-        expected_digest="a" * 64,
+        manifest_sha256="a" * 64,
+        blob_sha256="b" * 64,
         parameter_size="7.6B",
         quantization="Q4_K_M",
         model_family="qwen2",
@@ -29,7 +30,7 @@ def profile():
 def entry(profile, **overrides):
     return {
         "name": profile.ollama_model,
-        "digest": profile.expected_digest,
+        "digest": profile.manifest_sha256,
         "size": 100,
         "details": {
             "family": profile.model_family,
@@ -56,15 +57,30 @@ def api(monkeypatch):
 
 def test_shipped_profiles_are_pinned():
     profiles = load_profiles()
-    assert set(profiles) == {"small", "14b"}
+    assert set(profiles) == {"small", "coder14", "coder30", "14b"}
     assert profiles["small"].ollama_model == "qwen3:4b-instruct-2507-q4_K_M"
     assert profiles["14b"].ollama_model == "qwen3:14b"
-    assert profiles["small"].expected_digest == (
-        "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0"
-    )
-    assert profiles["14b"].expected_digest == (
-        "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8"
-    )
+    assert {
+        name: (profile.manifest_sha256, profile.blob_sha256)
+        for name, profile in profiles.items()
+    } == {
+        "small": (
+            "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+            "85e4a5b7b8ef0e48af0e8658f5aaab9c2324c76c1641493f4d1e25fce54b18b9",
+        ),
+        "coder14": (
+            "9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849",
+            "ac9bc7a69dab38da1c790838955f1293420b55ab555ef6b4615efa1c1507b1ed",
+        ),
+        "coder30": (
+            "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+            "1194192cf2a187eb02722edcc3f77b11d21f537048ce04b67ccf8ba78863006a",
+        ),
+        "14b": (
+            "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+            "a8cc1361f3145dc01f6d77c6c82c9116b9ffe3c97b34716fe20418455876c40e",
+        ),
+    }
 
 
 def test_wheel_profile_lookup(tmp_path, monkeypatch, profile):
@@ -97,9 +113,10 @@ def test_model_names_cannot_escape_manifest_store(profile, model):
         ModelProfile.model_validate({**profile.model_dump(), "ollama_model": model})
 
 
-def test_digest_required(profile):
+@pytest.mark.parametrize("field", ["manifest_sha256", "blob_sha256"])
+def test_identity_hashes_required(profile, field):
     data = profile.model_dump()
-    del data["expected_digest"]
+    del data[field]
     with pytest.raises(ValidationError):
         ModelProfile.model_validate(data)
 
@@ -125,7 +142,7 @@ def test_installed_is_not_resident(profile, api):
     client = LocalModels()
     assert client.inventory()[0].name == profile.ollama_model
     status = client.status(profile)
-    assert status.installed and status.digest_matches and status.metadata_matches
+    assert status.installed and status.manifest_matches and status.metadata_matches
     assert not status.resident and not status.ready
     assert status.model_dump()["ready"] is False
     assert all(payload is None for _, payload in calls)
@@ -133,12 +150,12 @@ def test_installed_is_not_resident(profile, api):
 
 def test_missing_model_is_not_installed(profile, api):
     status = LocalModels().status(profile)
-    assert not status.installed and not status.resident and not status.digest_matches
-    assert status.actual_digest is None
+    assert not status.installed and not status.resident and not status.manifest_matches
+    assert status.actual_manifest_sha256 is None
 
 
 @pytest.mark.parametrize(
-    "installed_digest,resident_digest,ready",
+    "installed_manifest,resident_manifest,ready",
     [
         ("a" * 64, "a" * 64, True),
         ("b" * 64, "a" * 64, False),
@@ -148,17 +165,17 @@ def test_missing_model_is_not_installed(profile, api):
 def test_installed_and_resident_identity_are_separate(
     profile,
     api,
-    installed_digest,
-    resident_digest,
+    installed_manifest,
+    resident_manifest,
     ready,
 ):
     replies, _ = api
-    replies["/api/tags"] = {"models": [entry(profile, digest=installed_digest)]}
-    replies["/api/ps"] = {"models": [entry(profile, digest=resident_digest)]}
+    replies["/api/tags"] = {"models": [entry(profile, digest=installed_manifest)]}
+    replies["/api/ps"] = {"models": [entry(profile, digest=resident_manifest)]}
     status = LocalModels().status(profile)
     assert status.installed and status.resident
-    assert status.actual_digest == installed_digest
-    assert status.resident_digest == resident_digest
+    assert status.actual_manifest_sha256 == installed_manifest
+    assert status.resident_manifest_sha256 == resident_manifest
     assert status.ready is ready
 
 
@@ -186,17 +203,17 @@ def test_warm_uses_promptless_keep_alive_and_checks_residency(profile, api):
     assert calls[-1] == ("/api/ps", None)
 
 
-@pytest.mark.parametrize("problem", ["missing", "digest", "metadata", "resident_digest"])
+@pytest.mark.parametrize("problem", ["missing", "manifest", "metadata", "resident_manifest"])
 def test_warm_refuses_unverified_identity(profile, api, problem):
     replies, calls = api
     if problem != "missing":
         model = entry(profile)
-        if problem == "digest":
+        if problem == "manifest":
             model["digest"] = "b" * 64
         if problem == "metadata":
             model["details"]["family"] = "other"
         replies["/api/tags"] = {"models": [model]}
-    if problem == "resident_digest":
+    if problem == "resident_manifest":
         replies["/api/ps"] = {"models": [entry(profile, digest="b" * 64)]}
     with pytest.raises(LocalModelError):
         LocalModels().warm(profile)
@@ -315,7 +332,8 @@ def model_store(tmp_path, profile):
     blob.write_bytes(content)
     pinned = profile.model_copy(
         update={
-            "expected_digest": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+            "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+            "blob_sha256": blob_digest,
         }
     )
     return LocalModels(models_dir=tmp_path), pinned, manifest_path, blob
@@ -325,14 +343,14 @@ def test_gguf_resolves_model_layer_not_manifest_digest(model_store):
     client, profile, manifest, blob = model_store
     before = {p: p.read_bytes() for p in (manifest, blob)}
     assert client.gguf_path(profile) == blob
-    assert profile.expected_digest not in blob.name
+    assert profile.manifest_sha256 not in blob.name
     assert before == {p: p.read_bytes() for p in (manifest, blob)}
 
 
 @pytest.mark.parametrize(
     "problem,match",
     [
-        ("manifest", "digest mismatch"),
+        ("manifest", "SHA-256 mismatch"),
         ("missing", "Cannot resolve"),
         ("truncated", "size"),
         ("header", "not a GGUF"),
@@ -350,6 +368,35 @@ def test_gguf_rejects_unverified_store(model_store, problem, match):
         blob.write_bytes(b"NOPE" + blob.read_bytes()[4:])
     with pytest.raises(LocalModelError, match=match):
         client.gguf_path(profile)
+
+
+def test_gguf_rejects_same_size_content_replacement(model_store):
+    client, profile, _manifest, blob = model_store
+    original = blob.read_bytes()
+    blob.write_bytes(original[:4] + bytes([original[4] ^ 1]) + original[5:])
+
+    with pytest.raises(LocalModelError, match="content SHA-256"):
+        client.gguf_path(profile)
+
+
+def test_require_resident_binds_inventory_and_blob_identity(model_store, api):
+    client, profile, _manifest, blob = model_store
+    replies, _ = api
+
+    with pytest.raises(LocalModelError, match="not verified resident"):
+        client.require_resident(profile)
+
+    replies["/api/tags"] = {"models": [entry(profile)]}
+    replies["/api/ps"] = {"models": [entry(profile)]}
+    verified = client.require_resident(profile)
+    assert verified.profile is profile
+    assert verified.manifest_sha256 == profile.manifest_sha256
+    assert verified.blob_sha256 == profile.blob_sha256
+
+    original = blob.read_bytes()
+    blob.write_bytes(original[:4] + bytes([original[4] ^ 1]) + original[5:])
+    with pytest.raises(LocalModelError, match="content SHA-256"):
+        client.require_resident(profile)
 
 
 @pytest.mark.parametrize(
@@ -373,7 +420,7 @@ def test_gguf_requires_one_model_layer(model_store, layers):
     manifest.write_text(json.dumps(data))
     profile = profile.model_copy(
         update={
-            "expected_digest": hashlib.sha256(manifest.read_bytes()).hexdigest(),
+            "manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(),
         }
     )
     with pytest.raises(LocalModelError, match="exactly one"):

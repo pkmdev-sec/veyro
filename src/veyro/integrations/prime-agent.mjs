@@ -73,7 +73,7 @@ export default function create(binding) {
       ctx.ui.setStatus("veyro", `Veyro: ${result.reason}`);
       if (result.action === "continue") {
         api.sendUserMessage(result.message, { deliverAs: "followUp" });
-      } else if (result.action === "complete" || result.action === "blocked") {
+      } else if (result.action === "blocked") {
         stopped = true;
         ctx.clearTimeout(timer);
         ctx.abort();

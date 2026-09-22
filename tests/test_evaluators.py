@@ -10,9 +10,11 @@ import pytest
 from pydantic import ValidationError
 
 from veyro.evaluators import (
+    BinaryDecisionHead,
     CalibrationExample,
     ChoiceQuestion,
     CorrectionRecord,
+    DecisionHeadExample,
     DistributionCalibrator,
     EvaluationCase,
     EvaluatorDefinition,
@@ -441,6 +443,148 @@ def test_holdout_can_disprove_training_improvement():
     ]
     metrics = calibrator.evaluate_holdout(examples)
     assert metrics["log_loss_after"] > metrics["log_loss_before"]
+
+
+def decision_examples(prefix="train"):
+    return [
+        DecisionHeadExample(
+            id=f"{prefix}-{index}",
+            features={
+                "preservation_regression": 0.05 + index * 0.005,
+                "placeholder_present": 0.02 + index * 0.003,
+            },
+            label="yes",
+        )
+        for index in range(8)
+    ] + [
+        DecisionHeadExample(
+            id=f"{prefix}-{index}",
+            features={
+                "preservation_regression": 0.65 + (index - 8) * 0.02,
+                "placeholder_present": 0.55 + (index - 8) * 0.02,
+            },
+            label="no",
+        )
+        for index in range(8, 16)
+    ]
+
+
+def fit_decision_head():
+    return BinaryDecisionHead.fit(
+        decision_examples(),
+        feature_names=["preservation_regression", "placeholder_present"],
+        holdout_ids=[f"holdout-{index}" for index in range(16)],
+        model="qwen3:14b@sha256:fixture",
+        profile="14b",
+        schema_sha256="b" * 64,
+        regularization=0.1,
+    )
+
+
+def predict_decision(head, features):
+    return head.predict(
+        features,
+        model=head.model,
+        profile=head.profile,
+        schema_sha256=head.schema_sha256,
+    )
+
+
+def test_binary_decision_head_fits_applies_and_roundtrips(tmp_path):
+    head = fit_decision_head()
+    complete = predict_decision(
+        head,
+        {"preservation_regression": 0.08, "placeholder_present": 0.04},
+    )
+    incomplete = predict_decision(
+        head,
+        {"preservation_regression": 0.8, "placeholder_present": 0.7},
+    )
+    assert complete > 0.9
+    assert incomplete < 0.1
+    assert head.training_metrics.accuracy == 1
+    assert head.training_sha256 == fit_decision_head().training_sha256
+
+    path = tmp_path / "head.json"
+    head.save(path)
+    restored = BinaryDecisionHead.load(path)
+    assert restored == head
+    assert predict_decision(
+        restored,
+        {"preservation_regression": 0.08, "placeholder_present": 0.04},
+    ) == pytest.approx(complete)
+
+
+def test_binary_decision_head_validates_reserved_holdout_and_reports_metrics():
+    head = fit_decision_head()
+    holdout = [
+        example.model_copy(update={"id": f"holdout-{index}"})
+        for index, example in enumerate(decision_examples())
+    ]
+    metrics = head.evaluate_holdout(holdout)
+    assert metrics.count == 16
+    assert metrics.accuracy == 1
+    assert metrics.brier < 0.01
+    assert metrics.log_loss < 0.1
+
+    for invalid in (
+        [],
+        decision_examples(),
+        [holdout[0], holdout[0]],
+        [holdout[0].model_copy(update={"id": "unreserved"})],
+    ):
+        with pytest.raises(ValueError):
+            head.evaluate_holdout(invalid)
+
+
+def test_binary_decision_head_rejects_leakage_bad_features_and_provenance():
+    examples = decision_examples()
+    kwargs = {
+        "feature_names": ["preservation_regression", "placeholder_present"],
+        "holdout_ids": ["holdout"],
+        "model": "m",
+        "profile": "p",
+        "schema_sha256": "c" * 64,
+        "regularization": 0.1,
+    }
+    for changed in (
+        kwargs | {"holdout_ids": [examples[0].id]},
+        kwargs | {"holdout_ids": []},
+        kwargs | {"feature_names": ["unknown"]},
+        kwargs | {"regularization": 0},
+    ):
+        with pytest.raises(ValueError):
+            BinaryDecisionHead.fit(examples, **changed)
+    with pytest.raises(ValueError, match="both outcome classes"):
+        BinaryDecisionHead.fit(examples[:8], **kwargs)
+
+    head = fit_decision_head()
+    valid = {"preservation_regression": 0.1, "placeholder_present": 0.1}
+    with pytest.raises(ValueError, match="provenance"):
+        head.predict(
+            valid,
+            model="wrong",
+            profile=head.profile,
+            schema_sha256=head.schema_sha256,
+        )
+    for invalid in (
+        {"preservation_regression": 0.1},
+        {"preservation_regression": -0.1, "placeholder_present": 0.1},
+        {"preservation_regression": math.nan, "placeholder_present": 0.1},
+    ):
+        with pytest.raises(ValueError):
+            predict_decision(head, invalid)
+
+
+def test_binary_decision_head_schema_rejects_shape_and_split_tampering():
+    artifact = fit_decision_head().model_dump(mode="json")
+    for changed in (
+        artifact | {"weights": [1.0]},
+        artifact | {"feature_names": ["same", "same"]},
+        artifact | {"holdout_ids": [artifact["training_ids"][0]]},
+    ):
+        with pytest.raises(ValidationError):
+            BinaryDecisionHead.model_validate(changed)
 
 
 @pytest.mark.parametrize("path", [[True], [1.5]])

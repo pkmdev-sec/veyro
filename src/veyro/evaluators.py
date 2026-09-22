@@ -499,3 +499,335 @@ def _brier(examples: Sequence[CalibrationExample], distributions: list[dict[str,
         )
         for example, distribution in zip(examples, distributions, strict=True)
     ) / len(examples)
+
+
+class DecisionHeadExample(Config):
+    """One reviewed binary outcome with frozen evaluator features."""
+
+    id: str = Field(min_length=1)
+    features: dict[str, Annotated[float, Field(ge=0, le=1)]] = Field(min_length=1)
+    label: Literal["no", "yes"]
+
+    @model_validator(mode="after")
+    def named_features(self) -> Self:
+        if any(not name for name in self.features):
+            raise ValueError("decision-head features must have non-empty names")
+        return self
+
+
+class DecisionHeadMetrics(Config):
+    count: int = Field(gt=0)
+    accuracy: float = Field(ge=0, le=1)
+    positive_accuracy: float = Field(ge=0, le=1)
+    negative_accuracy: float = Field(ge=0, le=1)
+    brier: float = Field(ge=0)
+    log_loss: float = Field(ge=0)
+
+
+class BinaryDecisionHead(Config):
+    """Auditable post-hoc logistic head over frozen evaluator probabilities.
+
+    This fits a small decision function, not model weights. Reliability still requires an
+    independent reserved holdout. Features are logit-transformed and standardized with the
+    recorded training statistics before the linear decision is applied.
+    """
+
+    version: Literal[1] = 1
+    method: Literal["l2_logistic_regression"] = "l2_logistic_regression"
+    transform: Literal["logit"] = "logit"
+    feature_names: list[str] = Field(min_length=1)
+    feature_means: list[float]
+    feature_scales: list[Annotated[float, Field(gt=0)]]
+    weights: list[float]
+    intercept: float
+    regularization: float = Field(gt=0)
+    model: str = Field(min_length=1)
+    profile: str = Field(min_length=1)
+    schema_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    training_ids: list[str] = Field(min_length=2)
+    holdout_ids: list[str] = Field(min_length=1)
+    training_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    training_metrics: DecisionHeadMetrics
+
+    @model_validator(mode="after")
+    def valid_shape_and_split(self) -> Self:
+        _unique(self.feature_names, "decision-head feature names")
+        _unique(self.training_ids, "decision-head training IDs")
+        _unique(self.holdout_ids, "decision-head holdout IDs")
+        if any(not value for value in (*self.feature_names, *self.training_ids, *self.holdout_ids)):
+            raise ValueError("decision-head names and IDs must not be empty")
+        width = len(self.feature_names)
+        if not all(
+            len(values) == width
+            for values in (self.feature_means, self.feature_scales, self.weights)
+        ):
+            raise ValueError("decision-head parameter shape does not match feature names")
+        if set(self.training_ids) & set(self.holdout_ids):
+            raise ValueError("holdout leakage: decision-head training and holdout IDs overlap")
+        return self
+
+    @classmethod
+    def fit(
+        cls,
+        examples: Sequence[DecisionHeadExample],
+        *,
+        feature_names: Sequence[str],
+        holdout_ids: Sequence[str],
+        model: str,
+        profile: str,
+        schema_sha256: str,
+        regularization: float = 1.0,
+    ) -> Self:
+        if len(examples) < 2:
+            raise ValueError("decision-head fitting requires at least two examples")
+        names = list(feature_names)
+        if not names:
+            raise ValueError("decision-head fitting requires selected features")
+        _unique(names, "decision-head feature names")
+        ids = [example.id for example in examples]
+        _unique(ids, "decision-head training IDs")
+        reserved = list(holdout_ids)
+        _unique(reserved, "decision-head holdout IDs")
+        if not reserved or set(ids) & set(reserved):
+            raise ValueError("holdout leakage: require nonempty disjoint decision-head holdout IDs")
+        if (
+            isinstance(regularization, bool)
+            or not isinstance(regularization, (int, float))
+            or not math.isfinite(regularization)
+            or regularization <= 0
+        ):
+            raise ValueError("decision-head regularization must be finite and positive")
+        if any(set(example.features) != set(names) for example in examples):
+            raise ValueError("decision-head training features must exactly match selected features")
+        outcomes = [example.label == "yes" for example in examples]
+        if all(outcomes) or not any(outcomes):
+            raise ValueError("decision-head fitting requires both outcome classes")
+
+        transformed = [
+            [_probability_logit(example.features[name]) for name in names] for example in examples
+        ]
+        means = [
+            math.fsum(row[index] for row in transformed) / len(transformed)
+            for index in range(len(names))
+        ]
+        scales = []
+        for index, mean in enumerate(means):
+            variance = math.fsum((row[index] - mean) ** 2 for row in transformed) / len(transformed)
+            scales.append(math.sqrt(variance) or 1.0)
+        rows = [
+            [
+                1.0,
+                *(
+                    (value - mean) / scale
+                    for value, mean, scale in zip(row, means, scales, strict=True)
+                ),
+            ]
+            for row in transformed
+        ]
+        weights = _fit_logistic(rows, outcomes, float(regularization))
+        probabilities = [_sigmoid(_dot(row, weights)) for row in rows]
+        metrics = _decision_metrics(examples, probabilities)
+        return cls(
+            feature_names=names,
+            feature_means=means,
+            feature_scales=scales,
+            weights=weights[1:],
+            intercept=weights[0],
+            regularization=float(regularization),
+            model=model,
+            profile=profile,
+            schema_sha256=schema_sha256,
+            training_ids=ids,
+            holdout_ids=reserved,
+            training_sha256=_hash(
+                {
+                    "examples": [example.model_dump(mode="json") for example in examples],
+                    "feature_names": names,
+                    "regularization": float(regularization),
+                }
+            ),
+            training_metrics=metrics,
+        )
+
+    def predict(
+        self,
+        features: Mapping[str, float],
+        *,
+        model: str,
+        profile: str,
+        schema_sha256: str,
+    ) -> float:
+        if (model, profile, schema_sha256) != (self.model, self.profile, self.schema_sha256):
+            raise ValueError("decision-head provenance does not match model/profile/schema")
+        if set(features) != set(self.feature_names):
+            raise ValueError("decision-head feature names do not match")
+        values = []
+        for name in self.feature_names:
+            value = features[name]
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                or not 0 <= value <= 1
+            ):
+                raise ValueError("decision-head features must be finite probabilities")
+            values.append(float(value))
+        standardized = [
+            (_probability_logit(value) - mean) / scale
+            for value, mean, scale in zip(
+                values, self.feature_means, self.feature_scales, strict=True
+            )
+        ]
+        return _sigmoid(self.intercept + _dot(standardized, self.weights))
+
+    def evaluate_holdout(self, examples: Sequence[DecisionHeadExample]) -> DecisionHeadMetrics:
+        ids = [example.id for example in examples]
+        _unique(ids, "decision-head holdout evaluation IDs")
+        if not ids or set(ids) & set(self.training_ids):
+            raise ValueError("holdout leakage: require independent decision-head examples")
+        if not set(ids) <= set(self.holdout_ids):
+            raise ValueError("decision-head evaluation IDs were not reserved for holdout")
+        probabilities = [
+            self.predict(
+                example.features,
+                model=self.model,
+                profile=self.profile,
+                schema_sha256=self.schema_sha256,
+            )
+            for example in examples
+        ]
+        return _decision_metrics(examples, probabilities)
+
+    def save(self, path: Path) -> None:
+        path.write_text(self.model_dump_json(indent=2) + "\n")
+
+    @classmethod
+    def load(cls, path: Path) -> Self:
+        return cls.model_validate_json(path.read_text())
+
+
+def _probability_logit(probability: float) -> float:
+    clipped = min(1 - 1e-12, max(1e-12, probability))
+    return math.log(clipped / (1 - clipped))
+
+
+def _sigmoid(value: float) -> float:
+    if value >= 0:
+        inverse = math.exp(-min(value, 40))
+        return 1 / (1 + inverse)
+    exponent = math.exp(max(value, -40))
+    return exponent / (1 + exponent)
+
+
+def _dot(left: Sequence[float], right: Sequence[float]) -> float:
+    return math.fsum(a * b for a, b in zip(left, right, strict=True))
+
+
+def _fit_logistic(
+    rows: list[list[float]], outcomes: list[bool], regularization: float
+) -> list[float]:
+    width = len(rows[0])
+    positive = sum(outcomes)
+    weights = [math.log(positive / (len(outcomes) - positive)), *([0.0] * (width - 1))]
+    for _ in range(100):
+        probabilities = [_sigmoid(_dot(row, weights)) for row in rows]
+        gradient = [
+            math.fsum(
+                (probability - outcome) * row[index]
+                for row, outcome, probability in zip(rows, outcomes, probabilities, strict=True)
+            )
+            + (regularization * weights[index] if index else 0.0)
+            for index in range(width)
+        ]
+        hessian = [
+            [
+                math.fsum(
+                    probability * (1 - probability) * row[left] * row[right]
+                    for row, probability in zip(rows, probabilities, strict=True)
+                )
+                + (regularization if left == right and left else 0.0)
+                + (1e-12 if left == right else 0.0)
+                for right in range(width)
+            ]
+            for left in range(width)
+        ]
+        delta = _solve_linear(hessian, gradient)
+        baseline = _logistic_objective(rows, outcomes, weights, regularization)
+        step = 1.0
+        while step > 1e-8:
+            candidate = [
+                value - step * change for value, change in zip(weights, delta, strict=True)
+            ]
+            if _logistic_objective(rows, outcomes, candidate, regularization) <= baseline:
+                break
+            step /= 2
+        candidate = [value - step * change for value, change in zip(weights, delta, strict=True)]
+        if max(abs(a - b) for a, b in zip(candidate, weights, strict=True)) < 1e-10:
+            return candidate
+        weights = candidate
+    return weights
+
+
+def _logistic_objective(
+    rows: Sequence[Sequence[float]],
+    outcomes: Sequence[bool],
+    weights: Sequence[float],
+    regularization: float,
+) -> float:
+    loss = math.fsum(
+        -math.log(max(1e-15, probability if outcome else 1 - probability))
+        for row, outcome in zip(rows, outcomes, strict=True)
+        for probability in [_sigmoid(_dot(row, weights))]
+    )
+    return loss + regularization * math.fsum(value * value for value in weights[1:]) / 2
+
+
+def _solve_linear(matrix: list[list[float]], vector: list[float]) -> list[float]:
+    augmented = [row[:] + [value] for row, value in zip(matrix, vector, strict=True)]
+    width = len(vector)
+    for column in range(width):
+        pivot = max(range(column, width), key=lambda row: abs(augmented[row][column]))
+        if abs(augmented[pivot][column]) < 1e-15:
+            raise ValueError("decision-head fit is singular")
+        augmented[column], augmented[pivot] = augmented[pivot], augmented[column]
+        divisor = augmented[column][column]
+        augmented[column] = [value / divisor for value in augmented[column]]
+        for row in range(width):
+            if row == column:
+                continue
+            factor = augmented[row][column]
+            augmented[row] = [
+                value - factor * base
+                for value, base in zip(augmented[row], augmented[column], strict=True)
+            ]
+    return [augmented[index][-1] for index in range(width)]
+
+
+def _decision_metrics(
+    examples: Sequence[DecisionHeadExample], probabilities: Sequence[float]
+) -> DecisionHeadMetrics:
+    positives = [index for index, example in enumerate(examples) if example.label == "yes"]
+    negatives = [index for index, example in enumerate(examples) if example.label == "no"]
+    if not positives or not negatives:
+        raise ValueError("decision-head metrics require both outcome classes")
+    outcomes = [example.label == "yes" for example in examples]
+    correct = [
+        (probability >= 0.5) == outcome
+        for probability, outcome in zip(probabilities, outcomes, strict=True)
+    ]
+    return DecisionHeadMetrics(
+        count=len(examples),
+        accuracy=sum(correct) / len(correct),
+        positive_accuracy=sum(correct[index] for index in positives) / len(positives),
+        negative_accuracy=sum(correct[index] for index in negatives) / len(negatives),
+        brier=math.fsum(
+            (probability - outcome) ** 2
+            for probability, outcome in zip(probabilities, outcomes, strict=True)
+        )
+        / len(outcomes),
+        log_loss=math.fsum(
+            -math.log(max(1e-15, probability if outcome else 1 - probability))
+            for probability, outcome in zip(probabilities, outcomes, strict=True)
+        )
+        / len(outcomes),
+    )

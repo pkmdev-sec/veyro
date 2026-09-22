@@ -55,9 +55,9 @@ The native attached TUI and Veyro can use the same server and session. The TUI k
 | Interrupt active turn | Supported | Stable | `POST /session/:id/abort` |
 | Reply to approval | Supported | Experimental | `POST /permission/:id/reply` |
 | Attach existing session | Supported | Stable | Session validation plus native `opencode attach` |
-| Replay events | Unsupported | — | Legacy SSE has no cursor; the bridge does not mix in the v2 event schema |
-| Steer active turn | Unsupported | — | An async prompt queues another user message; it does not steer the active model call |
-| Stop session | Unsupported | — | Abort preserves a session; delete permanently erases it |
+| Replay events | Unsupported | Not available | Legacy SSE has no cursor; the bridge does not mix in the v2 event schema |
+| Steer active turn | Unsupported | Not available | An async prompt queues another user message; it does not steer the active model call |
+| Stop session | Unsupported | Not available | Abort preserves a session; delete permanently erases it |
 
 Approval replies are request-bound. Veyro replies only to an approval ID observed on the attached session. `APPROVE` maps to `once`; it never silently grants `always` permission.
 

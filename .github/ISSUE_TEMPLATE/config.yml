@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/pkmdev-sec/veyro/discussions
+    about: Ask usage questions or discuss an idea before opening a feature request.
+  - name: Security vulnerability
+    url: https://github.com/pkmdev-sec/veyro/security/advisories/new
+    about: Report a vulnerability privately. Do not open a public issue.

@@ -1,5 +1,10 @@
 # Remaining local harness implementation
 
+Current next work: [evaluator recovery plan](.audit/06-structure-outline-evaluator-recovery.md)
+and [takeover handoff](.audit/EVALUATOR-RECOVERY-HANDOFF.md). The first adapter pilot is sealed
+with a quality failure. Start with baseline-model and development-data comparison, not another
+training run. The older implementation notes below include historical model choices.
+
 ## Scope and constraints
 
 - User authorized remaining tasks from docs/evidence/harness-status-review.md.
@@ -156,3 +161,58 @@ with exact results and source-backed bugs; do not hide a discovered defect by we
   small profile still fails the native canaries, the 14B readout benchmark and the 14B
   calibration predate v4, independent workflow calibration data and trained decision heads are
   absent. See GATES.md, not a broad “done” claim.
+
+## G6 v2 continuation — 2026-09-22
+
+Baseline HEAD: `2f50519177e4a32ebf7755908704f7a2f5449ac2`; existing dirty tree is preserved.
+The independent-v1 study stays sealed and failed. G4 and G6 remain open.
+
+Current increment: add a separate development/calibration capture boundary around the existing
+criterion evaluator. Bind every full response to a preregistered task contract, exact candidate,
+protected-check evidence, evaluator/feature schemas, model and protocol. Persist an exclusive
+attempt marker before inference; reject retries. Do not change v1's hashed evaluator sources.
+This increment does not implement or authorize holdout qualification: an independent custodian,
+new datasets, a frozen aggregation/calibration design and two independent holdouts remain needed.
+
+Checks: Codex canary tests 21/21 and baseline full suite 1154/1154 passed. Prior PTY failures
+remain unresolved intermittent evidence, not a demonstrated fix. Logs:
+`.audit/g6-v2-preflight/long-horizon-verify-1p0ofhn6/`.
+
+Capture implementation now exists in `src/veyro/evaluation_capture.py` with a thin
+`tools/capture_evaluation.py` CLI and `docs/evaluation-capture.md`. Focused capture/evaluator
+checks passed 48 tests. Independent read-only review found no actionable defect within the
+explicit development-only scope. No live model inference or accuracy study was run.
+
+Post-capture full suite: 1175 passed, one OpenCode repair lifecycle test failed. This exposed a
+checkpoint-reader defect: a transient unreadable/partial state became `{}` and was accepted as
+an updated decision. `_await_checkpoint` now requires a decision object before accepting a
+changed marker. A deterministic before/after reproduction is retained in
+`.audit/g6-v2-preflight/checkpoint-race-reproduction.json`; regression plus native-autonomy and
+capture tests passed 70 tests. This is separate from the unreproduced Codex PTY failures.
+The failed run is retained in `.audit/g6-v2-capture-verification/long-horizon-verify-wt093kzp/`.
+
+Recommended custody: a trusted colleague on a separate machine/account inaccessible to this
+session controls fresh holdout tasks and final labels. Evidence checks and final-label checks
+must remain distinct. Shared-workspace agents do not provide independent custody.
+Next: dataset split/exclusion enforcement, authenticated evidence, positive-recognition
+experiments, frozen aggregation and calibration, then independent holdouts. G4/G6 remain open.
+
+Final verification: 1177 tests passed with one asyncio subprocess-cleanup warning
+(`Event loop is closed` during garbage collection). Ruff and `git diff --check` passed.
+Logs: `.audit/g6-v2-final-verification/long-horizon-verify-xmv8rtt9/`.
+The warning and historical PTY failures prevent describing this as a clean release receipt.
+
+## Cross-repository training pilot — 2026-09-22
+
+User authorized actual training and evaluation on different local repositories. Work is in
+`.audit/repository-training-v1/PLAN.md`; reuse that checkpoint for this active study.
+Training uses Forge/Hydra; development uses Specter; Sigil/Chimera were reserved before source
+inspection. Existing model weights and dirty repository worktrees are preserved.
+The unavailable NVIDIA/Halo path and blocked new Qwen download were avoided by reusing a
+complete local ZeRank Qwen3-4B trainable checkpoint. Offline MLX conversion succeeded.
+The frozen experiment is `51f086c8630f08e5b40b88f8b670308a641249ddc9d319513d104906f3cd4558`.
+The fixed 96-update run completed, followed by both development and reserved-test evaluations.
+The quality result failed: test accuracy stayed at 16/32, and the adapter accepted all 16
+incorrect test criteria. The adapter is not selected. Preserve the sealed report and retire
+its test cases from future tuning. Final software checks passed 1,201 tests plus Ruff and
+whitespace validation. See `.audit/repository-training-v1/REPORT.md`; G4/G6 remain open.

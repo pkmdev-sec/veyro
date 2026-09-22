@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 from veyro import local_server
+from veyro.local_models import VerifiedModel
 from veyro.local_server import LocalServiceError, evaluate_local, service_status, stop_service
 
 QUESTIONS = {
@@ -75,8 +76,13 @@ def fake_backend(monkeypatch):
     monkeypatch.setattr(local_server, "ReadoutEngine", FakeEngine)
     monkeypatch.setattr(
         local_server.LocalModels,
-        "gguf_path",
-        lambda self, p: Path("/unused/blobs/sha256-" + "a" * 64),
+        "verify_model",
+        lambda self, profile: VerifiedModel(
+            profile,
+            Path("/unused/blobs/sha256-" + profile.blob_sha256),
+            profile.manifest_sha256,
+            profile.blob_sha256,
+        ),
     )
 
 
@@ -139,8 +145,11 @@ def test_http_readout_identity_and_persistent_engine(running):
         result = evaluate_local("small", {"result": "ok"}, QUESTIONS, state_dir=directory)
         assert result["predictions"]["safe"]["probabilities"] == [0.8, 0.2]
         assert result["instance_id"] == metadata["instance_id"]
-        assert result["profile"]["expected_digest"] == metadata["profile"]["expected_digest"]
-        assert result["model_digest"] == "a" * 64
+        assert result["profile"]["manifest_sha256"] == metadata["profile"][
+            "manifest_sha256"
+        ]
+        assert result["model_manifest_sha256"] == metadata["profile"]["manifest_sha256"]
+        assert result["model_blob_sha256"] == metadata["profile"]["blob_sha256"]
         assert result["protocol"] == local_server.READOUT_PROTOCOL
         assert result["calibrated"] is False
         assert "token" not in result
@@ -305,6 +314,22 @@ def test_private_state_and_symlink_metadata_required(tmp_path):
     with pytest.raises(OSError):
         service_status("small", state_dir=tmp_path)
     assert target.read_text() == "{}"
+
+
+def test_metadata_unlinked_during_open_is_observed_as_stopped(tmp_path, monkeypatch):
+    path = tmp_path / "small.json"
+    path.write_text("{}")
+    path.chmod(0o600)
+    real_open = os.open
+
+    def open_then_unlink(candidate, flags, mode=0o777):
+        descriptor = real_open(candidate, flags, mode)
+        if Path(candidate) == path:
+            path.unlink()
+        return descriptor
+
+    monkeypatch.setattr(local_server.os, "open", open_then_unlink)
+    assert service_status("small", state_dir=tmp_path)["status"] == "stopped"
 
 
 def test_mismatched_metadata_never_shuts_down_server(running):

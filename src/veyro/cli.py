@@ -1,57 +1,47 @@
 from __future__ import annotations
 
 import asyncio
-import os
-from datetime import UTC
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 import typer
-from dotenv import load_dotenv
 from rich.console import Console
 from rich.table import Table
 
 from veyro.agents import AgentId, launch_native_agent, probe_agents, probes_json
-from veyro.config import FactoryConfig
 from veyro.local_cli import evaluator_app, local_app
 from veyro.model_import import (
     GLIFORMER_LARGE_V1_WEIGHTS,
     ArtifactImportError,
     import_pinned_artifact,
 )
-from veyro.models import EventType, FactoryStatus, WorkerType
-from veyro.persistence import PersistenceError, RunStore
-from veyro.runtime import FactoryRuntime
-from veyro.terminal import TerminalRenderer, duration_label, elapsed_label
-from veyro.veyro import (
-    FakeVeyroModel,
-    JevVeyroModel,
-    ShadowingVeyroModel,
-    VeyroModel,
-)
-from veyro.workers import FakeWorker
+from veyro.selene_cli import selene_app
 
 app = typer.Typer(
     name="veyro",
-    help="Supervise native coding agents with localjev and Qwen3-14B.",
+    help=(
+        "Observe native coding sessions, apply policy-gated controls, and run explicit "
+        "local experiments."
+    ),
     no_args_is_help=True,
 )
 app.add_typer(local_app, name="local")
 app.add_typer(evaluator_app, name="evaluator")
+app.add_typer(selene_app, name="selene")
 console = Console()
 
 
 @app.command("supervise")
 def supervise_existing_session(
-    agent: Annotated[AgentId, typer.Option("--agent")],
+    agent: Annotated[Literal["prime-agent", "opencode"], typer.Option("--agent")],
     session: Annotated[str, typer.Option("--session")],
     repo: Annotated[Path, typer.Option("--repo", exists=True, file_okay=False, resolve_path=True)],
     proposal: Annotated[Path, typer.Option("--proposal", help="Private JSON control proposal")],
+    ledger_dir: Annotated[
+        Path, typer.Option("--ledger-dir", help="Required persistent private decision ledger")
+    ],
     policy: Annotated[
         Path | None, typer.Option("--policy", help="Private operator rollout policy")
-    ] = None,
-    ledger_dir: Annotated[
-        Path | None, typer.Option("--ledger-dir", help="Persistent private no-retry ledger")
     ] = None,
     socket: Annotated[Path | None, typer.Option("--socket")] = None,
     server: Annotated[str | None, typer.Option("--server")] = None,
@@ -74,7 +64,7 @@ def supervise_existing_session(
     async def run(selected_policy, selected_proposal):
         async with asyncio.timeout(timeout_seconds):
             await supervise_proposal(
-                provider=agent,
+                provider=AgentId(agent),
                 repository=repo,
                 selector=session,
                 proposal=selected_proposal,
@@ -237,12 +227,25 @@ def list_agents(
     if json_output:
         typer.echo(probes_json())
         return
-    table = Table("Agent", "Available", "Version", "Machine interface", "Stability", "Capabilities")
+    table = Table(
+        "Agent",
+        "Available",
+        "Observed version",
+        "Autonomy qualified",
+        "Qualified version",
+        "Required autonomy versions",
+        "Machine interface",
+        "Stability",
+        "Capabilities",
+    )
     for probe in probe_agents():
         table.add_row(
             str(probe["agent_id"]),
             "yes" if probe["available"] else "no",
             str(probe["version"] or "-"),
+            "yes" if probe["version_qualified"] else "no",
+            str(probe["qualified_version"] or "-"),
+            ", ".join(probe["required_autonomy_versions"]) or "-",
             str(probe["machine_interface"]),
             str(probe["interface_stability"]),
             ", ".join(probe["capabilities"]),
@@ -254,9 +257,9 @@ def list_agents(
     "agent",
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
 )
-def open_agent(
+def run_experimental_agent(
     ctx: typer.Context,
-    provider: Annotated[AgentId, typer.Argument(help="Native agent to open")],
+    provider: Annotated[AgentId, typer.Argument(help="Native agent for the pinned local task")],
     repo: Annotated[
         Path,
         typer.Option("--repo", exists=True, file_okay=False, resolve_path=True),
@@ -277,29 +280,40 @@ def open_agent(
         bool,
         typer.Option(
             "--allow-uncalibrated-evaluator",
-            "--allow-uncalibrated-judge",
-            help="Allow an uncalibrated local evaluator experiment",
+            help="Allow an uncalibrated advisory evaluator experiment",
         ),
     ] = False,
     check: Annotated[
-        list[str] | None, typer.Option("--check", help="Completion command; repeatable")
+        list[str] | None, typer.Option("--check", help="Worker-visible repair check; repeatable")
     ] = None,
-    max_continuations: Annotated[int, typer.Option("--max-continuations", min=1)] = 6,
+    max_continuations: Annotated[int, typer.Option("--max-continuations", min=0)] = 6,
+    deny_read_path: Annotated[
+        list[Path] | None,
+        typer.Option(
+            "--deny-read-path",
+            exists=True,
+            resolve_path=True,
+            help="Repeatable host path the local coding process must not read",
+        ),
+    ] = None,
     check_timeout: Annotated[float, typer.Option("--check-timeout", min=0.01)] = 120,
+    model_turn_timeout: Annotated[
+        float,
+        typer.Option("--model-turn-timeout", min=0.01, help="Local model response timeout"),
+    ] = 120,
     timeout: Annotated[float, typer.Option("--timeout", min=0.01)] = 1800,
     judge: Annotated[
         Path | None,
         typer.Option(
             "--evaluator",
-            "--judge",
             exists=True,
             dir_okay=False,
             resolve_path=True,
-            help="Typed completion rubric/provider JSON",
+            help="Typed advisory rubric/provider JSON",
         ),
     ] = None,
 ) -> None:
-    """Run a provider's native interactive harness with a Veyro sidecar."""
+    """Experimental: run a pinned local autonomous task; requires a coding profile."""
 
     def announce(record) -> None:
         console.print(f"Veyro sidecar: [bold]{record.session_id}[/bold]")
@@ -309,6 +323,13 @@ def open_agent(
 
     try:
         local_models = None
+        if not autonomous:
+            raise ValueError(
+                "local-only deployment does not launch unpinned interactive models; "
+                "use sessions/attach or --autonomous with --coding-profile"
+            )
+        if coding_profile is None:
+            raise ValueError("local-only autonomy requires --coding-profile")
         if evaluation_profile is not None and coding_profile is None:
             raise ValueError("--evaluation-profile requires --coding-profile")
         if coding_profile is not None:
@@ -328,10 +349,12 @@ def open_agent(
                 checks=tuple(check or ()),
                 max_continuations=max_continuations,
                 check_timeout=check_timeout,
+                model_turn_timeout=model_turn_timeout,
                 timeout=timeout,
                 judge_file=judge,
                 models=local_models,
                 allow_uncalibrated_judge=allow_uncalibrated_judge,
+                deny_read_paths=tuple(deny_read_path or ()),
             )
             if autonomous
             else None
@@ -360,89 +383,6 @@ def open_agent(
         raise typer.Exit(code=code)
 
 
-def _run_async(runtime: FactoryRuntime) -> FactoryStatus:
-    try:
-        state = asyncio.run(runtime.run())
-    except KeyboardInterrupt:
-        console.print("\nFactory interrupted.")
-        raise typer.Exit(code=130) from None
-    return state.status
-
-
-@app.command()
-def run(
-    repo: Annotated[
-        Path,
-        typer.Option("--repo", exists=True, file_okay=False, resolve_path=True, help="Repository"),
-    ],
-    job: Annotated[str, typer.Option("--job", help="Any free-form software job")],
-    agent: Annotated[
-        AgentId | None,
-        typer.Option("--agent", help="Native coding agent (default: configuration or Codex)"),
-    ] = None,
-) -> None:
-    """Launch a native coding agent with localjev and Qwen3-14B supervision."""
-
-    load_dotenv(repo / ".env", override=False)
-    load_dotenv(override=False)
-    config = FactoryConfig.from_environment()
-    if agent is not None:
-        config = config.model_copy(update={"agent_provider": agent})
-    provider = config.jev_provider
-    api_key = os.getenv(provider.api_key_env)
-    if not api_key:
-        console.print(
-            f"Missing {provider.api_key_env} for semantic provider {provider.provider_id!r}."
-        )
-        raise typer.Exit(code=2)
-    authoritative_model = JevVeyroModel(
-        provider_id=provider.provider_id,
-        base_url=str(provider.base_url),
-        api_key=api_key,
-        model=provider.request_model,
-        checkpoint=provider.checkpoint,
-        role="authoritative",
-        timeout_seconds=provider.timeout_seconds,
-        max_state_characters=provider.max_state_characters,
-        state_format=provider.state_format,
-    )
-    model: VeyroModel = authoritative_model
-    if shadow := config.jev_shadow_provider:
-        shadow_api_key = os.getenv(shadow.api_key_env)
-        if not shadow_api_key:
-            console.print(
-                f"Missing {shadow.api_key_env} for shadow provider {shadow.provider_id!r}."
-            )
-            raise typer.Exit(code=2)
-        model = ShadowingVeyroModel(
-            authoritative_model,
-            {
-                shadow.provider_id: JevVeyroModel(
-                    provider_id=shadow.provider_id,
-                    base_url=str(shadow.base_url),
-                    api_key=shadow_api_key,
-                    model=shadow.request_model,
-                    checkpoint=shadow.checkpoint,
-                    role="shadow",
-                    timeout_seconds=shadow.timeout_seconds,
-                    max_state_characters=shadow.max_state_characters,
-                    state_format=shadow.state_format,
-                )
-            },
-        )
-    runtime = FactoryRuntime(
-        repository=repo,
-        job=job,
-        model=model,
-        config=config,
-        event_sink=TerminalRenderer(console),
-    )
-    status = _run_async(runtime)
-    console.print(f"Run ID: [bold]{runtime.state.run_id}[/bold]")
-    if status is not FactoryStatus.FINISHED:
-        raise typer.Exit(code=1)
-
-
 @app.command("import-jeff-weights")
 def import_jeff_weights(
     source: Annotated[
@@ -461,7 +401,7 @@ def import_jeff_weights(
         typer.Option("--ca-bundle", help="Trusted CA bundle for an HTTPS source"),
     ] = None,
 ) -> None:
-    """Verify and atomically install the pinned GLiFormer weight file."""
+    """Experimental: install the pinned local jeff shadow weight file."""
 
     destination = model_dir.expanduser() / GLIFORMER_LARGE_V1_WEIGHTS.filename
     try:
@@ -479,155 +419,6 @@ def import_jeff_weights(
     console.print(f"{action}: {result.destination}")
     console.print(f"Bytes: {result.bytes_written}")
     console.print(f"SHA-256: {result.sha256}")
-
-
-@app.command()
-def demo(
-    repo: Annotated[
-        Path,
-        typer.Option("--repo", exists=True, file_okay=False, resolve_path=True),
-    ] = Path("."),
-    job: Annotated[str, typer.Option("--job")] = (
-        "Add rate limiting to the API and make sure it is properly tested."
-    ),
-) -> None:
-    """Run a deterministic local simulation with no credentials or external services."""
-
-    config = FactoryConfig(
-        assessment_min_interval_seconds=0.04,
-        periodic_assessment_seconds=0.25,
-        worker_timeout_seconds=5.0,
-        overall_timeout_seconds=10.0,
-        max_workers=2,
-        max_retries=1,
-        max_iterations=8,
-    )
-
-    def simulated_worker(worker_type: WorkerType) -> FakeWorker:
-        if worker_type is WorkerType.VERIFIER:
-            return FakeWorker(
-                output_lines=["Independently verifying requirements and tests"],
-                delay_seconds=0.02,
-            )
-        return FakeWorker(
-            output_lines=["Implementing the requested change", "Running relevant tests"],
-            delay_seconds=0.07,
-        )
-
-    runtime = FactoryRuntime(
-        repository=repo,
-        job=job,
-        model=FakeVeyroModel(),
-        config=config,
-        worker_factory=simulated_worker,
-        event_sink=TerminalRenderer(console),
-    )
-    status = _run_async(runtime)
-    console.print(f"Demo run ID: [bold]{runtime.state.run_id}[/bold]")
-    if status is not FactoryStatus.FINISHED:
-        raise typer.Exit(code=1)
-
-
-@app.command("inspect")
-def inspect_run(
-    run_id: Annotated[str, typer.Argument(help="Run identifier")],
-    repo: Annotated[
-        Path,
-        typer.Option("--repo", exists=True, file_okay=False, resolve_path=True),
-    ] = Path("."),
-) -> None:
-    """Reconstruct a persisted factory timeline."""
-
-    store = RunStore(repo)
-    try:
-        state = store.load_state(run_id)
-        events = store.load_events(run_id)
-    except PersistenceError as error:
-        console.print(str(error))
-        raise typer.Exit(code=2) from error
-
-    finished = state.finished_at or state.updated_at
-    duration = max(0.0, (finished - state.started_at).total_seconds())
-    console.print(f"[bold]VEYRO RUN: {state.run_id}[/bold]")
-    console.print("Job:")
-    console.print(state.job)
-    console.print(f"Duration: {duration_label(duration)}")
-    console.print(f"Workers: {len(state.workers)}")
-    console.print(f"Assessments: {len(state.assessment_history)}")
-    console.print(f"Result: {state.status.value}")
-
-    for event in events:
-        offset = (event.timestamp - state.started_at).total_seconds()
-        prefix = elapsed_label(offset)
-        payload = event.payload
-        if event.event_type is EventType.FACTORY_STARTED:
-            console.print(f"{prefix}  Factory started")
-        elif event.event_type in {EventType.WORKER_STARTED, EventType.VERIFICATION_STARTED}:
-            label = (
-                "Verification worker"
-                if event.event_type is EventType.VERIFICATION_STARTED
-                else "Worker"
-            )
-            console.print(f"{prefix}  {label} {payload.get('worker_id')} started")
-        elif event.event_type in {
-            EventType.WORKER_COMPLETED,
-            EventType.WORKER_FAILED,
-            EventType.WORKER_STOPPED,
-            EventType.VERIFICATION_COMPLETED,
-        }:
-            console.print(
-                f"{prefix}  {payload.get('worker_id')} {str(payload.get('status', '')).upper()}"
-            )
-        elif event.event_type is EventType.VEYRO_ASSESSED:
-            assessment = payload["assessment"]
-            console.print(f"{prefix}  Veyro assessment")
-            provenance = assessment.get("provenance")
-            if provenance:
-                console.print(
-                    f"       provider         {provenance['provider_id']} "
-                    f"({provenance['role']}, {provenance['checkpoint']})"
-                )
-            for label, key in [
-                ("implementation", "implementation_complete"),
-                ("requirements", "requirements_satisfied"),
-                ("tests", "tests_sufficient"),
-                ("verification", "needs_verification"),
-                ("progress", "meaningful_progress"),
-                ("stuck", "worker_stuck"),
-            ]:
-                console.print(f"       {label:<16} {float(assessment[key]):.2f}")
-        elif event.event_type is EventType.VEYRO_ASSESSMENT_FAILED:
-            console.print(
-                f"{prefix}  Shadow {payload.get('provider_id')} failed: {payload.get('message')}"
-            )
-        elif event.event_type is EventType.VEYRO_INTERVENED:
-            console.print(f"       {payload.get('action')}: {payload.get('reason', '')}")
-        elif event.event_type in {EventType.WORKER_STEERED, EventType.WORKER_STEER_FAILED}:
-            label = "steered" if event.event_type is EventType.WORKER_STEERED else "steer failed"
-            console.print(f"{prefix}  {payload.get('worker_id')} {label}")
-        elif event.event_type in {
-            EventType.FACTORY_FINISHED,
-            EventType.FACTORY_ESCALATED,
-            EventType.FACTORY_FAILED,
-        }:
-            console.print(f"{prefix}  {event.event_type.value}")
-
-
-@app.command()
-def runs(
-    repo: Annotated[
-        Path,
-        typer.Option("--repo", exists=True, file_okay=False, resolve_path=True),
-    ] = Path("."),
-) -> None:
-    """List recent runs stored under the repository's .veyro directory."""
-
-    table = Table("Run", "Status", "Updated", "Workers", "Job")
-    for state in RunStore(repo).list_states():
-        updated = state.updated_at.astimezone(UTC).strftime("%Y-%m-%d %H:%M:%SZ")
-        job = state.job.replace("\n", " ")
-        table.add_row(state.run_id, state.status.value, updated, str(len(state.workers)), job[:70])
-    console.print(table)
 
 
 if __name__ == "__main__":

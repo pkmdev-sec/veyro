@@ -18,6 +18,7 @@ from veyro.models import (
     BridgeCapability,
     CapabilityDeclaration,
     CapabilitySet,
+    ControlEffectStatus,
     ControlRequest,
     ControlResult,
     EventProvenance,
@@ -102,6 +103,11 @@ class ObservedBridge:
             detail="SECRET",
         )
 
+    async def execute_if_current(self, request, *, expected_sequence):
+        if self.last_event_sequence != expected_sequence:
+            return None
+        return await self.execute(request)
+
     async def close(self):
         self.closed = True
 
@@ -178,13 +184,24 @@ async def test_nonexecuting_modes_never_deliver_even_with_approval(tmp_path, dec
     request = control(bridge)
     policy = RolloutPolicy(mode=mode)
     gate = ControlAuthorizationGate(policy)
-    result = await AuthorizedControlDispatcher(bridge, gate).dispatch(
+    ledger = DeliveryLedger(tmp_path / "ledger")
+    result = await AuthorizedControlDispatcher(bridge, gate, ledger=ledger).dispatch(
         request,
         state=snapshot(bridge),
         boundary=gate.boundary_policy.classify(action(request)),
         human_approval=approval(request, decision),
     )
     assert result.result is None and not bridge.calls
+    assert result.effect.status is ControlEffectStatus.NOT_APPLICABLE
+    assert result.authorization.reason is (
+        AuthorizationReason.OBSERVE_ONLY
+        if mode == "observe_only"
+        else AuthorizationReason.HUMAN_DENIED
+        if decision == "deny"
+        else AuthorizationReason.ADVISORY_ONLY
+    )
+    (decision_receipt,) = (tmp_path / "ledger").glob("*.decision.json")
+    assert json.loads(decision_receipt.read_text())["outcome"] == "denied"
 
 
 @pytest.mark.parametrize("modification", ["deny", "future", "expired", "wrong_hash"])
@@ -241,21 +258,79 @@ async def test_automatic_decline_requires_pending_approval_and_durable_claim(tmp
     request = control(bridge)
     gate = ControlAuthorizationGate(automatic())
     evidence = dict(state=snapshot(bridge), boundary=gate.boundary_policy.classify(action(request)))
-    result = await AuthorizedControlDispatcher(bridge, gate).dispatch(request, **evidence)
-    assert result.authorization.reason is AuthorizationReason.DELIVERY_UNAVAILABLE
     ledger = DeliveryLedger(tmp_path / "ledger")
     dispatcher = AuthorizedControlDispatcher(bridge, gate, ledger=ledger)
     delivered = await dispatcher.dispatch(request, **evidence)
     duplicate = await AuthorizedControlDispatcher(
         bridge, gate, ledger=DeliveryLedger(tmp_path / "ledger")
     ).dispatch(request, **evidence)
-    assert delivered.result is not None and duplicate.result is None and len(bridge.calls) == 1
+    assert delivered.result is not None
+    assert delivered.effect.status is ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED
+    assert duplicate.result is None
+    assert duplicate.effect.status is ControlEffectStatus.NOT_APPLICABLE
+    assert len(bridge.calls) == 1
+    assert len(list((tmp_path / "ledger").glob("*.attempt.json"))) == 1
     assert all("SECRET" not in path.read_text() for path in (tmp_path / "ledger").iterdir())
     state = evidence["state"].model_copy(update={"pending_approvals": ()})
     result = gate.authorize(
         request, capabilities=bridge.capabilities, state=state, boundary=evidence["boundary"]
     )
     assert result.reason is AuthorizationReason.UNSAFE_STATE
+
+
+async def test_exact_provider_rejection_is_failed_effect(tmp_path):
+    bridge = ObservedBridge(tmp_path)
+    request = control(bridge)
+    gate = ControlAuthorizationGate(automatic())
+
+    async def reject(control_request):
+        bridge.calls.append(control_request)
+        return ControlResult(
+            veyro_session_id=bridge.identity.veyro_session_id,
+            provider_id=bridge.identity.provider_id,
+            command_id=control_request.command_id,
+            action=control_request.intent.action,
+            outcome="rejected",
+            detail="provider rejected the control",
+        )
+
+    bridge.execute = reject
+    result = await AuthorizedControlDispatcher(
+        bridge, gate, ledger=DeliveryLedger(tmp_path / "ledger")
+    ).dispatch(
+        request,
+        state=snapshot(bridge),
+        boundary=gate.boundary_policy.classify(action(request)),
+    )
+    assert result.result is not None
+    assert result.effect.status is ControlEffectStatus.FAILED
+    (attempt,) = (tmp_path / "ledger").glob("*.attempt.json")
+    assert json.loads(attempt.read_text())["effect"] == "failed"
+
+
+async def test_review_required_control_denies_without_invoking_assessor(tmp_path):
+    bridge = ObservedBridge(tmp_path)
+    request = control(bridge, message=True)
+    assessor = FakeAssessor()
+    loop = SupervisionControlLoop(
+        bridge,
+        CheckpointAssessmentService(assessor),
+        policy=RolloutPolicy(mode="approval_required"),
+        ledger=DeliveryLedger(tmp_path / "ledger"),
+    )
+    loop.reducer.apply(bridge.items[0])
+    result = await loop.run_control(
+        event=bridge.items[1],
+        request=request,
+        boundary_action=action(request, BoundaryOperation.NETWORK_READ),
+        human_approval=approval(request),
+    )
+    assert result.control.authorization.reason is AuthorizationReason.SEMANTIC_EVIDENCE_REQUIRED
+    assert result.effect.status is ControlEffectStatus.NOT_APPLICABLE
+    assert assessor.calls == 0
+    assert not bridge.calls
+    (decision,) = (tmp_path / "ledger").glob("*.decision.json")
+    assert json.loads(decision.read_text())["reason"] == "semantic_evidence_required"
 
 
 async def test_uncertain_delivery_claim_is_never_retried(tmp_path):
@@ -280,24 +355,19 @@ async def test_uncertain_delivery_claim_is_never_retried(tmp_path):
     with pytest.raises(asyncio.CancelledError):
         await pending
     retry = await dispatcher.dispatch(request, **evidence)
-    assert retry.result is None and len(bridge.calls) == 1
+    assert retry.result is None
+    assert retry.effect.status is ControlEffectStatus.NOT_APPLICABLE
+    assert len(bridge.calls) == 1
+    (attempt,) = (tmp_path / "ledger").glob("*.attempt.json")
+    assert json.loads(attempt.read_text())["effect"] == "unknown"
 
 
-@pytest.mark.parametrize("when", ["assessment", "approval"])
-async def test_state_changes_before_delivery_reject_stale_evidence(tmp_path, when):
+async def test_state_change_during_approval_rejects_stale_evidence(tmp_path):
     bridge = ObservedBridge(tmp_path)
     request = control(bridge, message=True)
-
-    class ChangingAssessor(FakeAssessor):
-        async def assess(self, *args, **kwargs):
-            result = await super().assess(*args, **kwargs)
-            if when == "assessment":
-                bridge.items.append(bridge.event(3, "session_idle"))
-            return result
-
     loop = SupervisionControlLoop(
         bridge,
-        CheckpointAssessmentService(ChangingAssessor()),
+        CheckpointAssessmentService(FakeAssessor()),
         policy=RolloutPolicy(mode="approval_required"),
         ledger=DeliveryLedger(tmp_path / "ledger"),
     )
@@ -310,11 +380,17 @@ async def test_state_changes_before_delivery_reject_stale_evidence(tmp_path, whe
     result = await loop.run_control(
         event=bridge.items[1],
         request=request,
-        boundary_action=action(request, BoundaryOperation.UNKNOWN),
+        boundary_action=action(request, BoundaryOperation.READ_REPOSITORY),
         approval_provider=approve,
     )
     assert result.control.authorization.reason is AuthorizationReason.STALE_OBSERVATION
-    assert not bridge.calls and list((tmp_path / "ledger").iterdir()) == []
+    assert result.effect.status is ControlEffectStatus.NOT_APPLICABLE
+    assert not bridge.calls
+    reasons = {
+        json.loads(decision.read_text())["reason"]
+        for decision in (tmp_path / "ledger").glob("*.decision.json")
+    }
+    assert reasons == {"human_approval_required", "stale_observation"}
 
 
 @pytest.mark.parametrize(
@@ -325,7 +401,10 @@ async def test_observe_and_forbidden_never_invoke_assessor(tmp_path, mode, opera
     request = control(bridge, message=True)
     assessor = FakeAssessor()
     loop = SupervisionControlLoop(
-        bridge, CheckpointAssessmentService(assessor), policy=RolloutPolicy(mode=mode)
+        bridge,
+        CheckpointAssessmentService(assessor),
+        policy=RolloutPolicy(mode=mode),
+        ledger=DeliveryLedger(tmp_path / "ledger"),
     )
     loop.reducer.apply(bridge.items[0])
     result = await loop.run_control(
@@ -366,20 +445,20 @@ def test_real_cli_drives_policy_and_sanitizes_results(tmp_path, monkeypatch, mod
     from veyro.supervision import supervisor
 
     bridge = ObservedBridge(tmp_path)
-    assessor = FakeAssessor()
     records = []
 
     async def connect(*args, **kwargs):
         return bridge
 
     monkeypatch.setattr(supervisor, "connect_bridge", connect)
-    monkeypatch.setattr(
-        supervisor, "authoritative_assessments", lambda: CheckpointAssessmentService(assessor)
-    )
     # Mode without an allowlist remains approval-required, even on a stable adapter.
     proposal = private_json(
         tmp_path / "proposal.json",
-        {"command_id": "cmd-1", "intent": {"action": "queue_follow_up", "message": "SECRET"}},
+        {
+            "command_id": "cmd-1",
+            "intent": {"action": "queue_follow_up", "message": "SECRET"},
+            "operation": "read_repository",
+        },
     )
     policy = private_json(tmp_path / "policy.json", {"mode": mode})
     # Patch the approval reader at the service seam, not the authorization path.
@@ -429,9 +508,11 @@ def test_real_cli_drives_policy_and_sanitizes_results(tmp_path, monkeypatch, mod
     assert "SECRET" not in result.output
     executing = mode in {"approval_required", "automatic"}
     assert len(bridge.calls) == int(executing)
-    assert assessor.calls == (0 if mode == "observe_only" else 1)
+    assert records[-1]["effect"]["status"] == (
+        "acknowledged_unverified" if executing else "not_applicable"
+    )
     assert bridge.closed
-    assert (tmp_path / "ledger").exists() == executing
+    assert list((tmp_path / "ledger").glob("*.decision.json"))
     assert records[-1]["type"] == "decision"
 
 
@@ -533,7 +614,7 @@ async def test_changed_context_and_boundary_do_not_reuse_semantic_cache(tmp_path
     assert second.checkpoint_id != third.checkpoint_id
 
 
-@pytest.mark.parametrize("change", ["expiry", "cursor"])
+@pytest.mark.parametrize("change", ["expiry", "cursor", "decision_cursor", "delivery_cursor"])
 async def test_persistence_cannot_outlive_approval_or_snapshot(tmp_path, monkeypatch, change):
     from veyro.supervision import authorization as module
 
@@ -550,13 +631,29 @@ async def test_persistence_cannot_outlive_approval_or_snapshot(tmp_path, monkeyp
     monkeypatch.setattr(module, "datetime", Clock)
 
     class AdvancingLedger(DeliveryLedger):
+        decision_count = 0
+
         def claim(self, **kwargs):
-            super().claim(**kwargs)
+            delivery_claim = super().claim(**kwargs)
             if change == "expiry":
                 clock[0] = human.expires_at + timedelta(seconds=1)
-            else:
+            elif change == "cursor":
                 bridge.items.append(bridge.event(3, "session_idle"))
+            return delivery_claim
 
+        def record_authorization(self, **kwargs):
+            super().record_authorization(**kwargs)
+            self.decision_count += 1
+            if change == "decision_cursor" and self.decision_count == 2:
+                bridge.items.append(bridge.event(3, "session_idle"))
+    if change == "delivery_cursor":
+        deliver_if_current = bridge.execute_if_current
+
+        async def advance_at_delivery(request, *, expected_sequence):
+            bridge.items.append(bridge.event(3, "session_idle"))
+            return await deliver_if_current(request, expected_sequence=expected_sequence)
+
+        bridge.execute_if_current = advance_at_delivery
     gate = ControlAuthorizationGate(RolloutPolicy(mode="approval_required"))
     dispatcher = AuthorizedControlDispatcher(
         bridge, gate, ledger=AdvancingLedger(tmp_path / "ledger")
@@ -573,7 +670,46 @@ async def test_persistence_cannot_outlive_approval_or_snapshot(tmp_path, monkeyp
         if change == "expiry"
         else AuthorizationReason.STALE_OBSERVATION
     )
-    assert len(list((tmp_path / "ledger").iterdir())) == 1
+    assert len(list((tmp_path / "ledger").iterdir())) == 4
+    (attempt,) = (tmp_path / "ledger").glob("*.attempt.json")
+    assert json.loads(attempt.read_text())["effect"] == "not_applicable"
+
+
+async def test_stale_boundary_receipt_failure_leaves_ledger_reopenable(tmp_path):
+    bridge = ObservedBridge(tmp_path)
+    request = control(bridge)
+    human = approval(request)
+    deliver_if_current = bridge.execute_if_current
+
+    async def advance_at_delivery(request, *, expected_sequence):
+        bridge.items.append(bridge.event(3, "session_idle"))
+        return await deliver_if_current(request, expected_sequence=expected_sequence)
+
+    bridge.execute_if_current = advance_at_delivery
+
+    class FailingLedger(DeliveryLedger):
+        decisions = 0
+
+        def record_authorization(self, **kwargs):
+            self.decisions += 1
+            if self.decisions == 3:
+                raise RuntimeError("decision receipt unavailable")
+            return super().record_authorization(**kwargs)
+
+    root = tmp_path / "ledger"
+    ledger = FailingLedger(root)
+    gate = ControlAuthorizationGate(RolloutPolicy(mode="approval_required"))
+    dispatcher = AuthorizedControlDispatcher(bridge, gate, ledger=ledger)
+
+    with pytest.raises(RuntimeError, match="decision receipt unavailable"):
+        await dispatcher.dispatch(
+            request,
+            state=snapshot(bridge),
+            boundary=gate.boundary_policy.classify(action(request)),
+            human_approval=human,
+        )
+
+    DeliveryLedger(root)
 
 
 async def test_persistence_wait_can_be_cancelled_without_native_delivery(tmp_path):
@@ -588,10 +724,10 @@ async def test_persistence_wait_can_be_cancelled_without_native_delivery(tmp_pat
 
     class BlockingLedger(DeliveryLedger):
         def claim(self, **kwargs):
-            super().claim(**kwargs)
+            delivery_claim = super().claim(**kwargs)
             loop.call_soon_threadsafe(started.set)
             assert release.wait(2)
-
+            return delivery_claim
     dispatcher = AuthorizedControlDispatcher(
         bridge, gate, ledger=BlockingLedger(tmp_path / "ledger")
     )
@@ -606,6 +742,6 @@ async def test_persistence_wait_can_be_cancelled_without_native_delivery(tmp_pat
         with pytest.raises(asyncio.CancelledError):
             await task
         assert not bridge.calls
-        assert len(list((tmp_path / "ledger").iterdir())) == 1
+        assert len(list((tmp_path / "ledger").iterdir())) == 2
     finally:
         release.set()

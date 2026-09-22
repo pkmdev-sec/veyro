@@ -11,8 +11,14 @@ from pathlib import Path
 
 import pytest
 
-from veyro.models import SessionIdentity
-from veyro.supervision.delivery import DeliveryError, DeliveryLedger
+from veyro.models import (
+    AuthorizationOutcome,
+    AuthorizationReason,
+    ControlEffectStatus,
+    SessionIdentity,
+    SupervisionEventType,
+)
+from veyro.supervision.delivery import DeliveryClaim, DeliveryError, DeliveryLedger
 
 DIGEST = hashlib.sha256(b"control text SECRET credential").hexdigest()
 
@@ -34,9 +40,51 @@ def scope(tmp_path: Path) -> tuple[Path, SessionIdentity]:
     return repository / "private" / "delivery", identity(repository)
 
 
-def claim(ledger: DeliveryLedger, session: SessionIdentity, **updates: str) -> None:
+def claim(
+    ledger: DeliveryLedger, session: SessionIdentity, **updates: str
+) -> DeliveryClaim:
     args = {"command_id": "command-secret", "request_sha256": DIGEST, **updates}
-    ledger.claim(session=session, **args)
+    return ledger.claim(session=session, **args)
+
+
+def receipt(ledger: DeliveryLedger, session: SessionIdentity) -> DeliveryClaim:
+    ledger.record_authorization(
+        session=session,
+        authorization_sha256="a" * 64,
+        outcome=AuthorizationOutcome.AUTHORIZED,
+        reason=AuthorizationReason.AUTHORIZED,
+    )
+    delivery_claim = claim(ledger, session)
+    ledger.commit_attempt(
+        delivery_claim,
+        authorization_sha256="a" * 64,
+        result_sha256="b" * 64,
+        effect=ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED,
+    )
+    return delivery_claim
+
+def test_authorization_decision_is_sanitized_idempotent_and_validated(scope):
+    root, session = scope
+    ledger = DeliveryLedger(root)
+    for _ in range(2):
+        ledger.record_authorization(
+            session=session,
+            authorization_sha256=DIGEST,
+            outcome=AuthorizationOutcome.HUMAN_APPROVAL_REQUIRED,
+            reason=AuthorizationReason.HUMAN_APPROVAL_REQUIRED,
+        )
+    (path,) = root.iterdir()
+    assert path.name.endswith(".decision.json")
+    data = path.read_bytes()
+    assert b"secret" not in data and b"SECRET" not in data
+    assert json.loads(data)["outcome"] == "human_approval_required"
+    DeliveryLedger(root)
+
+    value = json.loads(data)
+    value["outcome"] = "authorized"
+    path.write_text(json.dumps(value))
+    with pytest.raises(DeliveryError):
+        DeliveryLedger(root)
 
 
 def _contend(root: Path, session: SessionIdentity) -> bool:
@@ -55,7 +103,8 @@ def _crash_after_claim(root: Path, session: SessionIdentity) -> None:
 def test_private_bounded_digest_only_record(scope):
     root, session = scope
     ledger = DeliveryLedger(root)
-    assert claim(ledger, session) is None
+    delivery_claim = claim(ledger, session)
+    assert delivery_claim.delivery_sha256 and delivery_claim.claim_sha256
     assert stat.S_IMODE(root.stat().st_mode) == 0o700
     assert stat.S_IMODE(root.parent.stat().st_mode) == 0o700
     (record_path,) = root.iterdir()
@@ -70,13 +119,135 @@ def test_private_bounded_digest_only_record(scope):
     assert str(root.parent).encode() not in data
     assert b"control text" not in data and b"credential" not in data
     record = json.loads(data)
-    assert set(record) == {"version", "scope_sha256", "command_sha256", "request_sha256"}
+    assert set(record) == {
+        "version",
+        "kind",
+        "delivery_sha256",
+        "scope_sha256",
+        "command_sha256",
+        "request_sha256",
+        "claimed_at",
+    }
     assert record["request_sha256"] == DIGEST
-    assert len(record_path.stem) == 64
+    assert record_path.name == f"{delivery_claim.delivery_sha256}.claim.json"
     before = record_path.read_bytes()
     with pytest.raises(DeliveryError, match="already claimed"):
         claim(ledger, session)
     assert record_path.read_bytes() == before
+
+
+def test_attempt_receipt_is_exactly_once_sanitized_and_reopenable(scope):
+    root, session = scope
+    ledger = DeliveryLedger(root)
+    delivery_claim = receipt(ledger, session)
+    records = {path.name: path.read_bytes() for path in root.iterdir()}
+    assert f"{delivery_claim.delivery_sha256}.claim.json" in records
+    assert f"{delivery_claim.delivery_sha256}.attempt.json" in records
+    assert len([name for name in records if name.endswith(".decision.json")]) == 1
+    attempt = records[f"{delivery_claim.delivery_sha256}.attempt.json"]
+    assert b"secret" not in attempt and b"SECRET" not in attempt
+    assert b"control text" not in attempt and b"credential" not in attempt
+    assert json.loads(attempt)["effect"] == "acknowledged_unverified"
+    with pytest.raises(DeliveryError, match="already exists"):
+        ledger.commit_attempt(
+            delivery_claim,
+            authorization_sha256="a" * 64,
+            result_sha256="b" * 64,
+            effect=ControlEffectStatus.ACKNOWLEDGED_UNVERIFIED,
+        )
+    DeliveryLedger(root)
+
+
+@pytest.mark.parametrize("corruption", ["missing", "non_authorized"])
+def test_attempt_requires_matching_authorized_decision_receipt(scope, corruption):
+    root, session = scope
+    receipt(DeliveryLedger(root), session)
+    (decision,) = root.glob("*.decision.json")
+    if corruption == "missing":
+        decision.unlink()
+    else:
+        value = json.loads(decision.read_bytes())
+        value["outcome"] = AuthorizationOutcome.DENIED.value
+        value["reason"] = AuthorizationReason.BOUNDARY_FORBIDDEN.value
+        decision.write_bytes(
+            json.dumps(value, sort_keys=True, separators=(",", ":")).encode() + b"\n"
+        )
+    with pytest.raises(DeliveryError, match="attempt record is invalid"):
+        DeliveryLedger(root)
+
+
+def test_not_applicable_attempt_requires_non_authorized_decision(scope):
+    root, session = scope
+    ledger = DeliveryLedger(root)
+    authorization_sha256 = "c" * 64
+    ledger.record_authorization(
+        session=session,
+        authorization_sha256=authorization_sha256,
+        outcome=AuthorizationOutcome.DENIED,
+        reason=AuthorizationReason.BOUNDARY_FORBIDDEN,
+    )
+    delivery_claim = claim(ledger, session)
+    ledger.commit_attempt(
+        delivery_claim,
+        authorization_sha256=authorization_sha256,
+        result_sha256=None,
+        effect=ControlEffectStatus.NOT_APPLICABLE,
+    )
+    (decision,) = root.glob("*.decision.json")
+    value = json.loads(decision.read_bytes())
+    value["outcome"] = AuthorizationOutcome.AUTHORIZED.value
+    value["reason"] = AuthorizationReason.AUTHORIZED.value
+    decision.write_bytes(
+        json.dumps(value, sort_keys=True, separators=(",", ":")).encode() + b"\n"
+    )
+    with pytest.raises(DeliveryError, match="attempt record is invalid"):
+        DeliveryLedger(root)
+
+
+def test_final_effect_receipt_is_immutable_and_bound_to_attempt(scope):
+    root, session = scope
+    ledger = DeliveryLedger(root)
+    delivery_claim = receipt(ledger, session)
+    ledger.commit_final_effect(
+        session=session,
+        command_id="command-secret",
+        effect=ControlEffectStatus.VERIFIED,
+        native_event=SupervisionEventType.SESSION_FAILED,
+    )
+    effect_path = root / f"{delivery_claim.delivery_sha256}.effect.json"
+    final_data = effect_path.read_bytes()
+    assert b"secret" not in final_data and b"SECRET" not in final_data
+    assert json.loads(final_data)["effect"] == "verified"
+    assert json.loads(final_data)["native_event"] == "session_failed"
+    with pytest.raises(DeliveryError, match="already exists"):
+        ledger.commit_final_effect(
+            session=session,
+            command_id="command-secret",
+            effect=ControlEffectStatus.UNKNOWN,
+        )
+    DeliveryLedger(root)
+
+@pytest.mark.parametrize("corruption", ["content", "public", "symlink", "hardlink"])
+def test_reopen_fails_closed_for_corrupt_or_unsafe_receipt(scope, corruption):
+    root, session = scope
+    delivery_claim = receipt(DeliveryLedger(root), session)
+    path = root / f"{delivery_claim.delivery_sha256}.attempt.json"
+    target = root.parent / "receipt-target"
+    target.write_text("SECRET")
+    if corruption == "content":
+        path.write_text("{}")
+    elif corruption == "public":
+        path.chmod(0o644)
+    else:
+        path.unlink()
+        if corruption == "symlink":
+            path.symlink_to(target)
+        else:
+            path.hardlink_to(target)
+    with pytest.raises(DeliveryError):
+        DeliveryLedger(root)
+    assert target.read_text() == "SECRET"
+
 
 
 def test_restart_reconnect_and_changed_digest_never_retry(scope):
@@ -143,7 +314,7 @@ def test_process_contention_has_exactly_one_winner(scope):
     assert len(list(root.iterdir())) == 1
 
 
-def test_process_crash_keeps_claim(scope):
+def test_process_crash_keeps_unknown_claim_and_blocks_retry(scope):
     root, session = scope
     process = multiprocessing.get_context("spawn").Process(
         target=_crash_after_claim, args=(root, session)
@@ -156,6 +327,8 @@ def test_process_crash_keeps_claim(scope):
         if process.is_alive():
             process.kill()
             process.join()
+    (claim_path,) = root.iterdir()
+    assert claim_path.name.endswith(".claim.json")
     with pytest.raises(DeliveryError, match="already claimed"):
         claim(DeliveryLedger(root), session)
 
@@ -164,7 +337,7 @@ def test_process_crash_keeps_claim(scope):
 def test_native_session_identity_required(scope, native_id):
     root, session = scope
     ledger = DeliveryLedger(root)
-    with pytest.raises(DeliveryError, match="invalid delivery claim"):
+    with pytest.raises(DeliveryError):
         claim(ledger, session.model_copy(update={"provider_session_id": native_id}))
     assert not list(root.iterdir())
 
@@ -259,8 +432,8 @@ def test_any_existing_claim_is_a_no_retry_fence(scope, existing):
     else:
         path.write_bytes(b"" if existing == "empty" else b"SECRET")
         path.chmod(0o644 if existing == "public" else 0o600)
-    with pytest.raises(DeliveryError, match="already claimed"):
-        claim(DeliveryLedger(root), session)
+    with pytest.raises(DeliveryError):
+        DeliveryLedger(root)
     assert target.read_text() == "SECRET"
 
 
@@ -289,8 +462,13 @@ def test_persistence_failure_never_succeeds_or_retries(scope, monkeypatch, failu
             claim(ledger, session)
         assert "SECRET" not in str(caught.value)
     assert len(list(root.iterdir())) == 1
-    with pytest.raises(DeliveryError, match="already claimed"):
-        claim(DeliveryLedger(root), session)
+    if failure in {"file-fsync", "directory-fsync"}:
+        reopened = DeliveryLedger(root)
+        with pytest.raises(DeliveryError, match="already claimed"):
+            claim(reopened, session)
+    else:
+        with pytest.raises(DeliveryError):
+            DeliveryLedger(root)
 
 
 def test_exclusive_nofollow_creation_and_fsync_order(scope, monkeypatch):

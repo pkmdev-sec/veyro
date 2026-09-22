@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
+import re
 import shutil
 import subprocess
-from collections.abc import Callable
+import tempfile
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -34,6 +37,7 @@ class AgentDefinition:
     interface_evidence: str
     interface_stability: Literal["documented", "experimental"]
     capabilities: frozenset[AdapterCapability]
+    autonomy_versions: frozenset[str] = frozenset()
 
     def interactive_command(
         self, prompt: str | None = None, native_args: tuple[str, ...] = ()
@@ -109,9 +113,10 @@ AGENTS: dict[AgentId, AgentDefinition] = {
         display_name="Codex",
         executable="codex",
         machine_interface="stable hooks and exec JSON lines; opt-in experimental app-server",
-        interface_evidence="codex 0.154.0 hook schemas; codex queue/exec/app-server --help",
+        interface_evidence="codex 0.154.0 hook schemas; codex exec/app-server --help",
         interface_stability="documented",
         capabilities=_COMMON_CAPABILITIES,
+        autonomy_versions=frozenset({"0.154.0"}),
     ),
     AgentId.CLAUDE: AgentDefinition(
         agent_id=AgentId.CLAUDE,
@@ -132,6 +137,7 @@ AGENTS: dict[AgentId, AgentDefinition] = {
         ),
         interface_stability="experimental",
         capabilities=_COMMON_CAPABILITIES,
+        autonomy_versions=frozenset({"0.9.5"}),
     ),
     AgentId.PI: AgentDefinition(
         agent_id=AgentId.PI,
@@ -150,12 +156,28 @@ AGENTS: dict[AgentId, AgentDefinition] = {
         interface_evidence="opencode 1.18.30 serve/attach help; authenticated GET /doc",
         interface_stability="documented",
         capabilities=_COMMON_CAPABILITIES,
+        autonomy_versions=frozenset({"1.18.30"}),
     ),
 }
 
 
 def agent_definition(agent_id: AgentId | str) -> AgentDefinition:
     return AGENTS[AgentId(agent_id)]
+
+
+def _qualified_version(definition: AgentDefinition, output: str | None) -> str | None:
+    if output is None or "\n" in output or "\r" in output:
+        return None
+    patterns = {
+        AgentId.CODEX: r"codex-cli ([0-9]+\.[0-9]+\.[0-9]+)",
+        AgentId.PRIME_AGENT: r"prime-agent ([0-9]+\.[0-9]+\.[0-9]+)",
+        AgentId.OPENCODE: r"([0-9]+\.[0-9]+\.[0-9]+)",
+    }
+    pattern = patterns.get(definition.agent_id)
+    match = re.fullmatch(pattern, output) if pattern else None
+    if match is None or match.group(1) not in definition.autonomy_versions:
+        return None
+    return match.group(1)
 
 
 def probe_agent(definition: AgentDefinition) -> dict[str, object]:
@@ -172,11 +194,12 @@ def probe_agent(definition: AgentDefinition) -> dict[str, object]:
                 timeout=5,
             )
             output = result.stdout.strip() or result.stderr.strip()
-            version = output.splitlines()[0] if output else None
+            version = output if output else None
             if result.returncode != 0:
                 error = f"version probe exited {result.returncode}"
         except (OSError, subprocess.SubprocessError) as exc:
             error = str(exc)
+    qualified_version = _qualified_version(definition, version) if error is None else None
     return {
         "protocol_version": "1.0",
         "agent_id": definition.agent_id.value,
@@ -184,6 +207,9 @@ def probe_agent(definition: AgentDefinition) -> dict[str, object]:
         "available": path is not None,
         "executable": path,
         "version": version,
+        "qualified_version": qualified_version,
+        "version_qualified": qualified_version is not None,
+        "required_autonomy_versions": sorted(definition.autonomy_versions),
         "machine_interface": definition.machine_interface,
         "interface_evidence": definition.interface_evidence,
         "interface_stability": definition.interface_stability,
@@ -195,8 +221,61 @@ def probe_agent(definition: AgentDefinition) -> dict[str, object]:
     }
 
 
+def require_qualified_autonomy_version(
+    definition: AgentDefinition, probe: Mapping[str, object]
+) -> str:
+    qualified = probe.get("qualified_version")
+    if probe.get("probe_error") is not None or not probe.get("version_qualified"):
+        observed = probe.get("version")
+        required = ", ".join(sorted(definition.autonomy_versions)) or "none"
+        raise ValueError(
+            f"{definition.display_name} autonomous launch requires exact qualified version "
+            f"{required}; observed {observed!r}"
+        )
+    if not isinstance(qualified, str) or qualified not in definition.autonomy_versions:
+        raise ValueError(f"{definition.display_name} returned invalid qualification evidence")
+    return qualified
+
+
 def probe_agents() -> list[dict[str, object]]:
     return [probe_agent(definition) for definition in AGENTS.values()]
+
+
+def _recover_local_model(launch) -> None:
+    identity = launch.coding_model
+    if identity is None:
+        return
+    record = {
+        "coding_model": {
+            "profile": identity.profile_id,
+            "requested_model": identity.requested_model,
+            "manifest_sha256": identity.manifest_sha256,
+            "blob_sha256": identity.blob_sha256,
+        }
+    }
+    try:
+        result = subprocess.run(
+            ["ollama", "stop", identity.requested_model],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        record.update(
+            {"exit_code": result.returncode, "output": (result.stdout + result.stderr)[-2000:]}
+        )
+    except (OSError, subprocess.SubprocessError) as error:
+        record.update({"exit_code": None, "error": str(error)})
+    fd, temporary = tempfile.mkstemp(prefix=".model-recovery.", dir=launch.directory)
+    try:
+        with os.fdopen(fd, "w") as stream:
+            json.dump(record, stream, indent=2)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, launch.directory / "model-recovery.json")
+    finally:
+        Path(temporary).unlink(missing_ok=True)
 
 
 def launch_native_agent(
@@ -214,6 +293,9 @@ def launch_native_agent(
     if executable is None:
         raise FileNotFoundError(f"native agent executable not found: {definition.executable}")
     probe = probe_agent(definition)
+    qualified_version = None
+    if autonomy is not None:
+        qualified_version = require_qualified_autonomy_version(definition, probe)
     command = definition.interactive_command(prompt, native_args)
     autonomous = None
     if autonomy is not None:
@@ -221,26 +303,19 @@ def launch_native_agent(
 
         autonomous = prepare_autonomy(agent_id, repository, prompt or "", native_args, autonomy)
         command = autonomous.command
-    command[0] = executable
+    command[command.index(definition.executable)] = executable
 
     def completed() -> bool:
-        if autonomous is None:
-            return False
-        try:
-            state = json.loads((autonomous.directory / "state.json").read_text())
-            return (
-                state["phase"] == "completed"
-                and not (autonomous.directory / "adapter-error.json").exists()
-            )
-        except (OSError, ValueError, KeyError, TypeError):
-            return False
+        return False
 
     result = ManagedNativeSession(
         definition=definition,
         repository=repository,
         command=command,
         executable=executable,
-        agent_version=probe["version"] if isinstance(probe["version"], str) else None,
+        agent_version=qualified_version
+        if autonomy is not None
+        else (probe["version"] if isinstance(probe["version"], str) else None),
         prompt=prompt,
         on_started=on_started,
         environment=autonomous.environment if autonomous else None,
@@ -250,10 +325,13 @@ def launch_native_agent(
     if autonomous:
         from dataclasses import replace
 
+        succeeded = completed()
+        if autonomous.coding_model and not succeeded:
+            _recover_local_model(autonomous)
         result = replace(
             result,
             autonomy_directory=autonomous.directory,
-            exit_code=(result.exit_code or (0 if completed() else 1)),
+            exit_code=(result.exit_code or (0 if succeeded else 1)),
         )
     return result
 

@@ -55,8 +55,6 @@ def baseline(samples: int) -> dict:
             )
             config = launch.directory / "config.json"
             checkpoint(config, "benchmark", "start", claim=True)
-            (launch.directory / "plan.md").write_text("Run the labelled fixture check.")
-            checkpoint(config, "benchmark", "plan")
             started = time.perf_counter()
             process = subprocess.run(
                 [sys.executable, str(CHECKER), str(config), "benchmark", "build"],
@@ -126,6 +124,37 @@ def stop_disposable_prime(workspace: Path) -> dict:
         return {"success": False, "error": str(error)}
 
 
+def write_live_fixture(
+    workspace: Path, force_repair: bool, force_review: bool = False
+) -> tuple[Path, dict[Path, bytes]]:
+    verifier = workspace / "verify.py"
+    (workspace / "slug.py").write_text("def slug(text):\n    return text\n")
+    verifier.write_text(
+        "from slug import slug\n"
+        + "\n".join(f"assert slug({text!r}) == {expected!r}" for text, expected in CASES[:3])
+        + "\n"
+    )
+    check = verifier
+    if force_repair or force_review:
+        check = workspace / "veyro_check.py"
+        failure = (
+            "pre-completion review required: reread the original task and current "
+            "implementation, then fix any mismatch before rerunning checks"
+            if force_review
+            else "forced first Veyro checkpoint failure"
+        )
+        check.write_text(
+            "import json\n"
+            "from pathlib import Path\n"
+            "states = list(Path('.veyro/autonomy').glob('*/state.json'))\n"
+            "state = json.loads(states[0].read_text()) if states else {}\n"
+            "if state.get('phase') == 'verifying' and state.get('continuations', 0) == 0:\n"
+            f"    raise SystemExit({failure!r})\n"
+            "exec(compile(Path('verify.py').read_text(), 'verify.py', 'exec'))\n"
+        )
+    return check, {path: path.read_bytes() for path in (verifier, check)}
+
+
 def live(
     agent: str,
     model: str | None,
@@ -133,6 +162,9 @@ def live(
     judge: Path | None = None,
     local_profile: str | None = None,
     allow_uncalibrated: bool = False,
+    force_repair: bool = False,
+    force_review: bool = False,
+    evaluation_profile: str | None = None,
 ) -> dict:
     selected_profile = None
     if local_profile:
@@ -141,14 +173,7 @@ def live(
         selected_profile = load_profiles()[local_profile]
     workspace = Path(tempfile.mkdtemp(prefix=f"veyro-live-{agent}-"))
     workspace.chmod(0o700)
-    (workspace / "slug.py").write_text("def slug(text):\n    return text\n")
-    verifier = workspace / "verify.py"
-    verifier.write_text(
-        "from slug import slug\n"
-        + "\n".join(f"assert slug({text!r}) == {expected!r}" for text, expected in CASES[:3])
-        + "\n"
-    )
-    verifier_original = verifier.read_bytes()
+    check, protected_files = write_live_fixture(workspace, force_repair, force_review)
     command = [
         sys.executable,
         "-m",
@@ -159,7 +184,7 @@ def live(
         str(workspace),
         "--autonomous",
         "--check",
-        shlex.join([sys.executable, "verify.py"]),
+        shlex.join([sys.executable, check.name]),
         "--timeout",
         str(timeout),
         "--prompt",
@@ -172,7 +197,7 @@ def live(
     if local_profile:
         command += ["--coding-profile", local_profile]
         if judge is not None:
-            command += ["--evaluation-profile", local_profile]
+            command += ["--evaluation-profile", evaluation_profile or local_profile]
         if allow_uncalibrated:
             command += ["--allow-uncalibrated-evaluator"]
     if model:
@@ -281,9 +306,23 @@ def live(
         "assertions_passed": correct,
         "assertions_total": len(CASES),
         "accuracy": correct / len(CASES),
-        "verifier_unchanged": verifier.read_bytes() == verifier_original,
-        "transitions": [e["reason"] for e in events],
-        "checkpoint_latency_ms": [e["latency_ms"] for e in events],
+        "verifier_unchanged": all(
+            path.read_bytes() == original for path, original in protected_files.items()
+        ),
+        "forced_repair": force_repair,
+        "forced_review": force_review,
+        "transitions": [event["reason"] for event in events],
+        "decisions": [
+            {
+                "reason": event["reason"],
+                "continuations": event.get("continuations"),
+                "check_exit_codes": [check["exit_code"] for check in event.get("checks", [])],
+                "judge_status": event.get("judge", {}).get("status"),
+                "judge_scores": event.get("judge", {}).get("scores"),
+            }
+            for event in events
+        ],
+        "checkpoint_latency_ms": [event["latency_ms"] for event in events],
         "artifact_directory": str(workspace),
         "human_task_inputs": 0,
         "limits": (
@@ -299,8 +338,11 @@ def main() -> None:
     parser.add_argument("--live", choices=["prime-agent", "opencode"])
     parser.add_argument("--model")
     parser.add_argument("--judge", type=Path)
-    parser.add_argument("--local-profile", choices=["small", "14b"])
+    parser.add_argument("--local-profile", choices=["small", "coder14", "coder30", "14b"])
     parser.add_argument("--allow-uncalibrated-judge", action="store_true")
+    parser.add_argument("--evaluation-profile", choices=["small", "14b"])
+    parser.add_argument("--force-repair", action="store_true")
+    parser.add_argument("--force-review", action="store_true")
     parser.add_argument("--timeout", type=float, default=180)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -308,6 +350,8 @@ def main() -> None:
         parser.error("--samples must be at least 2")
     if args.local_profile and args.model:
         parser.error("--local-profile cannot be combined with --model")
+    if args.evaluation_profile and args.judge is None:
+        parser.error("--evaluation-profile requires --judge")
     if args.judge is not None and not args.local_profile:
         from dotenv import load_dotenv
 
@@ -324,6 +368,9 @@ def main() -> None:
             args.judge,
             args.local_profile,
             args.allow_uncalibrated_judge,
+            args.force_repair,
+            args.force_review,
+            args.evaluation_profile,
         )
         if args.live
         else baseline(args.samples),

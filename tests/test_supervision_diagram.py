@@ -84,15 +84,16 @@ def test_still_diagrams_have_expected_dimensions():
         assert struct.unpack(">II", data[16:24]) == dimensions
 
 
-def test_task_diagram_names_the_dual_model_control_order():
+def test_task_diagram_names_the_checked_task_control_order():
     source = (ROOT / "tools/generate_supervision_diagram.py").read_text()
     for label in (
-        "01 / DUAL-MODEL TASK LOOP",
-        "4B coder",
+        "01 / CHECKED TASK LOOP",
+        "Qwen3 Coder 30B",
         "Run checks",
         "Authoritative",
-        "14B evaluator",
-        "Runs only after executable checks pass",
+        "Optional Laya",
+        "Human review",
+        "Passing evidence requires review",
     ):
         assert label in source
 
@@ -100,7 +101,7 @@ def test_task_diagram_names_the_dual_model_control_order():
 def test_supervision_diagram_describes_current_model_roles():
     source = (ROOT / "tools/generate_supervision_diagram.py").read_text()
     assert "LOCAL MODEL ROLES / SEPARATE TASK PATH" in source
-    assert "Typed evaluation after checks" in source
-    assert "Native coding loop" in source
+    assert "Experimental OpenCode writer" in source
+    assert "Optional advisory evaluation" in source
     assert "G4 native-task qualification and G6 calibration remain open" in source
     assert "not shipped" not in source.lower()

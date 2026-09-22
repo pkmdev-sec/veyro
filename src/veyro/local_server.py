@@ -28,7 +28,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 from veyro.local_models import LocalModels, ModelProfile, load_profiles
 from veyro.readout import READOUT_PROTOCOL, ReadoutEngine, ReadoutQuestion
 
-DEFAULT_PORTS = {"small": 8081, "14b": 8082}
+DEFAULT_PORTS = {"small": 8081, "coder14": 8083, "coder30": 8084, "14b": 8082}
 MAX_REQUEST_BYTES = 1024 * 1024
 MAX_TIMEOUT = 120
 START_WAIT = 10
@@ -142,10 +142,15 @@ def _write_metadata(path: Path, data: dict) -> None:
 
 
 def _metadata(directory: Path, profile: ModelProfile) -> dict | None:
+    path = directory / f"{profile.id}.json"
     try:
-        fd = _private_open(directory / f"{profile.id}.json", os.O_RDONLY)
+        fd = _private_open(path, os.O_RDONLY)
     except FileNotFoundError:
         return None
+    except LocalServiceError:
+        if not path.exists():
+            return None
+        raise
     try:
         with os.fdopen(fd) as stream:
             raw = stream.read(16385)
@@ -164,8 +169,10 @@ def _metadata(directory: Path, profile: ModelProfile) -> dict | None:
             or not re.fullmatch(r"[0-9a-f]{64}", data["token"])
             or not isinstance(data.get("instance_id"), str)
             or not re.fullmatch(r"[0-9a-f]{32}", data["instance_id"])
-            or not isinstance(data.get("model_digest"), str)
-            or not re.fullmatch(r"[0-9a-f]{64}", data["model_digest"])
+            or not isinstance(data.get("model_manifest_sha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", data["model_manifest_sha256"])
+            or not isinstance(data.get("model_blob_sha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", data["model_blob_sha256"])
         ):
             raise ValueError("invalid or mismatched metadata")
         return data
@@ -206,7 +213,15 @@ def _request(metadata: dict, endpoint: str, payload: dict | None = None, *, time
 
 
 def _verify_identity(metadata: dict, response: dict) -> dict:
-    for key in ("instance_id", "profile", "model_digest", "protocol", "context_size", "port"):
+    for key in (
+        "instance_id",
+        "profile",
+        "model_manifest_sha256",
+        "model_blob_sha256",
+        "protocol",
+        "context_size",
+        "port",
+    ):
         if response.get(key) != metadata[key]:
             raise LocalServiceError(f"Local service identity mismatch: {key}")
     return response
@@ -492,10 +507,12 @@ def serve(
         raise LocalServiceError("Unsupported readout model family")
     with _lock(directory, profile_id, "worker", wait=0.25):
         _metadata(directory, profile)  # Reject corrupt metadata before replacing it.
-        model_path = LocalModels().gguf_path(profile)
+        verified = LocalModels().verify_model(profile)
+        model_path = verified.blob_path
         metadata = {
             "profile": profile.model_dump(),
-            "model_digest": model_path.name.removeprefix("sha256-"),
+            "model_manifest_sha256": verified.manifest_sha256,
+            "model_blob_sha256": verified.blob_sha256,
             "protocol": READOUT_PROTOCOL,
             "context_size": context_size,
             "instance_id": secrets.token_hex(16),

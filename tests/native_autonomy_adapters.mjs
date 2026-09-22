@@ -15,6 +15,34 @@ let turn = 0;
 let finish;
 let primeSignal;
 
+if (scenario === "opencode-local-bounds") {
+  Object.assign(binding, { codingModel: "qwen3:14b", maxMessageBytes: 512 });
+  const hooks = await createOpenCode(binding)({ directory, client: { session: {} } });
+  const system = { system: ["large ".repeat(10000), "<available_skills>unsafe</available_skills>"] };
+  await hooks["experimental.chat.system.transform"](
+    { model: { providerID: "veyro-local" } }, system);
+  assert.equal(system.system.length, 1);
+  assert.ok(Buffer.byteLength(system.system[0]) < 2000);
+  assert.ok(!system.system[0].includes("available_skills"));
+  const first = { info: { role: "user" }, parts: [{ type: "text", text: "original task" }] };
+  const recent = { info: { role: "assistant" }, parts: [{ type: "text", text: "recent" }] };
+  const messages = { messages: [
+    first,
+    { info: { role: "assistant" }, parts: [{ type: "text", text: "old".repeat(1000) }] },
+    recent,
+  ] };
+  await hooks["experimental.chat.messages.transform"]({}, messages);
+  assert.equal(messages.messages[0], first);
+  assert.equal(messages.messages.at(-1), recent);
+  assert.ok(Buffer.byteLength(JSON.stringify(messages.messages)) <= binding.maxMessageBytes);
+  await assert.rejects(() => hooks["experimental.chat.messages.transform"]({}, {
+    messages: [{ info: { role: "user" }, parts: [{ type: "text", text: "x".repeat(1000) }] }],
+  }));
+  assert.equal(JSON.parse(readFileSync(new URL("adapter-error.json", pathToFileURL(config)))).reason,
+    "model_context_limit");
+  process.exit(0);
+}
+
 if (scenario.startsWith("prime")) {
   const handlers = {};
   let session = "root";
@@ -63,7 +91,7 @@ if (scenario.startsWith("prime")) {
   const hooks = await createOpenCode(binding)({
     directory,
     client: { session: {
-      promptAsync: async (request) => {
+      prompt: async (request) => {
         delivered.push(request.body.parts[0].text);
         return { data: undefined };
       },
@@ -91,24 +119,24 @@ if (scenario.startsWith("prime")) {
     await hooks.event({ event: { type: "session.idle", properties: { sessionID: "foreign" } } });
     await hooks.event({ event: { type: "session.idle", properties: { sessionID: "root" } } });
     await pending;
-    assert.equal(delivered.length, 1);
+    assert.equal(delivered.length, 0);
     process.exit(0);
   }
 }
 
 await finish(++turn);
-assert.equal(delivered.length, 1, "plan must start a build turn");
+const expectedDeliveries = scenario.startsWith("prime") ? 1 : 0;
+assert.equal(delivered.length, expectedDeliveries,
+  "only in-process adapters deliver their own repair turn");
 await finish(turn);
-assert.equal(delivered.length, 1, "duplicates must not deliver");
-await finish(++turn);
-assert.equal(delivered.length, 2, "failed checks must start a repair turn");
+assert.equal(delivered.length, expectedDeliveries, "duplicates must not deliver");
 writeFileSync(join(directory, "done"), "ok");
 await finish(++turn);
-assert.equal(delivered.length, 2, "passing checks must not start more work");
+assert.equal(delivered.length, expectedDeliveries, "passing checks must not start more work");
 const state = JSON.parse(readFileSync(new URL("state.json", pathToFileURL(config)), "utf8"));
-assert.equal(state.phase, "completed");
+assert.equal(state.phase, "blocked");
 assert.ok(!existsSync(join(directory, "adapter-error.json")));
 
 if (scenario === "prime-success") {
-  assert.equal(primeSignal.aborted, true, "completion must stop native background work");
+  assert.equal(primeSignal.aborted, true, "review boundary must stop native background work");
 }

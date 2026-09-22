@@ -331,6 +331,7 @@ class PrimeAgentDaemonBridge:
         validate_connection(identity, self._capabilities)
         self._events: list[SupervisionEvent] = []
         self._changed = asyncio.Event()
+        self._dispatch_lock = asyncio.Lock()
         self._closed = False
         self._pump: asyncio.Task[None] | None = None
         self._active_turn_id: str | None = None
@@ -465,6 +466,34 @@ class PrimeAgentDaemonBridge:
             await self._changed.wait()
 
     async def execute(self, request: ControlRequest) -> ControlResult:
+        async with self._dispatch_lock:
+            return await self._execute_settled(request)
+
+    async def execute_if_current(
+        self, request: ControlRequest, *, expected_sequence: int
+    ) -> ControlResult | None:
+        async with self._dispatch_lock:
+            if self.last_event_sequence != expected_sequence:
+                return None
+            return await self._execute_settled(request)
+
+    async def _execute_settled(self, request: ControlRequest) -> ControlResult:
+        delivery = asyncio.create_task(self._execute(request))
+        try:
+            return await asyncio.shield(delivery)
+        except asyncio.CancelledError:
+            while not delivery.done():
+                try:
+                    await asyncio.shield(delivery)
+                except asyncio.CancelledError:
+                    continue
+            try:
+                delivery.result()
+            except BaseException:
+                pass
+            raise
+
+    async def _execute(self, request: ControlRequest) -> ControlResult:
         if self._closed:
             return self._result(
                 request, ControlOutcome.FAILED, "Prime Agent observation stream is closed"
@@ -539,17 +568,19 @@ class PrimeAgentDaemonBridge:
                 message = await self._client.next_outbound()
                 if message.get("activeSessionId") != self._active_session_id:
                     continue
-                self._normalize(message)
+                async with self._dispatch_lock:
+                    self._normalize(message)
         except asyncio.CancelledError:
             raise
         except Exception as error:
-            self._append_event(
-                native_type="bridge_error",
-                event_type=SupervisionEventType.NORMALIZATION_FAILED,
-                raw={"error_type": type(error).__name__},
-                replayed=False,
-                payload={"error_type": type(error).__name__},
-            )
+            async with self._dispatch_lock:
+                self._append_event(
+                    native_type="bridge_error",
+                    event_type=SupervisionEventType.NORMALIZATION_FAILED,
+                    raw={"error_type": type(error).__name__},
+                    replayed=False,
+                    payload={"error_type": type(error).__name__},
+                )
         finally:
             self._closed = True
             self._changed.set()

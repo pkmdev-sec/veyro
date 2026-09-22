@@ -1,4 +1,40 @@
-import { checker, recordFailure, recordModel } from "./checker.mjs";
+import {
+  block,
+  checker,
+  recordContextReduction,
+  recordFailure,
+  recordModel,
+} from "./checker.mjs";
+
+const LOCAL_SYSTEM = `You are Veyro's bounded local coding worker.
+Inspect only the current repository. Implement the user's task with the available file and shell tools.
+Run the stated verification commands. Fix failures before finishing.
+Never weaken checks, edit .veyro state, or claim that an unexecuted command passed.
+Keep prose brief. /no_think`;
+
+function byteLength(value) {
+  return Buffer.byteLength(JSON.stringify(value));
+}
+
+function reduceMessages(messages, limit) {
+  const beforeBytes = byteLength(messages);
+  if (beforeBytes <= limit) return { beforeBytes, afterBytes: beforeBytes };
+  if (messages.length < 2) {
+    throw new Error(`local model message exceeds ${limit} byte context budget`);
+  }
+  const first = messages[0];
+  const last = messages.at(-1);
+  if (byteLength([first, last]) > limit) {
+    throw new Error(`local model message exceeds ${limit} byte context budget`);
+  }
+  const recent = [last];
+  for (let index = messages.length - 2; index > 0; index -= 1) {
+    const candidate = [first, messages[index], ...recent];
+    if (byteLength(candidate) <= limit) recent.unshift(messages[index]);
+  }
+  messages.splice(0, messages.length, first, ...recent);
+  return { beforeBytes, afterBytes: byteLength(messages) };
+}
 
 export default function create(binding) {
   return async function veyro({ client, directory }) {
@@ -12,15 +48,34 @@ export default function create(binding) {
     let timer;
     let generation = 0;
     let activeCheck;
+    const modelTurns = new Map();
     return {
       "experimental.chat.system.transform": async (input, output) => {
         if (binding.codingModel && input.model.providerID === "veyro-local") {
-          output.system.push("/no_think");
+          output.system.splice(0, output.system.length, LOCAL_SYSTEM);
+        }
+      },
+      "experimental.chat.messages.transform": async (_input, output) => {
+        if (!binding.codingModel) return;
+        try {
+          const sizes = reduceMessages(output.messages, binding.maxMessageBytes);
+          if (sizes.afterBytes < sizes.beforeBytes) {
+            recordContextReduction(binding, sizes.beforeBytes, sizes.afterBytes);
+          }
+        } catch (error) {
+          recordFailure(binding, "model_context_limit");
+          throw error;
         }
       },
       "chat.params": async (input, output) => {
         if (!binding.codingModel || input.model.providerID !== "veyro-local") return;
+        const previous = modelTurns.get(input.sessionID);
+        const sameMessage = previous && previous.messageID === input.message?.id;
+        const turn = sameMessage ? previous.turn + 1 : 1;
+        modelTurns.set(input.sessionID, { messageID: input.message?.id, turn });
+        const outputLimit = turn >= (binding.maxModelSteps ?? 8) ? 128 : 1024;
         output.temperature = 0;
+        output.maxOutputTokens = Math.min(output.maxOutputTokens ?? outputLimit, outputLimit);
         output.options.reasoningEffort = "none";
         recordModel(binding, input.model.providerID, input.model.id, input.model.api.url || binding.codingBaseUrl, input.agent);
       },
@@ -33,6 +88,7 @@ export default function create(binding) {
             stopped = true;
             clearTimeout(timer);
             recordFailure(binding, "deadline");
+            void block(binding, "deadline");
             void client.session.abort({ path: { id: owner }, query: { directory },
               throwOnError: true }).catch(() => recordFailure(binding, "abort_failed"));
           }, Math.max(0, binding.deadline * 1000 - Date.now()));
@@ -57,6 +113,7 @@ export default function create(binding) {
             clearTimeout(timer);
             activeCheck?.abort();
             recordFailure(binding, "native_session_error");
+            await block(binding, "native_session_error");
             return;
           }
           if (event.type !== "session.idle" || event.properties.sessionID !== owner
@@ -65,6 +122,7 @@ export default function create(binding) {
             stopped = true;
             clearTimeout(timer);
             recordFailure(binding, "native_assistant_error");
+            await block(binding, "native_assistant_error");
             return;
           }
           busy = true;
@@ -74,13 +132,7 @@ export default function create(binding) {
           const result = await check(owner, latest.id, false, activeCheck.signal);
           activeCheck = undefined;
           if (stopped || turnGeneration !== generation) return;
-          if (result.action === "continue") {
-            await client.session.promptAsync({
-              path: { id: owner }, query: { directory },
-              body: { agent, model, parts: [{ type: "text", text: result.message }] },
-              throwOnError: true,
-            });
-          } else if (result.action === "complete" || result.action === "blocked") {
+          if (result.action === "blocked") {
             stopped = true;
             clearTimeout(timer);
           }
@@ -88,6 +140,7 @@ export default function create(binding) {
           stopped = true;
           clearTimeout(timer);
           recordFailure(binding, "native_delivery_error");
+          await block(binding, "native_delivery_error");
         } finally {
           if (checking) busy = false;
         }

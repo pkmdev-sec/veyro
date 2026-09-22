@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "protocol": "veyro-release-status-v1",
+  "authority": "artifact_only",
+  "production_qualified": false,
+  "interfaces": {
+    "supported": [
+      "agents",
+      "sessions",
+      "attach",
+      "supervise"
+    ],
+    "experimental": [
+      "agent",
+      "local",
+      "evaluator",
+      "selene",
+      "import-jeff-weights"
+    ],
+    "unavailable": [
+      "run",
+      "demo",
+      "inspect",
+      "runs"
+    ]
+  },
+  "gates": {
+    "G0": {
+      "status": "closed",
+      "scope": "source specification custody"
+    },
+    "G1": {
+      "status": "closed",
+      "scope": "pinned local model profiles"
+    },
+    "G2": {
+      "status": "closed",
+      "scope": "deterministic local readout mechanics"
+    },
+    "G3": {
+      "status": "closed",
+      "scope": "typed decision and calibration mechanics"
+    },
+    "G4": {
+      "status": "open",
+      "scope": "strict-local autonomous task reliability"
+    },
+    "G5": {
+      "status": "closed",
+      "scope": "recorded performance and accuracy measurements"
+    },
+    "G6": {
+      "status": "open",
+      "scope": "independent evaluator calibration and qualification"
+    },
+    "G7": {
+      "status": "artifact_only",
+      "scope": "deterministic package qualification; no semantic authority"
+    }
+  }
+}

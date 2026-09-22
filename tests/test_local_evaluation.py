@@ -80,7 +80,8 @@ def service(tmp_path, response):
     directory = local_server._directory(tmp_path / "worker")
     metadata = {
         "profile": profile.model_dump(),
-        "model_digest": "a" * 64,
+        "model_manifest_sha256": profile.manifest_sha256,
+        "model_blob_sha256": profile.blob_sha256,
         "protocol": READOUT_PROTOCOL,
         "context_size": 8192,
         "instance_id": "b" * 32,

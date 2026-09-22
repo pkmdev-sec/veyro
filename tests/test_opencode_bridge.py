@@ -86,6 +86,213 @@ class AttachableFakeClient(FakeClient):
         }
 
 
+class BlockingControlClient(AttachableFakeClient):
+    def __init__(self) -> None:
+        super().__init__()
+        self.request_started = asyncio.Event()
+        self.release_request = asyncio.Event()
+        self.event_yielded = asyncio.Event()
+
+    async def request_json(
+        self,
+        method: str,
+        path: str,
+        *,
+        body: object | None = None,
+        directory: Path | None = None,
+        expected_status: tuple[int, ...] = (200,),
+    ) -> object | None:
+        if method == "POST":
+            self.request_started.set()
+            await self.release_request.wait()
+        return await super().request_json(
+            method,
+            path,
+            body=body,
+            directory=directory,
+            expected_status=expected_status,
+        )
+
+    async def events(self, *, directory: Path):
+        yield {"type": "server.connected"}
+        while True:
+            event = await self.native_events.get()
+            self.event_yielded.set()
+            yield event
+
+
+class DetachedControlClient(BlockingControlClient):
+    def __init__(self) -> None:
+        super().__init__()
+        self.worker: asyncio.Task[object | None] | None = None
+
+    async def request_json(
+        self,
+        method: str,
+        path: str,
+        *,
+        body: object | None = None,
+        directory: Path | None = None,
+        expected_status: tuple[int, ...] = (200,),
+    ) -> object | None:
+        if method != "POST":
+            return await super().request_json(
+                method,
+                path,
+                body=body,
+                directory=directory,
+                expected_status=expected_status,
+            )
+        self.request_started.set()
+
+        async def complete() -> object | None:
+            await self.release_request.wait()
+            return await FakeClient.request_json(
+                self,
+                method,
+                path,
+                body=body,
+                directory=directory,
+                expected_status=expected_status,
+            )
+
+        self.worker = asyncio.create_task(complete())
+        return await asyncio.shield(self.worker)
+
+
+class FailingEventClient(BlockingControlClient):
+    def __init__(self) -> None:
+        super().__init__()
+        self.fail_events = asyncio.Event()
+
+    async def events(self, *, directory: Path):
+        yield {"type": "server.connected"}
+        await self.fail_events.wait()
+        self.event_yielded.set()
+        raise OpenCodeError("event stream failed")
+
+
+
+@pytest.mark.asyncio
+async def test_observation_ingestion_cannot_interleave_with_atomic_control_dispatch() -> None:
+    client = BlockingControlClient()
+    adapter = await OpenCodeServerBridge.attach_connected(
+        client=client,  # type: ignore[arg-type]
+        provider_session_id="ses_opencode_1",
+        veyro_session_id="veyro-opencode-1",
+        repository=Path("/tmp/repository"),
+    )
+    sequence = adapter.last_event_sequence
+    pending = asyncio.create_task(
+        adapter.execute_if_current(
+            request(InterruptTurn(reason="Stop the current turn."), session=adapter.identity),
+            expected_sequence=sequence,
+        )
+    )
+    await client.request_started.wait()
+    await client.native_events.put(
+        {
+            "id": "evt_idle",
+            "type": "session.idle",
+            "properties": {"sessionID": "ses_opencode_1"},
+        }
+    )
+    await client.event_yielded.wait()
+    await asyncio.sleep(0)
+
+    assert adapter.last_event_sequence == sequence
+
+    client.release_request.set()
+    result = await pending
+    observed = await asyncio.wait_for(
+        anext(adapter.events(after_sequence=sequence)), timeout=1
+    )
+    await adapter.close()
+
+    assert result is not None
+    assert result.outcome is ControlOutcome.EXECUTED
+    assert adapter.last_event_sequence == sequence + 1
+    assert observed.sequence == sequence + 1
+
+
+@pytest.mark.asyncio
+async def test_cancelled_control_settles_native_send_before_releasing_dispatch_boundary() -> None:
+    client = DetachedControlClient()
+    adapter = await OpenCodeServerBridge.attach_connected(
+        client=client,  # type: ignore[arg-type]
+        provider_session_id="ses_opencode_1",
+        veyro_session_id="veyro-opencode-1",
+        repository=Path("/tmp/repository"),
+    )
+    sequence = adapter.last_event_sequence
+    pending = asyncio.create_task(
+        adapter.execute_if_current(
+            request(InterruptTurn(reason="Stop the current turn."), session=adapter.identity),
+            expected_sequence=sequence,
+        )
+    )
+    await client.request_started.wait()
+    pending.cancel()
+    await asyncio.sleep(0)
+    await client.native_events.put(
+        {
+            "id": "evt_idle",
+            "type": "session.idle",
+            "properties": {"sessionID": "ses_opencode_1"},
+        }
+    )
+    await client.event_yielded.wait()
+    await asyncio.sleep(0)
+
+    assert adapter.last_event_sequence == sequence
+
+    client.release_request.set()
+    with pytest.raises(asyncio.CancelledError):
+        await pending
+    observed = await asyncio.wait_for(
+        anext(adapter.events(after_sequence=sequence)), timeout=1
+    )
+    await adapter.close()
+
+    assert client.requests == [("POST", "/session/ses_opencode_1/abort", None)]
+    assert observed.sequence == sequence + 1
+
+
+@pytest.mark.asyncio
+async def test_observation_failure_waits_for_atomic_control_dispatch() -> None:
+    client = FailingEventClient()
+    adapter = await OpenCodeServerBridge.attach_connected(
+        client=client,  # type: ignore[arg-type]
+        provider_session_id="ses_opencode_1",
+        veyro_session_id="veyro-opencode-1",
+        repository=Path("/tmp/repository"),
+    )
+    sequence = adapter.last_event_sequence
+    pending = asyncio.create_task(
+        adapter.execute_if_current(
+            request(InterruptTurn(reason="Stop the current turn."), session=adapter.identity),
+            expected_sequence=sequence,
+        )
+    )
+    await client.request_started.wait()
+    client.fail_events.set()
+    await client.event_yielded.wait()
+    await asyncio.sleep(0)
+
+    assert adapter.last_event_sequence == sequence
+
+    client.release_request.set()
+    result = await pending
+    observed = await asyncio.wait_for(
+        anext(adapter.events(after_sequence=sequence)), timeout=1
+    )
+    await adapter.close()
+
+    assert result is not None
+    assert result.outcome is ControlOutcome.EXECUTED
+    assert observed.event_type is SupervisionEventType.NORMALIZATION_FAILED
+
+
 def identity() -> SessionIdentity:
     return SessionIdentity(
         veyro_session_id="veyro-opencode-1",

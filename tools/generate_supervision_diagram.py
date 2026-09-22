@@ -142,15 +142,15 @@ def build_scene() -> tuple[Image.Image, list[list[tuple[int, int]]]]:
     label(40, 1010, "LOCAL MODEL ROLES / SEPARATE TASK PATH", 20, MUTED)
     card(
         (40, 1050, 540, 1150),
-        "Qwen3 14B",
-        "Typed evaluation after checks",
-        MINT,
+        "Qwen3 Coder 30B",
+        "Experimental OpenCode writer",
+        BLUE,
     )
     card(
         (580, 1050, 1080, 1150),
-        "Qwen3 4B Instruct",
-        "Native coding loop",
-        AMBER,
+        "Laya typed-decisions",
+        "Optional advisory evaluation",
+        LAVENDER,
     )
     label(
         40,
@@ -210,18 +210,18 @@ def build_task_readout_scene() -> Image.Image:
 
     text(40, 28, "NATIVE TASKS + LOCAL EVALUATION", 20, MUTED)
     text(40, 68, "Different paths. Different guarantees.", 38)
-    text(40, 140, "01 / DUAL-MODEL TASK LOOP     Prime Agent or OpenCode", 22, BLUE)
-    box(40, 185, 240, "4B coder", ["Plan + edit", "Native tools"], BLUE)
+    text(40, 140, "01 / CHECKED TASK LOOP     OpenCode", 22, BLUE)
+    box(40, 185, 240, "Coder 30B", ["Plan + edit", "Native tools"], BLUE)
     box(310, 185, 240, "Run checks", ["Shell commands", "Authoritative"], AMBER)
-    box(580, 185, 240, "14B evaluator", ["Typed criteria", "Evidence only"], LAVENDER)
-    box(850, 185, 230, "Complete", ["Both gates pass", "Within limits"], MINT)
+    box(580, 185, 240, "Optional Laya", ["Typed criteria", "Evidence only"], LAVENDER)
+    box(850, 185, 230, "Human review", ["Evidence ready", "No self-approval"], MINT)
     for x in (280, 550, 820):
         arrow([(x + 2, 248), (x + 28, 248)])
     arrow([(700, 314), (700, 345), (430, 345), (430, 314)], AMBER)
     text(
         40,
         369,
-        "Failed checks or criteria return to 4B for bounded repair. Errors never complete.",
+        "Failed checks or criteria return for bounded repair. Passing evidence requires review.",
         22,
         AMBER,
     )
@@ -232,9 +232,9 @@ def build_task_readout_scene() -> Image.Image:
         40,
         486,
         500,
-        "Qwen3 4B Instruct / coding",
+        "Qwen3 Coder 30B / coding",
         [
-            "Ollama :11434 -> native coding agent",
+            "Ollama :11434 -> OpenCode",
             "Generates edits; cannot approve completion",
         ],
         BLUE,
@@ -243,9 +243,9 @@ def build_task_readout_scene() -> Image.Image:
         580,
         486,
         500,
-        "Qwen3 14B / typed evaluation",
+        "Laya / optional typed evaluation",
         [
-            "GGUF readout :8082 -> finite-label scores",
+            "Pinned offline subprocess; no port",
             "Runs only after executable checks pass",
         ],
         LAVENDER,

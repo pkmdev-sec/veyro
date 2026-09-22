@@ -1,20 +1,24 @@
-# Typed completion evaluator
+# Typed advisory evaluator
 
 ## Run a rubric after executable checks
 
 Add `--evaluator` to an autonomous native launch:
 
 ```sh
-veyro agent prime-agent --repo . --autonomous \
+veyro agent opencode --repo . --autonomous --coding-profile coder30 \
+  --evaluation-profile laya \
   --prompt "Implement and document the requested behavior" \
-  --check '.venv/bin/python -m pytest -q' --evaluator rubric.json
+  --check '.venv/bin/python -m pytest -q' \
+  --evaluator examples/native-judge.json \
+  --allow-uncalibrated-evaluator
 ```
 
-Replace `prime-agent` with `opencode` for the same contract. The rubric file is
-explicit opt-in to sending its selected artifacts and task to the configured
-evaluator endpoint. No global agent configuration changes are needed.
+The checked-in rubric targets the example `slug.py` task. Copy it and replace its criteria and
+evidence paths for your repository. Adding `--evaluator` explicitly opts in to sending the selected
+artifacts and task to the configured evaluator endpoint. Veyro does not change global agent
+configuration.
 
-Example `rubric.json`:
+An evaluator rubric has this shape:
 
 ```json
 {
@@ -38,29 +42,28 @@ Provider defaults reuse Veyro's configured localjev/Qwen3-14B baseline: local
 endpoint `http://127.0.0.1:8080`, request alias `jev-latest`, and
 `TYPESAFE_API_KEY`. The evaluator reads that key from its environment or the target
 repository's `.env`. The key is not copied into Veyro's run configuration or sent
-as evidence. See [localjev setup](localjev.md). Other Jev-compatible endpoints can
-be configured through `provider`; there is no automatic provider fallback.
-Non-loopback endpoints require HTTPS. Endpoint credentials must use the named
-environment variable, not URL userinfo or query parameters.
+as evidence. See [localjev setup](localjev.md). A Jev-compatible endpoint can be configured through `provider`, but it must resolve to
+`127.0.0.1`, `localhost`, or `::1`. There is no remote endpoint or automatic provider fallback.
+Endpoint credentials must use the named environment variable, not URL userinfo or query parameters.
 
 The runnable [slug rubric](../examples/native-judge.json) and
 [labelled fixture set](../examples/native-judge-cases.json) are examples, not
 universal acceptance tests.
 
-## Completion policy
+## Review policy
 
 1. Run every required executable check.
 2. If any check fails, request a repair. Do not call the typed evaluator.
-3. If all checks pass and no evaluator is configured, complete as before.
+3. If all checks pass and no evaluator is configured, stop for operator review.
 4. If an evaluator is configured, read only its explicit evidence files and score
    each criterion against the original task and that evidence.
-5. Complete only when every criterion meets `pass_threshold`.
+5. When every criterion meets `pass_threshold`, stop for operator review.
 
 A score at or above the threshold passes its criterion. A score at or below
 `1 - pass_threshold` is a failure. Other scores are uncertain. Failure and
-uncertainty request bounded repairs; neither counts as completion. Provider
-errors, missing credentials, invalid scores, missing/oversized evidence, or a
-changed evidence snapshot block automation. The deadline remains authoritative,
+uncertainty request bounded repairs. None authorizes completion. Provider
+errors, missing credentials, invalid scores, missing or oversized evidence, and
+a changed evidence snapshot block automation. The deadline remains authoritative,
 even if a late response says the task passed.
 
 There are no human approval checkpoints. Native permission denials remain in
@@ -98,9 +101,9 @@ Each result records:
 - Per-criterion provider/model/checkpoint provenance and SDK latency.
 - Whole-evaluation and child-process latency.
 
-The configured checkpoint identifies intended weights; it does not attest the
-weights used for each response. These are model-generated probability estimates,
-not measured calibrated correctness or verified direct token-logit readouts.
+The local Laya profile verifies the launcher, runtime, inference code, tokenizer,
+configuration, and checkpoint hashes before and after each call. These remain
+model-generated probability estimates, not measured calibrated correctness.
 
 ### Evidence and privacy
 
@@ -164,13 +167,10 @@ tests, or control journal.
 .venv/bin/python tools/benchmark_native_judge.py --live --repeats 2 \
   --output /tmp/judge-results.json
 
-# Actual coding-agent TUI plus executable and semantic completion checks.
-.venv/bin/python tools/benchmark_native_autonomy.py --live prime-agent \
-  --model litellm/claude-haiku-4-5 --evaluator examples/native-judge.json \
-  --output /tmp/prime-with-judge.json
+# Actual local coding-agent TUI plus executable and semantic completion checks.
 .venv/bin/python tools/benchmark_native_autonomy.py --live opencode \
-  --model litellm/claude-haiku-4-5 --evaluator examples/native-judge.json \
-  --output /tmp/opencode-with-judge.json
+  --local-profile small --evaluator examples/native-judge.json \
+  --output /tmp/opencode-local-with-judge.json
 ```
 
 The fixture set was labelled before model evaluation. It covers complete work,

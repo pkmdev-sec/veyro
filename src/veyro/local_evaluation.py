@@ -23,6 +23,12 @@ from veyro.evaluators import (
     normalize_result,
     outcome_labels,
 )
+from veyro.laya_evaluation import (
+    LayaProfile,
+    evaluate_laya,
+    laya_model_identity,
+    load_laya_profiles,
+)
 from veyro.local_models import ModelProfile, load_profiles
 from veyro.readout import READOUT_PROTOCOL
 
@@ -39,8 +45,27 @@ class _Response(BaseModel):
     metrics: dict[str, JsonValue]
 
 
-def model_identity(profile: ModelProfile) -> str:
-    return f"{profile.ollama_model}@sha256:{profile.expected_digest}"
+EvaluationProfile = ModelProfile | LayaProfile
+
+
+def load_evaluation_profiles() -> dict[str, EvaluationProfile]:
+    profiles: dict[str, EvaluationProfile] = dict(load_profiles())
+    laya = load_laya_profiles()
+    overlap = set(profiles) & set(laya)
+    if overlap:
+        raise ValueError(f"duplicate evaluator profile IDs: {sorted(overlap)}")
+    profiles.update(laya)
+    return profiles
+
+
+def model_identity(profile: EvaluationProfile) -> str:
+    if isinstance(profile, LayaProfile):
+        return laya_model_identity(profile)
+    return (
+        f"{profile.ollama_model}"
+        f"@manifest-sha256:{profile.manifest_sha256}"
+        f"@blob-sha256:{profile.blob_sha256}"
+    )
 
 
 def calibration_schema(
@@ -53,6 +78,26 @@ def calibration_schema(
         "evaluator": definition.model_dump(mode="json"),
         "question": question,
         "few_shot_examples": json.loads(few_shot_preview(definition, corrections, holdout_ids=())),
+    }
+    return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
+
+
+def decision_head_schema(
+    definition: EvaluatorDefinition,
+    feature_names: Sequence[str],
+) -> str:
+    """Bind a fitted decision head to one evaluator and ordered feature selection."""
+    names = list(feature_names)
+    if (
+        not names
+        or len(names) != len(set(names))
+        or any(name not in definition.questions for name in names)
+    ):
+        raise ValueError("decision-head features must be unique evaluator questions")
+    value = {
+        "protocol": READOUT_PROTOCOL,
+        "evaluator": definition.model_dump(mode="json"),
+        "feature_names": names,
     }
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
@@ -91,7 +136,7 @@ def run_evaluator(
 ) -> dict:
     from veyro.local_server import evaluate_local
 
-    profiles = load_profiles()
+    profiles = load_evaluation_profiles()
     if profile_id not in profiles:
         raise ValueError(f"unknown local model profile: {profile_id}")
     profile = profiles[profile_id]
@@ -117,13 +162,19 @@ def run_evaluator(
         ],
     )
     questions = wire_questions(definition)
-    response = (
-        evaluate_local(
+    if not questions:
+        response = {"protocol": READOUT_PROTOCOL, "predictions": {}, "metrics": {}}
+    elif isinstance(profile, LayaProfile):
+        response = evaluate_laya(
+            profile,
+            request["state"],
+            definition.questions,
+            timeout=timeout,
+        )
+    else:
+        response = evaluate_local(
             profile_id, request["state"], questions, timeout=timeout, state_dir=state_dir
         )
-        if questions
-        else {"protocol": READOUT_PROTOCOL, "predictions": {}, "metrics": {}}
-    )
     try:
         response = _Response.model_validate(response)
     except ValidationError:
@@ -135,7 +186,15 @@ def run_evaluator(
     results = {}
     for name, question in definition.questions.items():
         labels = outcome_labels(question)
-        source = "single_outcome" if len(labels) == 1 else "uncalibrated_label_logits"
+        source = (
+            "single_outcome"
+            if len(labels) == 1
+            else (
+                "uncalibrated_model_distribution"
+                if isinstance(profile, LayaProfile)
+                else "uncalibrated_label_logits"
+            )
+        )
         if len(labels) == 1:
             probabilities = {labels[0]: 1.0}
         else:

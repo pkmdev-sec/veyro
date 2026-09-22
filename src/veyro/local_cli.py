@@ -11,8 +11,12 @@ from typing import Annotated
 import typer
 from pydantic import TypeAdapter
 
-local_app = typer.Typer(help="Pinned local Qwen workers; no global service reconfiguration.")
-evaluator_app = typer.Typer(help="Preview, run, correct and calibrate typed evaluators.")
+local_app = typer.Typer(
+    help="Experimental: inspect and run pinned local Qwen workers without global reconfiguration."
+)
+evaluator_app = typer.Typer(
+    help="Experimental: preview, run, correct, and calibrate typed local evaluators."
+)
 
 
 @contextmanager
@@ -186,12 +190,15 @@ def calibrate(
         load_corrections,
         outcome_labels,
     )
-    from veyro.local_evaluation import calibration_schema, model_identity
-    from veyro.local_models import load_profiles
+    from veyro.local_evaluation import (
+        calibration_schema,
+        load_evaluation_profiles,
+        model_identity,
+    )
 
     with _errors():
         schema = EvaluatorDefinition.load(definition)
-        profiles = load_profiles()
+        profiles = load_evaluation_profiles()
         if question not in schema.questions or profile not in profiles:
             raise ValueError("unknown question or local profile")
         examples = TypeAdapter(list[CalibrationExample]).validate_json(training.read_text())
@@ -210,6 +217,57 @@ def calibrate(
         )
         artifact.save(output)
         _print(artifact.model_dump(mode="json"))
+
+
+@evaluator_app.command("fit-decision-head")
+def fit_decision_head(
+    definition: Path,
+    training: Path,
+    holdout_ids: Path,
+    output: Path,
+    feature: Annotated[
+        list[str] | None, typer.Option(help="Repeat selected evaluator feature")
+    ] = None,
+    profile: str = "small",
+    regularization: Annotated[float, typer.Option(min=1e-9)] = 1.0,
+) -> None:
+    """Fit an auditable binary logistic head; this does not train model weights."""
+    from veyro.evaluators import BinaryDecisionHead, DecisionHeadExample, EvaluatorDefinition
+    from veyro.local_evaluation import (
+        decision_head_schema,
+        load_evaluation_profiles,
+        model_identity,
+    )
+
+    with _errors():
+        schema = EvaluatorDefinition.load(definition)
+        profiles = load_evaluation_profiles()
+        if profile not in profiles:
+            raise ValueError("unknown local profile")
+        features = feature or []
+        examples = TypeAdapter(list[DecisionHeadExample]).validate_json(training.read_text())
+        reserved = TypeAdapter(list[str]).validate_json(holdout_ids.read_text(), strict=True)
+        artifact = BinaryDecisionHead.fit(
+            examples,
+            feature_names=features,
+            holdout_ids=reserved,
+            model=model_identity(profiles[profile]),
+            profile=profile,
+            schema_sha256=decision_head_schema(schema, features),
+            regularization=regularization,
+        )
+        artifact.save(output)
+        _print(artifact.model_dump(mode="json"))
+
+
+@evaluator_app.command("validate-decision-head")
+def validate_decision_head(head: Path, holdout: Path) -> None:
+    from veyro.evaluators import BinaryDecisionHead, DecisionHeadExample
+
+    with _errors():
+        artifact = BinaryDecisionHead.load(head)
+        examples = TypeAdapter(list[DecisionHeadExample]).validate_json(holdout.read_text())
+        _print(artifact.evaluate_holdout(examples).model_dump(mode="json"))
 
 
 @evaluator_app.command("validate-calibration")

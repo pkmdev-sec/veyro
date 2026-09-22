@@ -12,10 +12,23 @@ from veyro.agents import AgentId
 from veyro.autonomy import AutonomyOptions, CodingModel, HarnessModels, prepare_autonomy
 from veyro.evaluators import DistributionCalibrator, EvaluatorDefinition, load_corrections
 from veyro.local_evaluation import calibration_schema, model_identity
-from veyro.local_models import load_profiles
+from veyro.local_models import LocalModels, VerifiedModel, load_profiles
 from veyro.readout import READOUT_PROTOCOL
 
 runner = CliRunner()
+
+
+@pytest.fixture(autouse=True)
+def verified_resident_model(monkeypatch, tmp_path):
+    def require_resident(_self, profile):
+        return VerifiedModel(
+            profile=profile,
+            blob_path=tmp_path / f"{profile.id}.gguf",
+            manifest_sha256=profile.manifest_sha256,
+            blob_sha256=profile.blob_sha256,
+        )
+
+    monkeypatch.setattr(LocalModels, "require_resident", require_resident)
 
 
 @pytest.fixture
@@ -177,8 +190,8 @@ def test_bad_correction_preserves_existing_store(artifacts):
     assert p["store"].read_bytes() == before
 
 
-@pytest.mark.parametrize("native", ["prime-agent", "opencode"])
-def test_dual_model_cli_options_are_scoped_to_launch(tmp_path, monkeypatch, native):
+def test_dual_model_cli_options_are_scoped_to_launch(tmp_path, monkeypatch):
+    native = "opencode"
     seen = []
 
     def launch(provider, repo, prompt, args, **kwargs):
@@ -220,22 +233,22 @@ def test_local_flags_without_autonomy_fail_before_launch(tmp_path, monkeypatch):
     monkeypatch.setattr(cli, "launch_native_agent", forbidden)
     result = invoke(
         "agent",
-        "prime-agent",
+        "opencode",
         "--repo",
         tmp_path,
         "--coding-profile",
-        "small",
+        "coder30",
         "--evaluation-profile",
         "14b",
     )
     assert result.exit_code == 2
-    assert "require --autonomous" in result.output
+    assert "does not launch unpinned interactive models" in result.output
 
 
 def test_evaluation_profile_requires_coding_profile(tmp_path):
     result = invoke(
         "agent",
-        "prime-agent",
+        "opencode",
         "--repo",
         tmp_path,
         "--prompt",
@@ -260,7 +273,7 @@ def test_coding_profile_can_run_without_typed_evaluation(tmp_path, monkeypatch):
     monkeypatch.setattr(cli, "launch_native_agent", launch)
     result = invoke(
         "agent",
-        "prime-agent",
+        "opencode",
         "--repo",
         tmp_path,
         "--prompt",
@@ -269,10 +282,10 @@ def test_coding_profile_can_run_without_typed_evaluation(tmp_path, monkeypatch):
         "--check",
         "true",
         "--coding-profile",
-        "small",
+        "coder30",
     )
     assert result.exit_code == 0, repr(result.exception)
-    assert seen[0].models == CodingModel("small")
+    assert seen[0].models == CodingModel("coder30")
 
 
 def test_dual_model_profiles_preserve_native_denials_and_global_configuration(
@@ -325,7 +338,7 @@ def test_malformed_local_judge_file_is_a_safe_launch_error(tmp_path, monkeypatch
     monkeypatch.setattr(cli, "launch_native_agent", prepare)
     result = invoke(
         "agent",
-        "prime-agent",
+        "opencode",
         "--repo",
         tmp_path,
         "--prompt",
@@ -334,11 +347,11 @@ def test_malformed_local_judge_file_is_a_safe_launch_error(tmp_path, monkeypatch
         "--check",
         "true",
         "--coding-profile",
-        "small",
+        "coder30",
         "--evaluation-profile",
         "14b",
         "--allow-uncalibrated-evaluator",
-        "--judge",
+        "--evaluator",
         path,
     )
     assert result.exit_code == 2, repr(result.exception)
@@ -418,19 +431,70 @@ def test_launch_snapshots_local_judge_only_with_explicit_raw_score_opt_in(tmp_pa
     options = AutonomyOptions(
         ("true",),
         judge_file=path,
-        models=HarnessModels("small", "14b"),
+        models=HarnessModels("coder30", "14b"),
         allow_uncalibrated_judge=opt_in,
     )
     if not opt_in:
         with pytest.raises(ValueError, match="invalid semantic evaluator"):
-            prepare_autonomy(AgentId.PRIME_AGENT, tmp_path, "Task", (), options)
+            prepare_autonomy(AgentId.OPENCODE, tmp_path, "Task", (), options)
         assert not (tmp_path / ".veyro").exists()
     else:
-        launch = prepare_autonomy(AgentId.PRIME_AGENT, tmp_path, "Task", (), options)
+        launch = prepare_autonomy(AgentId.OPENCODE, tmp_path, "Task", (), options)
         config = json.loads((launch.directory / "config.json").read_text())
         assert config["judge"]["provider"]["kind"] == "local"
         assert config["judge"]["provider"]["profile"] == "14b"
-        assert config["model_roles"]["coding"]["profile"] == "small"
+        assert config["model_roles"]["coding"]["profile"] == "coder30"
         assert config["model_roles"]["evaluation"]["profile"] == "14b"
         assert config["judge"]["provider"]["allow_uncalibrated"] is True
     assert json.loads(path.read_text()) == original
+
+
+def test_fit_and_validate_decision_head_cli(artifacts, tmp_path):
+    p = artifacts
+    training = tmp_path / "head-training.json"
+    training.write_text(
+        json.dumps(
+            [
+                {"id": "train-yes-1", "features": {"done": 0.9}, "label": "yes"},
+                {"id": "train-yes-2", "features": {"done": 0.8}, "label": "yes"},
+                {"id": "train-no-1", "features": {"done": 0.2}, "label": "no"},
+                {"id": "train-no-2", "features": {"done": 0.1}, "label": "no"},
+            ]
+        )
+    )
+    reserved = tmp_path / "head-holdout-ids.json"
+    reserved.write_text('["held-yes", "held-no"]')
+    output = tmp_path / "decision-head.json"
+    fitted = invoke(
+        "evaluator",
+        "fit-decision-head",
+        p["definition"],
+        training,
+        reserved,
+        output,
+        "--feature",
+        "done",
+        "--regularization",
+        "0.1",
+    )
+    assert fitted.exit_code == 0, fitted.output
+
+    from veyro.evaluators import BinaryDecisionHead
+    from veyro.local_evaluation import decision_head_schema
+
+    head = BinaryDecisionHead.load(output)
+    definition = EvaluatorDefinition.load(p["definition"])
+    assert head.schema_sha256 == decision_head_schema(definition, ["done"])
+    assert head.training_ids == ["train-yes-1", "train-yes-2", "train-no-1", "train-no-2"]
+    holdout = tmp_path / "head-holdout.json"
+    holdout.write_text(
+        json.dumps(
+            [
+                {"id": "held-yes", "features": {"done": 0.85}, "label": "yes"},
+                {"id": "held-no", "features": {"done": 0.15}, "label": "no"},
+            ]
+        )
+    )
+    validated = invoke("evaluator", "validate-decision-head", output, holdout)
+    assert validated.exit_code == 0, validated.output
+    assert json.loads(validated.output)["accuracy"] == 1

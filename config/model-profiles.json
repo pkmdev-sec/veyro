@@ -2,15 +2,35 @@
   "small": {
     "id": "small",
     "ollama_model": "qwen3:4b-instruct-2507-q4_K_M",
-    "expected_digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "manifest_sha256": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "blob_sha256": "85e4a5b7b8ef0e48af0e8658f5aaab9c2324c76c1641493f4d1e25fce54b18b9",
     "parameter_size": "4.0B",
     "quantization": "Q4_K_M",
     "model_family": "qwen3"
   },
+  "coder14": {
+    "id": "coder14",
+    "ollama_model": "qwen2.5-coder:14b",
+    "manifest_sha256": "9ec8897f747e246e970bc5cfdda85d22f1123dc2e3d34978a010a75968716849",
+    "blob_sha256": "ac9bc7a69dab38da1c790838955f1293420b55ab555ef6b4615efa1c1507b1ed",
+    "parameter_size": "14.8B",
+    "quantization": "Q4_K_M",
+    "model_family": "qwen2"
+  },
+  "coder30": {
+    "id": "coder30",
+    "ollama_model": "qwen3-coder:30b",
+    "manifest_sha256": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+    "blob_sha256": "1194192cf2a187eb02722edcc3f77b11d21f537048ce04b67ccf8ba78863006a",
+    "parameter_size": "30.5B",
+    "quantization": "Q4_K_M",
+    "model_family": "qwen3moe"
+  },
   "14b": {
     "id": "14b",
     "ollama_model": "qwen3:14b",
-    "expected_digest": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "manifest_sha256": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8",
+    "blob_sha256": "a8cc1361f3145dc01f6d77c6c82c9116b9ffe3c97b34716fe20418455876c40e",
     "parameter_size": "14.8B",
     "quantization": "Q4_K_M",
     "model_family": "qwen3"

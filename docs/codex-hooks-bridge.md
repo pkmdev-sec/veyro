@@ -5,7 +5,7 @@ For the dated cross-provider checks, see [verification results](supervision-veri
 
 This bridge targets **Codex 0.154.0**. Pi and Claude Code have no existing-session
 supervision bridge.
-The bridge uses stable native command hooks and the native `codex queue` command.
+The bridge uses stable native command hooks for observation only.
 It does not start or connect to App Server. Direct Codex usage remains unchanged.
 
 ## Start an observe-only listener
@@ -58,8 +58,7 @@ control requests. Input frames are bounded to 16 KiB, active clients and session
 to 64. A per-session OS lock prevents simultaneous journal writers.
 
 The mapping of repository + CODEX_HOME + native thread UUID to Veyro session ID
-is deterministic. Explicit queue opt-in/opt-out changes reconcile capabilities
-under the writer lock without discarding observation history. Each thread has a private broker journal under
+is deterministic. Each thread has a private broker journal under
 `.veyro/supervision/`. Resuming the same thread continues that local journal.
 Receipt sequence is contiguous local observation order, **not provider execution
 order**. Broker replay does not imply native replay. Multiple sessions remain
@@ -71,7 +70,7 @@ separate; subagent scope is retained rather than counted as root activity.
 | --- | --- |
 | Lifecycle, prompt, tool, permission boundaries | Supported, metadata only |
 | Native event replay / attach-existing discovery | Unsupported in this bridge |
-| Follow-up queue | Explicit opt-in, experimental Veyro integration |
+| Follow-up queue | Unsupported; hook supervision is observation-only |
 | Active-turn steering / remote interrupt / session stop | Unsupported |
 | Approval reply through the sidecar | Unsupported |
 | Synchronous hook policy decisions | Not enabled |
@@ -85,42 +84,13 @@ Therefore reduced state does not claim completed tools, turns, approval decision
 or task completion. These events can support advisory inspection, not automatic
 completion or unrestricted intervention.
 
-## Follow-up queue
-
-`CodexHookListener(..., allow_queue=True)` enables the adapter seam for a control
-external controller. The executable listener above is observe-only. Existing
-`AuthorizedControlDispatcher` must authorize each queue request; the experimental
-declaration requires current exact-request human approval. The message must also
-pass deterministic boundary policy and any required authoritative LocalJev review.
-The hook listener does not enable autonomous dispatch or expose a public control socket.
-
-The adapter invokes the configured native executable with the exact thread UUID:
-
-```text
-codex queue --thread <UUID> --message <TEXT>
-```
-
-This queues follow-up input, not active-turn steering. An idle loaded thread may
-start immediately. Native Codex can persist the queued message and exposes text
-in process argv; enable this only after accepting those native privacy properties.
-Veyro never logs argv or stores message content. Use the same CODEX_HOME and
-repository as the observed session. Native queue routing to an unloaded thread
-does not prove delivery to a live TUI.
-
-An exclusive durable intent file prevents duplicate invocation for one command ID,
-including across restart. Queue success requires a matching native thread/queue
-UUID acknowledgment. Unknown, failed, timed-out, cancelled, or interrupted
-submission is not retried automatically. `failed` with `delivery uncertain` is
-used because the current control contract has no unknown-outcome variant.
-A successful control result means queue acceptance, not model execution. Do not
-resubmit with a new command ID without reconciling delivery with the operator.
 
 ## Experimental App Server is separate
 
-The existing factory worker now defaults to `exec`. Use
-`VEYRO_CODEX_BACKEND=app-server` only to explicitly opt into its experimental
-controls. The hook bridge never silently switches to RPC if a hook/control is
-unavailable. See [steering.md](steering.md) for that separate legacy worker path.
+The internal legacy factory worker defaults to `exec`. Use
+`VEYRO_CODEX_BACKEND=app-server` only to opt into its experimental controls in library code.
+The hook bridge never silently switches to RPC if a hook or control is unavailable. See
+[steering.md](steering.md) for that separate internal worker path.
 
 ## Verification
 

@@ -21,7 +21,6 @@ from veyro.bridges.prime_agent import (
     prime_daemon_capabilities,
 )
 from veyro.cli import app
-from veyro.config import FactoryConfig
 from veyro.models.authorization import AuthorizationReason
 from veyro.supervision.checkpoints import (
     AUTHORITATIVE_MODEL_CHECKPOINT,
@@ -38,7 +37,6 @@ def test_capability_matrix_matches_every_adapter_declaration():
         prime_daemon_capabilities(),
         opencode_server_capabilities(),
         codex_hook_capabilities(),
-        codex_hook_capabilities(allow_queue=True),
     ]
     expected = []
     for declarations in zip(*(matrix.declarations for matrix in matrices), strict=True):
@@ -56,8 +54,6 @@ def test_capability_matrix_matches_every_adapter_declaration():
 
 
 def test_reference_pins_match_runtime():
-    readme = (ROOT / "README.md").read_text()
-    assert f"| `VEYRO_CODEX_BACKEND` | `{FactoryConfig().codex_backend}` |" in readme
     reference = (DOCS / "supervision-reference.md").read_text()
     for provider, version in [
         ("Prime Agent", PRIME_AGENT_VERSION),

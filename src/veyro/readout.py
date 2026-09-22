@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from numpy import float32
     from numpy.typing import NDArray
 
-READOUT_PROTOCOL = "qwen-label-readout-v4"
+READOUT_PROTOCOL = "typed-label-readout-v5"
 
 
 def _render(value: object, depth: int = 0) -> str:

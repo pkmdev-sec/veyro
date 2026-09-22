@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import urlsplit
+
+import pytest
 
 from veyro.supervision.checkpoints import (
     AUTHORITATIVE_MODEL_CHECKPOINT,
@@ -14,6 +17,13 @@ from veyro.supervision.checkpoints import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+
+TOOL = ROOT / "tools" / "check_public_docs.py"
+spec = importlib.util.spec_from_file_location("public_docs_check", TOOL)
+assert spec is not None and spec.loader is not None
+public_docs_check = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(public_docs_check)
+validate_public_documents = public_docs_check.validate_public_documents
 DOCUMENTS = [
     ROOT / "README.md",
     *sorted((ROOT / "docs").rglob("*.md")),
@@ -22,34 +32,57 @@ DOCUMENTS = [
 
 
 def test_public_document_links_and_anchors_resolve():
-    for document in DOCUMENTS:
-        text = document.read_text()
-        targets = re.findall(r"\]\(([^)]+)\)", text)
-        targets += re.findall(r'(?:href|src)="([^"]+)"', text)
-        for target in targets:
-            url = urlsplit(target)
-            if url.scheme or url.netloc:
-                continue
-            linked = document.parent / unquote(url.path) if url.path else document
-            assert linked.exists(), (document.name, target)
-            if url.fragment:
-                headings = re.findall(r"^#+ (.+)$", linked.read_text(), re.MULTILINE)
-                slugs = {
-                    re.sub(r"[^a-z0-9 _-]", "", heading.lower()).replace(" ", "-")
-                    for heading in headings
-                }
-                assert unquote(url.fragment) in slugs, (document.name, target)
+    validate_public_documents(ROOT)
 
 
-def test_public_docs_exclude_planning_and_personal_machine_artifacts():
-    removed = ["task.md", "docs/product-charter.md", "docs/trustworthy-supervision-plan.md"]
-    assert not any((ROOT / name).exists() for name in removed)
-    for document in DOCUMENTS:
-        text = document.read_text()
-        assert not re.search(r"\b(?:SUP|GOV|ARCH|JEV)-[0-9]{3}\b", text), document
-        assert not re.search(r"/(?:Users|home)/[A-Za-z0-9_.-]+/|/var/folders/", text), document
-        for name in removed:
-            assert Path(name).name not in text, document
+@pytest.mark.parametrize(
+    "target",
+    ["missing.md", ".audit/private-report.md", "../.audit/private-report.md"],
+)
+def test_public_document_validator_rejects_nonportable_links(tmp_path: Path, target: str):
+    (tmp_path / "README.md").write_text(f"[private evidence]({target})\n")
+    audit = tmp_path / ".audit"
+    audit.mkdir()
+    (audit / "private-report.md").write_text("private\n")
+
+    with pytest.raises(ValueError):
+        validate_public_documents(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        "[private][evidence]\n\n[evidence]: .audit/private-report.md\n",
+        "<a href='.audit/private-report.md'>private</a>\n",
+        "<img src=missing-image.png>\n",
+        "[private](file:///etc/passwd)\n",
+        "<a href=javascript:alert(1)>unsafe</a>\n",
+    ],
+)
+def test_public_document_validator_covers_reference_and_html_links(
+    tmp_path: Path, body: str
+):
+    (tmp_path / "README.md").write_text(body)
+
+    with pytest.raises(ValueError):
+        validate_public_documents(tmp_path)
+
+
+def test_public_taxonomy_matches_machine_readable_release_status():
+    status = json.loads((ROOT / "release-status.json").read_text())
+    readme = (ROOT / "README.md").read_text()
+    scope = (ROOT / "docs/release-scope.md").read_text()
+
+    assert status["authority"] == "artifact_only"
+    assert status["production_qualified"] is False
+    assert status["gates"]["G4"]["status"] == "open"
+    assert status["gates"]["G6"]["status"] == "open"
+    for category, commands in status["interfaces"].items():
+        assert category.capitalize() in readme
+        assert category.capitalize() in scope
+        for command in commands:
+            assert f"`veyro {command}`" in readme
+            assert f"`{command}`" in scope
 
 
 def test_localjev_showcase_matches_runtime_and_baseline():
@@ -58,34 +91,34 @@ def test_localjev_showcase_matches_runtime_and_baseline():
     guide = (ROOT / "docs/localjev.md").read_text()
     assert "localjev" in readme.split("##", 1)[0]
     assert "Qwen3-14B" in readme.split("##", 1)[0]
-    for text in (readme, guide):
-        assert AUTHORITATIVE_PROVIDER_ID in text
-        assert baseline["upstream"]["model"] in text
-        assert baseline["upstream"]["quantization"] in text
-        assert baseline["provider"]["endpoint"] in text
-        assert baseline["provider"]["request_model"] in text
+    text = guide
+    assert AUTHORITATIVE_PROVIDER_ID in text
+    assert baseline["upstream"]["model"] in text
+    assert baseline["upstream"]["quantization"] in text
+    assert baseline["provider"]["endpoint"] in text
+    assert baseline["provider"]["request_model"] in text
     assert AUTHORITATIVE_MODEL_CHECKPOINT in guide
     assert baseline["upstream"]["digest"] in AUTHORITATIVE_MODEL_CHECKPOINT
     explanation = (ROOT / "docs/why-jev.md").read_text()
     assert all(f"`{question}`" in explanation for question in CHECKPOINT_QUESTIONS)
 
 
-def test_readme_separates_new_logo_introduction_and_animated_diagram():
+def test_readme_visuals_are_accessible_and_ordered():
     readme = (ROOT / "README.md").read_text()
-    assert 'src="docs/assets/veyro-supervision.gif"' in readme
-    images = re.findall(r'<img\b[^>]*src="([^"]+)"', readme)
+    image_tags = re.findall(r'<img\b[^>]*>', readme)
+    images = [re.search(r'src="([^"]+)"', tag).group(1) for tag in image_tags]
     assert images == [
         "docs/assets/veyro-relay-logo.svg",
+        "https://github.com/pkmdev-sec/veyro/actions/workflows/ci.yml/badge.svg",
+        "https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white",
+        "https://img.shields.io/badge/License-MIT-93dec4",
         "docs/assets/veyro-supervision.gif",
         "docs/assets/veyro-task-readout.png",
     ]
-    logo = readme.index('src="docs/assets/veyro-relay-logo.svg"')
-    intro_start = readme.index("Veyro observes Prime Agent")
-    intro_end = readme.index("structured events, not terminal scraping.")
-    diagram = readme.index('src="docs/assets/veyro-supervision.gif"')
-    assert logo < intro_start < intro_end < diagram < readme.index("## Qwen3-14B")
-    assert "</p>" in readme[logo:intro_start]
-    assert '<p align="center">' in readme[intro_end:diagram]
+    assert all(re.search(r'alt="[^"]+"', tag) for tag in image_tags)
+    assert readme.index("docs/assets/veyro-relay-logo.svg") < readme.index(
+        "docs/assets/veyro-supervision.gif"
+    ) < readme.index("docs/assets/veyro-task-readout.png")
     assert "```mermaid" not in readme
     for document in DOCUMENTS:
         text = document.read_text()
@@ -133,17 +166,21 @@ def test_retired_controller_term_is_absent_from_repository_text():
 
 def test_dual_model_harness_roles_are_documented_from_runtime_profiles():
     profiles = json.loads((ROOT / "config/model-profiles.json").read_text())
-    documents = [
-        (ROOT / "README.md").read_text(),
+    laya = json.loads((ROOT / "config/laya-profiles.json").read_text())["laya"]
+    readme = (ROOT / "README.md").read_text()
+    assert profiles["coder30"]["ollama_model"] in readme
+    assert laya["checkpoint"] in readme
+
+    detailed_guides = [
         (ROOT / "docs/qwen-models.md").read_text(),
         (ROOT / "docs/local-harness.md").read_text(),
     ]
-    for text in documents:
-        assert profiles["small"]["ollama_model"] in text
-        assert profiles["14b"]["ollama_model"] in text
-        assert "--coding-profile small" in text
-        assert "--evaluation-profile 14b" in text
-    role_guide = documents[1]
+    for text in detailed_guides:
+        assert profiles["coder30"]["ollama_model"] in text
+        assert laya["checkpoint"] in text
+        assert "--coding-profile coder30" in text
+        assert "--evaluation-profile laya" in text
+    role_guide = detailed_guides[0]
     assert "Executable checks remain authoritative" in role_guide
     assert "G4 remains open" in role_guide
     assert "G6 remains open" in role_guide

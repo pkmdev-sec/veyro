@@ -22,11 +22,11 @@ uv pip check --python .venv/bin/python
 git diff --check
 ```
 
-The documentation tests compare the matrix to all live adapter declarations,
-including both Codex queue settings. They also check source pins, recovery-reason
-coverage, local links, and the executable help for documented flags. They make no
-native connection. Runtime tests exercise rejection, replay limits, exact approval,
-claim persistence, reconnect deduplication, cancellation, and metadata filtering.
+The documentation tests compare the matrix to every live adapter declaration.
+They also check source pins, recovery-reason coverage, local links, and the
+executable help for documented flags. They make no native connection. Runtime
+tests exercise rejection, replay limits, exact approval, claim persistence,
+reconnect deduplication, cancellation, and metadata filtering.
 They do not substitute for native delivery proof.
 
 ## Check the assessor deployment

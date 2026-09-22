@@ -69,8 +69,6 @@ def prepare(tmp_path, rubric, *, checks=None, max_continuations=6):
     )
     config_path = launch.directory / "config.json"
     autonomy_check.checkpoint(config_path, "root", "start", claim=True)
-    (launch.directory / "plan.md").write_text("Implement and verify the requested behavior.")
-    assert autonomy_check.checkpoint(config_path, "root", "plan")["reason"] == "plan_ready"
     return config_path
 
 
@@ -99,6 +97,7 @@ def prepare(tmp_path, rubric, *, checks=None, max_continuations=6):
         {"pass_threshold": float("inf")},
         {"max_evidence_bytes": 0},
         {"max_evidence_bytes": 256001},
+        {"provider": {"base_url": "https://example.test"}},
         {"provider": {"base_url": "https://user:secret@example.test"}},
         {"provider": {"base_url": "https://example.test?token=secret"}},
         {"provider": {"base_url": "https://example.test#secret"}},
@@ -303,7 +302,7 @@ def test_failed_executable_checks_never_call_judge(tmp_path, rubric, monkeypatch
 @pytest.mark.parametrize(
     ("status", "action", "reason", "phase"),
     [
-        ("passed", "complete", "checks_and_judge_passed", "completed"),
+        ("passed", "blocked", "operator_review_required", "blocked"),
         ("failed", "continue", "judge_failed", "building"),
         ("uncertain", "continue", "judge_uncertain", "building"),
         ("error", "blocked", "judge_error", "blocked"),
@@ -344,13 +343,13 @@ def test_semantic_repairs_are_bounded(tmp_path, rubric, monkeypatch, status):
         return {"status": status, "scores": {"correctness": 0.5}}
 
     monkeypatch.setattr(autonomy_check, "run_judge", simulated_judge)
-    path = prepare(tmp_path, rubric, max_continuations=2)
+    path = prepare(tmp_path, rubric, max_continuations=1)
     first = autonomy_check.checkpoint(path, "root", "build")
     assert first["action"] == "continue"
-    assert first["continuations"] == 2
+    assert first["continuations"] == 1
     second = autonomy_check.checkpoint(path, "root", "repair")
     assert (second["action"], second["reason"]) == ("blocked", "continuation_limit")
-    assert second["continuations"] == 2
+    assert second["continuations"] == 1
     assert autonomy_check.checkpoint(path, "root", "again")["reason"] == "blocked"
     assert len(calls) == 2
 
@@ -363,11 +362,11 @@ def test_semantic_repair_can_complete_on_last_budget_turn(tmp_path, rubric, monk
         return {"status": status, "scores": {"correctness": 1 if status == "passed" else 0}}
 
     monkeypatch.setattr(autonomy_check, "run_judge", simulated_judge)
-    path = prepare(tmp_path, rubric, max_continuations=2)
+    path = prepare(tmp_path, rubric, max_continuations=1)
     assert autonomy_check.checkpoint(path, "root", "build")["reason"] == "judge_failed"
     result = autonomy_check.checkpoint(path, "root", "repair")
-    assert result["action"] == "complete"
-    assert result["continuations"] == 2
+    assert (result["action"], result["reason"]) == ("blocked", "operator_review_required")
+    assert result["continuations"] == 1
 
 
 def test_default_mode_does_not_call_judge_or_snapshot_task(tmp_path, monkeypatch):
@@ -380,7 +379,7 @@ def test_default_mode_does_not_call_judge_or_snapshot_task(tmp_path, monkeypatch
     assert "judge" not in config
     assert "task" not in config
     result = autonomy_check.checkpoint(path, "root", "build")
-    assert (result["action"], result["reason"]) == ("complete", "checks_passed")
+    assert (result["action"], result["reason"]) == ("blocked", "operator_review_required")
     assert "judge" not in result
 
 

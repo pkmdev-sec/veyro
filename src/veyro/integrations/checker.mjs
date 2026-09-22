@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { appendFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
 
@@ -12,9 +12,26 @@ export function recordModel(binding, provider, model, endpoint, purpose) {
 }
 
 export function recordFailure(binding, reason) {
-  writeFileSync(join(dirname(binding.config), "adapter-error.json"),
-    JSON.stringify({ reason }) + "\n", { mode: 0o600 });
+  const path = join(dirname(binding.config), "adapter-error.json");
+  if (!existsSync(path)) {
+    writeFileSync(path, JSON.stringify({ reason }) + "\n", { mode: 0o600 });
+  }
 }
+
+export function recordContextReduction(binding, beforeBytes, afterBytes) {
+  appendFileSync(join(dirname(binding.config), "context-events.jsonl"),
+    JSON.stringify({ timestamp: Date.now(), beforeBytes, afterBytes }) + "\n", { mode: 0o600 });
+}
+
+export async function block(binding, reason) {
+  try {
+    await execute(binding.python, [binding.checker, binding.config, "--block", reason],
+      { maxBuffer: 1024 * 1024 });
+  } catch {
+    recordFailure(binding, "checker_transport");
+  }
+}
+
 
 export function checker(binding) {
   return async (session, turn, claim = false, signal) => {
@@ -23,7 +40,7 @@ export function checker(binding) {
         binding.checker, binding.config, session, turn, ...(claim ? ["claim"] : []),
       ], { maxBuffer: 1024 * 1024, signal });
       const result = JSON.parse(stdout);
-      if (!["continue", "complete", "blocked", "ignore"].includes(result.action)) {
+      if (!["continue", "blocked", "ignore"].includes(result.action)) {
         throw new Error("invalid checkpoint decision");
       }
       if (result.action === "continue" && typeof result.message !== "string") {

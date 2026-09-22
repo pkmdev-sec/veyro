@@ -1,7 +1,8 @@
-# Agent router
+# Experimental pinned-local agent task
 
-Veyro supports five coding-agent harnesses through one executable interface without replacing any
-provider's native user experience.
+Veyro discovers five native harnesses, but the experimental `veyro agent` command is not a
+general interactive launcher. It currently runs only an autonomous OpenCode task with an explicit
+pinned local coding profile. Use `sessions` and `attach` for supported existing-session observation.
 
 ## Caller interface
 
@@ -10,25 +11,25 @@ provider's native user experience.
 veyro agents
 veyro agents --json
 
-# Enter a native interactive harness. Arguments after `--` pass through unchanged.
-veyro agent codex --repo . --prompt "Fix the failing test"
-veyro agent claude --repo . -- --model sonnet
-veyro agent prime-agent --repo .
-veyro agent pi --repo .
-veyro agent opencode --repo .
+# Experimental: run OpenCode with a pinned local model.
+veyro agent opencode --repo . --autonomous --coding-profile coder30 \
+  --prompt "Fix the failing test" --check '.venv/bin/python -m pytest -q'
 
-# Run one agent under Veyro's supervisor.
-veyro run --agent claude --repo . --job "Fix the failing test"
+# Discover or observe previously recorded native sessions.
+veyro sessions --agent opencode --repo .
 ```
 
-`veyro agent` keeps Veyro alive as a sidecar parent and starts the native executable as the
-foreground terminal process. The child inherits the real terminal directly; Veyro does not parse,
-redraw, or proxy human-oriented terminal output. The provider still owns its terminal UI, commands,
-configuration, credentials, session storage, and updates. The commands `codex`, `claude`,
-`prime-agent`, `pi`, and `opencode` remain valid and do not depend on Veyro.
+The deployed `veyro agent` path requires `--autonomous` and a pinned local coding profile.
+It rejects unpinned interactive launches and native model overrides. G4 remains open. The removed
+top-level `run` command has no compatibility shim. Independently installed native CLIs remain
+separate programs.
 
 `veyro agents --json` is the language-neutral discovery interface. Shell scripts, Node programs,
 Go programs, and other clients can consume it without importing Veyro's Python package.
+
+The human table and JSON document report executable availability separately from pinned autonomy
+version qualification. An available provider with an unqualified version is not eligible for the
+experimental autonomous task path.
 
 ## Boundary
 
@@ -37,20 +38,11 @@ operator or automation
         |
         +-- native executable ----------------------> native interactive harness
         |
-        +-- veyro agent --------------------------> managed native interactive harness
-                |                                      (real foreground terminal)
-                +-- Veyro sidecar ----------------> lifecycle + workspace evidence
+        +-- veyro agent --------------------------> experimental pinned-local task
+                |                                      (OpenCode autonomous mode)
+                +-- Veyro evidence ---------------> lifecycle + workspace evidence
         |
-        +-- veyro run
-                |
-                v
-        AgentDefinition + NativeCliWorker
-                |
-                +-- Codex exec JSON (default); App Server JSON-RPC (opt-in)
-                +-- Claude stream-json
-                +-- Prime Agent JSON mode
-                +-- Pi JSON mode
-                +-- OpenCode JSON events
+        +-- veyro sessions / attach --------------> supported bounded observation
 ```
 
 A managed native session writes versioned evidence under
@@ -78,27 +70,26 @@ workers instead of pretending a steering request succeeded.
 
 ## Compatibility
 
-Codex remains the default agent. Existing `VEYRO_CODEX_BACKEND`, Codex App Server behavior, and
-persisted `codex_thread_id` and `codex_turn_id` fields remain supported. New records also carry neutral
-`agent_id`, `session_id`, and `turn_id` fields. The legacy fields can be removed only through a separate
-persisted-data migration.
+The internal legacy factory runtime defaults to Codex `exec`; App Server remains an explicit
+experimental opt-in through `VEYRO_CODEX_BACKEND=app-server`. Persisted records can still carry
+legacy `codex_thread_id` and `codex_turn_id` fields alongside neutral `agent_id`, `session_id`, and
+`turn_id` fields. Removing those persisted fields requires a separate data migration.
 
 For the version-pinned Codex hook listener, see [Codex hooks bridge](codex-hooks-bridge.md).
-The factory defaults to `exec`; App Server controls require `VEYRO_CODEX_BACKEND=app-server`.
 
 ## Native autonomous tasks
 
-`veyro agent prime-agent --autonomous --prompt JOB --check COMMAND` and the same
-command with `opencode` load launch-scoped native hooks. The shared checker drives
-plan, build, verification, and bounded repair without Veyro approval prompts.
-This is different from the observation-only launcher described above.
+`veyro agent opencode --autonomous --coding-profile PROFILE --prompt JOB --check COMMAND`
+loads launch-scoped native hooks and a pinned loopback model. The shared checker drives
+build, verification, and bounded repair without Veyro approval prompts. This experimental task
+path is the only behavior of `veyro agent`; it is not an observation-only interactive launcher.
 See [native autonomy](native-autonomy.md) for the architecture and live benchmarks.
 
 ## Existing-session supervision
 
-The launcher sidecar, legacy `veyro run` workers, and existing-session control
-plane are separate interfaces. Starting a native agent does not automatically
-connect its provider bridge or enable controls.
+The experimental pinned-local task, internal legacy factory runtime, and supported existing-session
+control plane are separate interfaces. Starting a native task does not automatically connect its
+provider bridge or enable controls.
 
 Use `veyro sessions` for metadata discovery, `veyro attach` for read-only
 observation, and `veyro supervise` for one policy-gated proposal. See the
@@ -112,8 +103,8 @@ observation, and `veyro supervise` for one policy-gated proposal. See the
 | Prime Agent `0.9.5` | Internal daemon protocol 7, schema 29 | Controls require approval; no approval observation/reply |
 | OpenCode `1.18.30` | Authenticated loopback HTTP/SSE | No replay, active-turn steering, or non-destructive stop |
 
-Pi and Claude Code have no existing-session supervision bridge. Their native
-launch and factory worker mappings below remain available.
+Pi and Claude Code have no existing-session supervision bridge. Their native launch definitions
+and internal worker mappings below remain available to library code.
 
 The control-plane contracts are versioned. Adapter capabilities do not grant
 authorization. Public JSON/NDJSON commands do not require callers to import

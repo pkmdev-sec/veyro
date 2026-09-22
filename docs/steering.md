@@ -1,8 +1,8 @@
-# Factory App Server steering
+# Internal factory App Server steering
 
-This is the separate `veyro run` factory with explicit `VEYRO_CODEX_BACKEND=app-server`
-opt-in. It is not the existing-session approval protocol. Its default assessor is
-localjev with Qwen3-14B, and its observations can include task text and worker output.
+This is an internal experimental factory feature with explicit
+`VEYRO_CODEX_BACKEND=app-server` opt-in. It is not exposed as a top-level factory command and is
+not the existing-session approval protocol. Its observations can include task text and worker output.
 
 Veyro can send localjev-informed guidance into an active Codex turn before resorting to termination.
 The feature uses Codex App Server because the non-interactive `codex exec` transport has no channel
@@ -26,8 +26,8 @@ ordinary Python selects an allowed action and deterministically formats the guid
 
 Each worker records its Codex thread ID, turn ID, steering count, last steering time, and steering
 history. Successful and rejected attempts become `WORKER_STEERED` or `WORKER_STEER_FAILED` events.
-The terminal prints accepted guidance live, and `veyro inspect` includes the event in the persisted
-timeline.
+The internal event timeline records accepted guidance and persisted steering events. No supported
+root command exposes the legacy factory timeline.
 
 ## Configuration
 
