@@ -103,13 +103,16 @@ agent SDK. There is no network call on the default checkpoint path.
 
 The small adapters in `src/veyro/integrations/` translate native events:
 
-| Native API | Prime Agent 0.9.5 | OpenCode 1.18.30 / 1.18.31 |
+| Native API | Prime Agent 0.9.5 | OpenCode 1.18.30 |
 | --- | --- | --- |
 | Load | Explicit `--extension` file | Launch-only `OPENCODE_CONFIG_CONTENT` plugin |
 | Bind session | `before_agent_start` | `chat.message` |
 | Check result | `agent_end` | Completed assistant + `session.idle` |
 | Continue | `sendUserMessage`, `followUp` | New bounded `run --session <id>` process |
 | Cancel | Native abort signal/context | Session error/deletion and SDK abort |
+
+The launcher accepts only OpenCode `1.18.30` for autonomous runs. Recorded `1.18.31`
+canaries are historical evidence only; the current launcher does not accept that version.
 
 The version-1 checker interface is:
 
@@ -182,8 +185,11 @@ protocol tests, not substitutes for the real native canaries.
 
 ### Typed advisory evaluation
 
-Use `--evaluator examples/native-judge.json` to try the checked-in [typed criteria](native-judge.md), or supply your own rubric. For the local dual-model
-path, also pass `--coding-profile coder30 --evaluation-profile laya`. Evaluation runs only after
-the executable checks pass. Low or uncertain scores request bounded repairs. Passing scores stop
-for operator review; they cannot authorize completion. Existing-session supervision remains a
-separate control path.
+Use `--evaluator examples/native-judge.json` to try the checked-in [typed criteria](native-judge.md), or supply your own rubric. The
+`--coding-profile coder30 --evaluation-profile laya` pair documented in the local
+evaluation guides is only a recorded example for an already pre-provisioned
+maintainer machine that matches the pinned Laya profile. This repository does not
+publish a reproducible Laya installation or checkpoint acquisition procedure.
+Evaluation runs only after the executable checks pass. Low or uncertain scores
+request bounded repairs. Passing scores stop for operator review; they cannot
+authorize completion. Existing-session supervision remains a separate control path.

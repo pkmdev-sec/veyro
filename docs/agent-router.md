@@ -99,7 +99,7 @@ observation, and `veyro supervise` for one policy-gated proposal. See the
 
 | Provider | Implemented supervision bridge | Limits |
 | --- | --- | --- |
-| Codex `0.154.0` | Native command hooks and private metadata journal | Queue is an experimental opt-in adapter seam; no public control socket or native attach/replay |
+| Codex `0.154.0` | Native command hooks and private metadata journal | Observation only; no follow-up delivery, public control socket, or native attach/replay |
 | Prime Agent `0.9.5` | Internal daemon protocol 7, schema 29 | Controls require approval; no approval observation/reply |
 | OpenCode `1.18.30` | Authenticated loopback HTTP/SSE | No replay, active-turn steering, or non-destructive stop |
 

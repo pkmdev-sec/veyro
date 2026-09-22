@@ -69,11 +69,13 @@ message ran. Those successful controls have effect
 `acknowledged_unverified`. An exact, validated provider rejection has effect
 `failed`, while a control denied before delivery has effect `not_applicable`.
 
-Prime stop is the current verified-effect path. It starts as
-`acknowledged_unverified` and becomes `verified` only after a later native
-`session_completed` or `session_failed` event for the same session. A delivery or
-verification exception, cancellation, timeout, or closed event stream leaves the
-effect `unknown`; Veyro does not retry it.
+Prime stop is the only implemented verified-effect mechanism, but the public
+command cannot currently authorize its review-required proposal. If a direct
+library integration supplies valid authorization and delivers the stop, its
+effect starts as `acknowledged_unverified` and becomes `verified` only after a
+later native `session_completed` or `session_failed` event for the same session.
+A delivery or verification exception, cancellation, timeout, or closed event
+stream leaves the effect `unknown`; Veyro does not retry it.
 
 Every mode persists an owner-only ledger under `--ledger-dir`. Before returning
 an authorization outcome, Veyro fsyncs an immutable sanitized decision receipt

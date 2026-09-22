@@ -6,8 +6,10 @@ For the dated cross-provider checks, see [verification results](supervision-veri
 `veyro sessions` discovers metadata. `veyro attach` connects a read-only
 observer. Neither command starts or resumes a native session, sends a prompt,
 or enables controls. Run the native agent separately with its normal interface.
-These commands do not call the semantic supervisor or change its authority.
-Pinned LocalJev/Qwen3 remains the sole authoritative semantic supervisor.
+These commands call no semantic assessor. The public `veyro supervise` command is
+also assessor-free. LocalJev/Qwen3 is limited to standalone assessment examples,
+direct library integrations, and the internal legacy factory runtime. It has no
+authority over discovery or attachment.
 
 ## Provider support
 

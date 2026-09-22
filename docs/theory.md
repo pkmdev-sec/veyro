@@ -1,47 +1,63 @@
-# Semantic assessment and deterministic control
+# Assessor-free public supervision and separate semantic assessment
 
-Veyro separates native execution from local semantic assessment. A coding agent
-keeps its tools, terminal, and permission system. localjev uses Qwen3-14B to assess
-structured evidence at review checkpoints. Veyro, not the model, authorizes controls.
+Veyro keeps native execution with the coding agent and its own tools, terminal,
+and permission system. The public existing-session `veyro supervise` command
+evaluates one proposal without calling LocalJev or another assessor. LocalJev
+assessment remains available to the standalone synthetic example, direct library
+integrations, and the internal legacy factory runtime. Scores in those separate
+paths never grant control authority.
 
 ## Model sizes and release status
 
-**Qwen3 14B** remains the historical pinned localjev assessor in the existing-session path below.
-The separate strict-local autonomous task path uses **Qwen3 Coder 30B** through OpenCode,
-authoritative executable checks, then optional **Laya typed-decisions** evaluation. That task path does not grant
-model scores control authority. G4 native-task qualification and G6 calibration remain
-open. See the [model-role guide](qwen-models.md) for tags, boundaries, and limits.
+**Qwen3 14B** is the configured LocalJev checkpoint for those explicit assessment
+paths, not for the public existing-session command. A recorded strict-local
+autonomous example on a pre-provisioned maintainer machine paired **Qwen3 Coder
+30B** through OpenCode with optional **Laya typed-decisions** evaluation. This
+repository has no reproducible public Laya installation or checkpoint procedure.
+G4 native-task qualification and G6 calibration remain open. See the
+[model-role guide](qwen-models.md) for tags, boundaries, and limits.
 
-## Existing-session data flow
+## Public existing-session data flow
 
 ```text
 Native provider events
     -> version-pinned bridge
     -> metadata normalization
     -> SessionReducer
-    -> deterministic policy and capability checks
-    -> localjev / Qwen3-14B when review is needed
-    -> exact approval and fresh-state checks
-    -> durable no-retry claim
-    -> recheck, then supported native control
+    -> deterministic boundary, policy, and capability checks
+    -> no assessor
+        -> observe-only or advisory: record non-delivery
+        -> review-required in an executing mode:
+             semantic_evidence_required before approval, then stop
+        -> deterministically permitted in an executing mode:
+             applicable approval and fresh-state checks
+             -> durable no-retry claim
+             -> recheck, then supported native control
 ```
 
 `SessionReducer` maintains bounded typed state rather than a transcript. Events
 have contiguous local sequence numbers; missing native history remains unknown.
-`CheckpointSelector` recognizes failed verification, completion claims, idle
-sessions, and risky actions. The current CLI evaluates one operator-supplied
-proposal. It is not a background proposal generator or a judge invoked on every event.
+The current CLI evaluates one operator-supplied proposal. It is not a background
+proposal generator or a judge invoked on every event. `CheckpointSelector` and
+the semantic checkpoint schema remain available to the separate assessment paths;
+the public command does not invoke them.
 
-## The model estimates; policy authorizes
+## Models estimate; policy does not manufacture evidence
 
-`LocalJevCheckpointAssessor` validates the configured assessor identity and asks
-seven named questions about reduced state. Scores express uncertainty. They do
-not establish task completion or replace evidence from the native provider.
+`LocalJevCheckpointAssessor` is a library component. The standalone example uses
+it to score a checked-in synthetic fixture, and direct library callers can use it
+to ask seven named questions about reduced state after validating the configured
+identity. Its scores express uncertainty. They do not establish task completion
+or replace evidence from the native provider. The historical Prime canary still
+constructs this component, but the current control loop does not consume it.
 
-`SupervisionControlLoop` applies rollout policy. Observe-only neither assesses nor
-delivers. Advisory may assess but cannot deliver. Executing modes require the
-necessary capabilities, current evidence, and exact approval. Forbidden actions
-and explicit human denial cannot be overridden by a high score.
+The public command constructs `SupervisionControlLoop` without an assessment
+service. Observe-only and advisory modes neither assess nor deliver. In
+`approval_required` and `automatic` modes, a review-required proposal fails with
+`semantic_evidence_required` before human approval. No policy setting supplies
+semantic evidence or connects LocalJev. Deterministically permitted proposals
+still pass the applicable capability, approval, freshness, and delivery gates.
+Forbidden actions and explicit human denial cannot be overridden by a model score.
 
 `AuthorizedControlDispatcher` reserves a durable delivery claim before native
 execution. It rechecks approval expiry and the observed cursor after persistence.

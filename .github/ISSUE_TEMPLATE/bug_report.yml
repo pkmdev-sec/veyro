@@ -52,5 +52,5 @@ body:
     attributes:
       label: Privacy check
       options:
-        - label: I removed credentials, private source, prompts, and live session transcripts.
+        - label: I removed credentials and unrelated private material. Any prompt, source text, or session transcript included is redacted and limited to what is essential to reproduce this bug.
           required: true

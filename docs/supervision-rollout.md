@@ -13,12 +13,18 @@ supervision.
 
 ## Choose an operator policy
 
-| Mode | Assessment | Delivery |
+| Mode | Assessor in public command | Delivery |
 | --- | --- | --- |
 | `observe_only` (default) | None | Never |
-| `advisory` | Pinned LocalJev at meaningful checkpoints | Never, even with approval |
-| `approval_required` | Pinned LocalJev when policy requires review | Every control needs current exact-request approval |
-| `automatic` | Same assessment rules | Only explicitly allowlisted low-risk controls; all other controls still need approval |
+| `advisory` | None | Never |
+| `approval_required` | None. Review-required proposals return `semantic_evidence_required` before approval. | Only deterministically permitted proposals can reach exact-request approval and the remaining delivery gates. |
+| `automatic` | None. Review-required proposals return `semantic_evidence_required` before approval. | Only explicitly allowlisted low-risk controls can continue automatically; no pinned adapter currently qualifies. |
+
+The public command constructs `SupervisionControlLoop` without an assessor. No
+policy mode connects LocalJev, supplies semantic evidence, or makes a
+review-required proposal reach approval. LocalJev is limited to standalone
+assessment examples, direct library integrations, and the internal legacy factory
+runtime.
 
 A policy is a versioned private JSON file, selected separately from the proposal:
 
@@ -29,8 +35,8 @@ A policy is a versioned private JSON file, selected separately from the proposal
 No command automatically promotes the mode. Keep operator policy files outside
 agent-editable repositories. Policy and proposal files must be current-user-owned,
 private regular files, with no symlink leaf or hard links, and at most 64 KiB.
-Use mode `0600`. Proposals cannot set the mode or supply assessments, reduced state,
-or capability declarations.
+Use mode `0600`. Neither a policy nor a proposal can supply semantic evidence.
+Proposals also cannot set the mode, reduced state, or capability declarations.
 
 The initial automatic allowlist contains only `deny_approval`:
 
@@ -46,20 +52,23 @@ The initial automatic allowlist contains only `deny_approval`:
 That action declines an approval already observed on the connection. It does not
 execute the requested operation. It also requires a supported **stable** capability,
 low risk, usable observation state, and no human veto. An empty allowlist permits
-no automatic controls. `review_operations` can raise low risk to review-required;
-it cannot lower risk or make forbidden operations permissible.
+no automatic controls. `review_operations` can raise low risk to review-required,
+which makes the public command fail with `semantic_evidence_required` before
+approval. It cannot lower risk or make forbidden operations permissible.
 
 **No currently pinned adapter qualifies for automatic delivery.** Prime controls
-are internal. OpenCode approval replies and follow-ups are experimental; its
-stable interruption is disruptive and still requires approval. Codex supervision
-is observation-only. Tests use a deliberately stable test adapter to exercise the
-automatic branch; there is no claim of live automatic control validation or
-capability promotion.
+are internal. OpenCode approval replies and follow-ups are experimental. Its
+stable interruption is disruptive and review-required, so the public command
+fails before approval. Codex supervision is observation-only. Tests use a
+deliberately stable test adapter to exercise the automatic branch; there is no
+claim of live automatic control validation or capability promotion.
 
-Free-text follow-ups and steering, interruption, stop, and approval grants always
-require human approval. A queued follow-up can immediately start an idle native
-turn; queue acceptance does not prove model execution. Native capabilities remain
-unchanged and unsupported controls remain unsupported.
+Free-text follow-ups and steering, interruption, stop, and approval grants are
+review-required. The public command therefore rejects them with
+`semantic_evidence_required` before requesting human approval. A queued follow-up
+can immediately start an idle native turn; queue acceptance does not prove model
+execution. Native capabilities remain unchanged and unsupported controls remain
+unsupported.
 
 ## Submit one proposal
 
@@ -91,8 +100,8 @@ veyro supervise --agent prime-agent --repo /path/to/repo \
   --ledger-dir /real/private/path/delivery
 ```
 
-This default invocation reports a decision and sends no control. For explicit
-approval-required operation:
+This default invocation reports a decision and sends no control. To evaluate the
+same proposal under approval-required policy, run:
 
 ```sh
 veyro supervise --agent prime-agent --repo /path/to/repo \
@@ -100,6 +109,10 @@ veyro supervise --agent prime-agent --repo /path/to/repo \
   --proposal /private/path/proposal.json --policy /private/path/policy.json \
   --ledger-dir /real/private/path/delivery --timeout-seconds 180
 ```
+
+For the review-required example above, this command returns
+`semantic_evidence_required`. It does not call an assessor, emit an
+`approval_required` record, read approval from stdin, or deliver the control.
 
 For OpenCode, use `--agent opencode --server http://127.0.0.1:PORT` instead of
 `--socket`. Credentials come only from `OPENCODE_SERVER_USERNAME` and
@@ -110,17 +123,22 @@ nonsymlinked. On macOS, use the real path, such as `/private/var/...`, not the `
 `/tmp/...` aliases. Veyro creates missing ledger directories with owner-only permissions and
 persists every decision before returning it.
 
-## Approve the exact request
+## Approve the exact request when reached
 
 The executable emits newline-delimited JSON:
 
 1. `supervision`: identity, mode, policy digest, and exact request digest.
-2. `approval_required`, when needed: authorization metadata with `request_sha256`.
+2. `approval_required`: authorization metadata with `request_sha256`, only when a
+   deterministically permitted proposal reaches an applicable approval gate.
 3. `decision`: authorization, delivery outcome if attempted, and terminal stop
    verification if available.
 
-After reviewing the proposal and the selected native session, send one JSON line
-on stdin. Use the emitted digest and actual current UTC timestamps:
+A review-required proposal never reaches step 2 through the public command. It
+fails at the semantic gate before approval.
+
+Only when the command emits `approval_required`, review the proposal and selected
+native session, then send one JSON line on stdin. Use the emitted digest and
+actual current UTC timestamps:
 
 ```json
 {"approval_id":"operator-001","request_sha256":"<emitted SHA-256>","decision":"approve","approved_by":"<operator identity>","issued_at":"<current UTC timestamp>","expires_at":"<later UTC timestamp>"}
@@ -142,23 +160,23 @@ already in flight was undone.
 
 ## Safety and evidence
 
-- Deterministic rules run before semantic assessment. Credential exposure and
+- Deterministic rules run before the semantic gate. Credential exposure and
   security-control bypass remain forbidden; neither approval nor a model score
   overrides them.
-- Only loopback `localjev-qwen3-14b`, pinned to
-  `qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8`,
-  supplies semantic assessments. Loopback SDK requests use a direct transport,
-  never ambient proxies. External endpoints keep their proxy and TLS/CA defaults.
-  There is no fallback or shadow voting. This checkpoint is a configured identity,
-  not per-response weight attestation; verify the deployment as described in the
-  [assessor prerequisite](supervision-verification.md#check-the-assessor-deployment).
+- The public executable has no assessor and never contacts LocalJev. In both
+  executing modes, a review-required proposal returns
+  `semantic_evidence_required` before approval. A configured model label, policy
+  setting, or proposal field is not semantic evidence.
+- The loopback `localjev-qwen3-14b` deployment and configured
+  `qwen3:14b@sha256:bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8`
+  checkpoint remain available only to explicitly named non-public assessment
+  paths. The configured identity is not per-response weight attestation.
 - Boundaries bind to the complete request digest. Changed requests cannot reuse
-  boundary evidence. Checkpoint caches distinguish changed state, risky-action
-  evidence, and task context.
-- Veyro checks the live normalized event cursor after assessment and after
-  approval, and revalidates approval time and the cursor after durable persistence.
-  Changed observations reject the proposal; the CLI does not silently
-  rebase approval or retry. This check is not a provider-side atomic transaction.
+  boundary evidence.
+- Veyro checks the live normalized event cursor after any applicable approval and
+  revalidates approval time and the cursor after durable persistence. Changed
+  observations reject the proposal; the CLI does not silently rebase approval or
+  retry. This check is not a provider-side atomic transaction.
 - Terminal/failed observation state blocks delivery. Active-turn controls require
   an observed active turn. Approval replies require an observed pending ID; there
   is no backfill of approvals that predate the connection.
@@ -193,33 +211,20 @@ Run the focused tests through the project environment:
 
 The existing attachment canaries also run the real `veyro supervise` executable
 in default observe-only mode and check that the original native session remains.
-The disposable Prime control canary explicitly selects approval-required mode,
-uses a private delivery ledger, requests pinned LocalJev assessment, and verifies
-an approved stop without sending a native-agent work prompt:
+Those public-command checks call no assessor and deliver no control.
 
-```sh
-.venv/bin/python -m veyro.supervision.prime_canary --repo /path/to/repo \
-  --approved-by OPERATOR --approve-stop
-```
+### Historical approved-stop canaries
 
-Only this owned no-prompt canary can make one fresh assessment after startup
-metadata invalidates the first snapshot. It does not retry native delivery. The
-operator command instead reports the stale decision and stops.
+The `veyro.supervision.prime_canary` and `veyro.supervision.rollout_canary`
+modules remain as historical records of an intended approved-stop path. They are
+not current verification procedures. `SupervisionControlLoop.run_control()` does
+not consume the assessment service injected by `prime_canary`, and the public CLI
+used by `rollout_canary` constructs no assessor. Their review-required stop
+therefore returns `semantic_evidence_required` before approval or delivery.
 
-
-For an end-to-end test of the **actual executable and approval stdin protocol**:
-
-```sh
-.venv/bin/python -m veyro.supervision.rollout_canary --repo /path/to/repo \
-  --approved-by OPERATOR --approve-stop
-```
-
-This creates a disposable resident `noSession` fixture, because native client-owned
-sessions cannot be attached by a separate CLI client. It approves only the exact
-fixture stop digest, verifies the terminal event, confirms removal from the daemon
-roster, and checks that exactly one durable claim was written. Its private files
-and ledger are removed after the subprocess and native fixture are closed. It
-sends no model prompt and does not modify an existing user session.
+Do not run either module as qualification evidence. The checked-in reports are
+dated records from an earlier implementation, not proof that current HEAD can
+assess, authorize, or deliver an approved stop.
 
 ### Recorded verification
 

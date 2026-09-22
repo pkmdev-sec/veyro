@@ -1,14 +1,21 @@
 # Deploy localjev with Qwen3-14B
 
-Veyro uses [localjev](https://github.com/githubnext/localjev) as its local decision
-API. localjev translates typed questions into an inference request to Ollama's
-`qwen3:14b`, validates the response, and returns Jev-compatible scores.
-The existing-session control plane accepts only the configured
-`localjev-qwen3-14b` assessor. A missing or failed assessor does not select a fallback.
+Veyro uses [localjev](https://github.com/githubnext/localjev) as a local decision
+API for the standalone assessment example, direct library integrations, and the
+internal legacy factory runtime. The service translates typed questions into an
+inference request to Ollama's `qwen3:14b`, validates the response, and returns
+Jev-compatible scores.
+
+The public existing-session `veyro supervise` command does not construct an
+assessor or call localjev. In both executing modes, review-required proposals fail
+with `semantic_evidence_required` before approval. No policy setting supplies the
+missing evidence. The pinned `localjev-qwen3-14b` identity applies only to the
+explicit assessment paths above. The standalone example does not select a
+fallback after a missing or failed assessor.
 
 ## Deployment contract
 
-| Component | Required setting |
+| Component | Required setting for the explicit assessment paths |
 | --- | --- |
 | Veyro endpoint | `http://127.0.0.1:8080` |
 | localjev API | `POST /v1/systemone`, `GET /health`, `GET /ready` |
@@ -24,8 +31,10 @@ record of a tested deployment, not an installer or a model-weight attestation.
 
 ## Prepare compatible services
 
-You need Python 3.11+ for Veyro, Bun for localjev, and an Ollama installation with
-hardware that can serve `qwen3:14b`. Veyro does not bundle these services or weights.
+For the standalone live example or a direct library integration, you need Python
+3.11+ for Veyro, Bun for LocalJev, and an Ollama installation with hardware that
+can serve `qwen3:14b`. Public `sessions`, `attach`, and `supervise` use none of
+these model services. Veyro does not bundle the services or weights.
 
 With your Ollama service running, obtain the model through its normal interface:
 
@@ -91,7 +100,7 @@ These GET requests do not run inference. Empty inventory or a different digest i
 not a successful check. Confirm the effective upstream configuration with the
 service owner; readiness alone cannot establish that trust.
 
-Then send only the checked-in synthetic fixture:
+Then send only the checked-in synthetic fixture through the standalone example:
 
 ```sh
 .venv/bin/python examples/assess_localjev.py --live
@@ -102,29 +111,38 @@ establishes API connectivity, valid score shape, and configured provenance. It d
 not establish model calibration, task correctness, or per-response weight identity.
 Do not connect a new deployment to consequential controls based on this one example.
 
-## Which settings Veyro reads
+## Which paths use the pinned client
 
-`veyro supervise` and the example use the same pinned assessor constructor in
-`src/veyro/supervision/supervisor.py`. They use `jev-latest`, fixed loopback port
-8080, a 120-second assessment timeout, and a 50,000-character state limit.
-They do not use `.env` to select an alternate assessor or change the checkpoint.
+The standalone live example calls `authoritative_assessments()` in
+`src/veyro/supervision/supervisor.py`. It uses `jev-latest`, fixed loopback port
+8080, a 180-second assessment timeout, and a 50,000-character state limit. The
+historical `veyro.supervision.prime_canary` module still constructs the equivalent
+pinned client, but the current control loop does not consume its injected
+assessment service. Do not use that module as current qualification evidence.
 
-The current control-plane client sends a fixed SDK placeholder bearer value,
-`loopback-localjev`. It does not accept an operator-supplied localjev API key.
-A service requiring a different key is incompatible with this CLI. Keep that
-service's authentication enabled and use read-only observation instead; do not
-replace a real secret with the placeholder. Loopback access is not isolation from
-other programs running as the same OS user.
+The public `veyro supervise` command takes the opposite path. It constructs
+`SupervisionControlLoop` with no assessor. It does not use `.env`, a policy file,
+or a proposal field to select an assessor, change the checkpoint, or supply
+semantic evidence.
 
-The internal experimental factory runtime can read the `VEYRO_JEV_*` settings in
-[`.env.example`](../.env.example), including `VEYRO_JEV_API_KEY_ENV`. It has a separate runtime
-and privacy contract and is not exposed as a top-level command. Do not interpret those environment
-settings as control-plane overrides.
+The standalone example sends a fixed SDK placeholder bearer value,
+`loopback-localjev`. It does not accept an operator-supplied LocalJev API key. A
+service requiring a different key is incompatible with that example. Keep the
+service's authentication enabled; do not replace a real secret with the
+placeholder. Loopback access is not isolation from other programs running as the
+same OS user.
+
+The internal legacy factory runtime can read the `VEYRO_JEV_*` settings in
+[`.env.example`](../.env.example), including `VEYRO_JEV_API_KEY_ENV`. It has a
+separate runtime and privacy contract and is not exposed as a top-level command.
+Do not interpret those environment settings as public control-plane overrides.
 
 ## Interpret the scores
 
 localjev generates probability estimates with a chat model. They are not direct
 logit measurements and have not been calibrated for arbitrary software tasks.
-Veyro validates their shape and range, then applies deterministic authorization.
-A score never substitutes for native permissions, exact human approval, or fresh
-evidence. See [typed assessment](why-jev.md) and [evidence limits](what-veyro-proves.md).
+The standalone example validates and reports them without enabling controls. In an
+explicitly injected supervision workflow, Veyro validates their shape and range
+before applying separate deterministic authorization. A score never substitutes
+for native permissions, exact human approval, or fresh evidence. See
+[typed assessment](why-jev.md) and [evidence limits](what-veyro-proves.md).

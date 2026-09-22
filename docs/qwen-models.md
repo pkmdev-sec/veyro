@@ -24,10 +24,17 @@ Executable checks remain authoritative and always run before typed evaluation.
 
 Evaluator errors, unavailable services, exhausted limits, and passing scores all leave final acceptance to the operator.
 
-## Run the pair
+## Example for a pre-provisioned machine
 
-The Laya checkpoint and launcher must match their pinned hashes. The 30B model must be
-installed in Ollama. Veyro does not download either model.
+The `coder30` and `laya` pair is available only on a pre-provisioned maintainer
+machine that matches the pinned profiles. In particular, the Laya runtime and
+checkpoint must already exist at the paths and hashes recorded by the `laya`
+profile. This repository does not publish a reproducible Laya installation or
+checkpoint acquisition procedure. Veyro does not download Laya, and the coding
+model must also already be installed in Ollama.
+
+The following command is a recorded example for an already-provisioned maintainer.
+It is not a public setup or first-run procedure.
 
 ```sh
 veyro local models
@@ -42,7 +49,14 @@ veyro agent opencode --repo . --autonomous \
   --allow-uncalibrated-evaluator
 ```
 
-OpenCode is the only eligible strict-local coding driver. Model selection is launch-scoped. It does not edit global provider settings or remove native
+For this invocation, the CLI replaces the rubric's provider settings with a
+launch-scoped local provider bound to the pinned `laya` profile. It does not call a
+Jev endpoint or read `TYPESAFE_API_KEY`. After the executable checks pass, Veyro
+sends the original task, check exit and timeout facts, and only the repository
+files declared in `evidence_files` to the pinned offline Laya evaluator.
+
+OpenCode is the only eligible strict-local coding driver. Model selection is
+launch-scoped. It does not edit global provider settings or remove native
 permission denials.
 
 The evaluator normally requires a matching calibration artifact for each criterion.

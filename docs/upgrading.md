@@ -32,10 +32,12 @@ Application records still use protocol version `1.0` within the new namespace.
 That number does not make old serialized fields or client identifiers compatible.
 The package namespace and required field names form a breaking boundary.
 
-Native provider IDs, versions, protocol/schema pins, model checkpoint digests,
-and upstream vendor commands have not changed. LocalJev remains the sole configured
-authoritative assessor. Its configured checkpoint label is not per-response weight
-attestation. See the [deployment checks](supervision-verification.md#check-the-assessor-deployment).
+Native provider IDs, versions, and protocol/schema pins have not changed. The
+LocalJev baseline identifiers also remain recorded, but only for the standalone
+assessment example, direct library integrations, and the internal legacy factory
+runtime. The public `veyro supervise` command constructs no assessor and never
+calls LocalJev. A policy setting cannot supply semantic evidence. Configured
+checkpoint labels are not per-response weight attestation.
 
 ## Keep existing state safe
 
@@ -57,9 +59,12 @@ Claims still bind repository, provider, native session, and command ID. Do not
 move to an empty or cloned ledger, delete claims, or mint IDs to retry uncertainty.
 A new package name is not permission to repeat a native control.
 
-Observe-only is still the default. No pinned native adapter qualifies for automatic
-delivery. Start with read-only discovery and attachment, inspect the reported
-history limits, and follow the [operator guide](supervision-operator-guide.md).
+Observe-only is still the default. Observe-only and advisory modes call no
+assessor and deliver no control. In both executing modes, review-required
+proposals fail with `semantic_evidence_required` before approval. No pinned native
+adapter qualifies for automatic delivery. Start with read-only discovery and
+attachment, inspect the reported history limits, and follow the
+[operator guide](supervision-operator-guide.md).
 
 ## Verify the renamed build
 
