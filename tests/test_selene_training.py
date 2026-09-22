@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shlex
 import stat
 import sys
 from datetime import UTC, datetime
@@ -155,7 +156,8 @@ def fixture_run(
     package_manifest = tmp_path / "packages.txt"
     package_manifest.write_text("framework==1.0\n")
     python = tmp_path / "venv-python"
-    python.symlink_to(Path(sys.executable).resolve())
+    python.write_text(f'#!/bin/sh\nexec {shlex.quote(str(Path(sys.executable).resolve()))} "$@"\n')
+    python.chmod(stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
     runtime = TrainingRuntime(
         framework="test-framework",
         framework_version="1.0",

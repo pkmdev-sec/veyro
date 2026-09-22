@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shlex
 import stat
 import sys
 from datetime import UTC, datetime
@@ -139,7 +140,8 @@ def write_runtime(tmp_path: Path) -> tuple[Path, QuantizationRuntime]:
     quantizer = tmp_path / "llama-quantize"
     executable(quantizer)
     python = tmp_path / "venv-python"
-    python.symlink_to(Path(sys.executable).resolve())
+    python.write_text(f'#!/bin/sh\nexec {shlex.quote(str(Path(sys.executable).resolve()))} "$@"\n')
+    python.chmod(stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
     runtime = QuantizationRuntime(
         framework_version="0.31.3",
         python=python,

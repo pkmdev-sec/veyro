@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shlex
 import stat
 import sys
 from pathlib import Path
@@ -138,7 +139,8 @@ def profile(
     packages = tmp_path / "packages.txt"
     packages.write_text("transformers==test\npeft==test\n")
     python = tmp_path / "venv-python"
-    python.symlink_to(Path(sys.executable).resolve())
+    python.write_text(f'#!/bin/sh\nexec {shlex.quote(str(Path(sys.executable).resolve()))} "$@"\n')
+    python.chmod(stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
     return GroundingShadowProfile(
         id="selene-shadow",
         model_identity=MODEL_IDENTITY,

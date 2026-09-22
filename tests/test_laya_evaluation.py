@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # ruff: noqa: E501 - embedded fake launcher source is intentionally literal.
 import hashlib
+import shlex
 import sys
 from pathlib import Path
 
@@ -92,7 +93,8 @@ print(json.dumps({"model": "rl-agent", "answers": answers, "usage": {"input_toke
     runtime_root.mkdir()
     (runtime_root / "runtime.txt").write_text("pinned runtime")
     python = tmp_path / "venv-python"
-    python.symlink_to(Path(sys.executable).resolve())
+    python.write_text(f'#!/bin/sh\nexec {shlex.quote(str(Path(sys.executable).resolve()))} "$@"\n')
+    python.chmod(0o700)
     return LayaProfile(
         id="laya",
         python=python,
