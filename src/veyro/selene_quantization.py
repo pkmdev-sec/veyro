@@ -243,6 +243,11 @@ def run_quantization(run: QuantizationRun) -> QuantizationResult:
     if not preflight.ready:
         raise ValueError(f"quantization preflight blocked: {', '.join(preflight.blockers)}")
     loaded = _load_inputs(run)
+    quantizer = _verified_file(
+        loaded.runtime.quantizer,
+        loaded.runtime.quantizer_sha256,
+        executable=True,
+    )
     attempt_path, result_path = _receipt_paths(run)
     started = datetime.now(UTC)
     began = time.monotonic()
@@ -267,7 +272,7 @@ def run_quantization(run: QuantizationRun) -> QuantizationResult:
         "output_directory": str(run.output_directory),
         "framework": loaded.runtime.framework,
         "framework_version": loaded.runtime.framework_version,
-        "quantizer": str(loaded.runtime.quantizer),
+        "quantizer": str(quantizer),
         "quantizer_sha256": loaded.runtime.quantizer_sha256,
         "quantizer_version": loaded.runtime.quantizer_version,
         "quantization": run.quantization.value,
@@ -378,7 +383,13 @@ def _verify_runtime(runtime: QuantizationRuntime, blockers: list[str]) -> None:
         ("quantizer", runtime.quantizer, runtime.quantizer_sha256, True),
     ):
         try:
-            _verified_file(path, digest, executable=executable)
+            _verified_file(
+                path,
+                digest,
+                executable=executable,
+                allow_symlink=name == "python",
+                allow_root_owner=name == "python",
+            )
         except (OSError, ValueError):
             blockers.append(f"quantization_runtime_invalid:{name}")
 

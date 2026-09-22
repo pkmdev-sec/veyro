@@ -13,6 +13,7 @@ from io import BytesIO
 from itertools import pairwise
 from pathlib import Path
 
+from generated_asset_checks import assets_needing_regeneration
 from PIL import Image, ImageColor, ImageDraw, ImageFilter, ImageFont
 
 ASSETS = Path(__file__).resolve().parents[1] / "docs" / "assets"
@@ -328,11 +329,7 @@ def main() -> int:
     args = parser.parse_args()
     assets = render_assets()
     if args.check:
-        stale = [
-            name
-            for name, data in assets.items()
-            if not (ASSETS / name).exists() or (ASSETS / name).read_bytes() != data
-        ]
+        stale = assets_needing_regeneration(ASSETS, assets)
         if stale:
             print("Diagram needs regeneration: " + ", ".join(stale))
             return 1

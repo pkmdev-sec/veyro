@@ -9,6 +9,8 @@ import xml.etree.ElementTree as ET
 import zlib
 from pathlib import Path
 
+from test_animated_brand import canonical_png, encode_png
+
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "docs" / "assets"
 GENERATOR = ROOT / "tools" / "generate_brand_assets.py"
@@ -103,34 +105,67 @@ def test_shipped_assets_pass_check() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_generation_is_deterministic_and_check_detects_drift_without_writing(
+def test_generation_is_canonical_and_check_detects_drift_without_writing(
     tmp_path: Path,
 ) -> None:
     tools = tmp_path / "tools"
     tools.mkdir()
     script = tools / GENERATOR.name
     shutil.copyfile(GENERATOR, script)
+    shutil.copyfile(ROOT / "tools/generated_asset_checks.py", tools / "generated_asset_checks.py")
     command = [sys.executable, str(script)]
-    subprocess.run(command, check=True, capture_output=True)
     output = tmp_path / "docs" / "assets"
-    expected = {path.name: path.read_bytes() for path in ASSETS.glob("veyro-logo.*")}
-    assert set(expected) == {"veyro-logo.svg", "veyro-logo.png"}
-    assert {path.name: path.read_bytes() for path in output.iterdir()} == expected
-    subprocess.run(command, check=True, capture_output=True)
-    assert {path.name: path.read_bytes() for path in output.iterdir()} == expected
-
-    (output / "veyro-logo.svg").unlink()
+    svg = output / "veyro-logo.svg"
     png = output / "veyro-logo.png"
+    expected_svg = (ASSETS / svg.name).read_bytes()
+    expected_png = canonical_png((ASSETS / png.name).read_bytes())
+
+    for _ in range(2):
+        subprocess.run(command, check=True, capture_output=True)
+        assert {path.name for path in output.iterdir()} == {svg.name, png.name}
+        assert svg.read_bytes() == expected_svg
+        assert canonical_png(png.read_bytes()) == expected_png
+
+    generated_png = png.read_bytes()
+    png.write_bytes(encode_png(expected_png))
+    assert png.read_bytes() != generated_png
+    canonical_before = (png.read_bytes(), png.stat().st_mtime_ns)
+    subprocess.run(command + ["--check"], check=True, capture_output=True)
+    assert (png.read_bytes(), png.stat().st_mtime_ns) == canonical_before
+
+    metadata, pixels = expected_png
+    width, height, bit_depth, color_type = metadata
+    changed_pixels = bytearray(pixels)
+    changed_pixels[0] ^= 1
+    cropped = b"".join(
+        pixels[start : start + (width - 1) * 4] for start in range(0, len(pixels), width * 4)
+    )
+    rgb = b"".join(pixels[start : start + 3] for start in range(0, len(pixels), 4))
+    mutations = (
+        ((metadata, bytes(changed_pixels)), "pixel"),
+        (((width - 1, height, bit_depth, color_type), cropped), "dimensions"),
+        (((width, height, bit_depth, 2), rgb), "mode"),
+    )
+    for changed_png, _description in mutations:
+        png.write_bytes(encode_png(changed_png))
+        before = (png.read_bytes(), png.stat().st_mtime_ns)
+        result = subprocess.run(command + ["--check"], capture_output=True, text=True, check=False)
+        assert result.returncode == 1 and png.name in result.stdout
+        assert (png.read_bytes(), png.stat().st_mtime_ns) == before
+
+    svg.unlink()
     png.write_bytes(b"stale")
     before = png.stat().st_mtime_ns
     result = subprocess.run(command + ["--check"], capture_output=True, text=True, check=False)
     assert result.returncode == 1
-    assert "veyro-logo.svg" in result.stdout and "veyro-logo.png" in result.stdout
-    assert not (output / "veyro-logo.svg").exists()
+    assert svg.name in result.stdout and png.name in result.stdout
+    assert not svg.exists()
     assert png.read_bytes() == b"stale" and png.stat().st_mtime_ns == before
+
     subprocess.run(command, check=True, capture_output=True)
     subprocess.run(command + ["--check"], check=True, capture_output=True)
-    assert {path.name: path.read_bytes() for path in output.iterdir()} == expected
+    assert svg.read_bytes() == expected_svg
+    assert canonical_png(png.read_bytes()) == expected_png
 
 
 def test_sentinel_geometry_spacing_and_level_wordmark() -> None:

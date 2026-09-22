@@ -137,7 +137,8 @@ def profile(
     launcher(worker, result=result, logit_result=logit_result, extra=extra)
     packages = tmp_path / "packages.txt"
     packages.write_text("transformers==test\npeft==test\n")
-    python = Path(sys.executable).resolve()
+    python = tmp_path / "venv-python"
+    python.symlink_to(Path(sys.executable).resolve())
     return GroundingShadowProfile(
         id="selene-shadow",
         model_identity=MODEL_IDENTITY,
@@ -237,6 +238,25 @@ def test_shadow_detects_artifact_mutation_before_inference(tmp_path, monkeypatch
         lambda *_args, **_kwargs: pytest.fail("mutated model must fail before inference"),
     )
     with pytest.raises(ValueError, match="size mismatch|SHA-256 mismatch"):
+        evaluate_grounding_shadow(selected, grounding_case())
+
+
+def test_shadow_rejects_writable_interpreter_target_before_inference(tmp_path, monkeypatch):
+    selected = profile(tmp_path)
+    unsafe = tmp_path / "writable-python"
+    unsafe.write_text("#!/bin/sh\nexit 0\n")
+    unsafe.chmod(0o777)
+    selected.python.unlink()
+    selected.python.symlink_to(unsafe)
+    selected = selected.model_copy(update={"python_sha256": sha(unsafe)})
+    import veyro.grounding_shadow as shadow
+
+    monkeypatch.setattr(
+        shadow.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("unsafe runtime must fail before inference"),
+    )
+    with pytest.raises(ValueError, match="unsafe shadow runtime file"):
         evaluate_grounding_shadow(selected, grounding_case())
 
 

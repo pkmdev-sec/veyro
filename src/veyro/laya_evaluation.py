@@ -179,23 +179,33 @@ def _immutable_tree_layout_sha256(root: Path) -> str:
             raise ValueError(f"Laya runtime entry is not user-owned and immutable: {path}")
         relative = "." if path == root else path.relative_to(root).as_posix()
         kind = "d" if path.is_dir() else "f" if path.is_file() else "x"
-        record = (
-            f"{kind}\0{relative}\0{info.st_size}\0{stat.S_IMODE(info.st_mode)}".encode()
-        )
+        record = f"{kind}\0{relative}\0{info.st_size}\0{stat.S_IMODE(info.st_mode)}".encode()
         digest.update(len(record).to_bytes(4, "big"))
         digest.update(record)
     return digest.hexdigest()
 
 
-def _verified_file(path: Path, expected: str, *, executable: bool = False) -> Path:
+def _verified_file(
+    path: Path,
+    expected: str,
+    *,
+    executable: bool = False,
+    allow_symlink: bool = False,
+    allow_root_owner: bool = False,
+) -> Path:
     try:
+        is_symlink = path.is_symlink()
         resolved = path.resolve(strict=True)
         info = resolved.stat()
+        allowed_owners = {os.getuid(), 0} if allow_root_owner else {os.getuid()}
+        link_owned = not is_symlink or path.lstat().st_uid in allowed_owners
     except OSError as error:
         raise ValueError(f"Laya runtime file is unavailable: {path}") from error
     if (
-        not stat.S_ISREG(info.st_mode)
-        or info.st_uid != os.getuid()
+        (is_symlink and not allow_symlink)
+        or not link_owned
+        or not stat.S_ISREG(info.st_mode)
+        or info.st_uid not in allowed_owners
         or info.st_mode & 0o022
         or (executable and not os.access(resolved, os.X_OK))
     ):
@@ -207,7 +217,13 @@ def _verified_file(path: Path, expected: str, *, executable: bool = False) -> Pa
 
 
 def _verify_runtime(profile: LayaProfile) -> _VerifiedRuntime:
-    python = _verified_file(profile.python, profile.python_sha256, executable=True)
+    python = _verified_file(
+        profile.python,
+        profile.python_sha256,
+        executable=True,
+        allow_symlink=True,
+        allow_root_owner=True,
+    )
     try:
         runtime_root = profile.runtime_root.resolve(strict=True)
         runtime_info = runtime_root.stat()
@@ -267,9 +283,7 @@ def _laya_questions(questions: Mapping[str, Question]) -> dict[str, dict]:
             mapped[name] = {
                 "type": "choice",
                 "instructions": question.prompt,
-                "criteria": {
-                    outcome.label: outcome.description for outcome in question.outcomes
-                },
+                "criteria": {outcome.label: outcome.description for outcome in question.outcomes},
             }
         elif isinstance(question, ScoreQuestion):
             mapped[name] = {

@@ -2,6 +2,7 @@
 
 import colorsys
 import hashlib
+import runpy
 import shutil
 import struct
 import subprocess
@@ -11,6 +12,38 @@ from pathlib import Path
 import pytest
 
 ASSETS = Path(__file__).resolve().parents[1] / "docs" / "assets"
+canonical_png = runpy.run_path(str(ASSETS.parents[1] / "tools/generated_asset_checks.py"))[
+    "canonical_png"
+]
+
+
+def encode_png(
+    content: tuple[tuple[int, int, int, int], bytes], *, compression_level: int = 0
+) -> bytes:
+    """Encode canonical pixels with fixed unfiltered rows for cross-encoder tests."""
+    (width, height, bit_depth, color_type), pixels = content
+    channels = {0: 1, 2: 3, 4: 2, 6: 4}[color_type]
+    assert bit_depth == 8 and len(pixels) == width * height * channels
+
+    def chunk(kind: bytes, payload: bytes) -> bytes:
+        return (
+            struct.pack(">I", len(payload))
+            + kind
+            + payload
+            + struct.pack(">I", zlib.crc32(kind + payload))
+        )
+
+    row_size = width * channels
+    raster = b"".join(
+        b"\x00" + pixels[start : start + row_size] for start in range(0, len(pixels), row_size)
+    )
+    header = struct.pack(">IIBBBBB", width, height, bit_depth, color_type, 0, 0, 0)
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", header)
+        + chunk(b"IDAT", zlib.compress(raster, level=compression_level))
+        + chunk(b"IEND", b"")
+    )
 
 
 def read_gif(
@@ -167,26 +200,62 @@ def test_independent_decoder_proves_fixed_wordmark_loop_and_clean_rasters() -> N
     assert differences[-1] <= max(differences[:-1]) * 1.15
 
 
-def test_animation_generation_is_deterministic_and_check_does_not_write(tmp_path: Path) -> None:
+def test_animation_generation_is_visually_deterministic_and_check_does_not_write(
+    tmp_path: Path,
+) -> None:
     uv = shutil.which("uv")
     if uv is None:
         pytest.skip("uv is required for the isolated, pinned animation builder")
     tools = tmp_path / "tools"
     tools.mkdir()
     source = ASSETS.parents[1] / "tools"
-    for name in ("generate_brand_assets.py", "generate_animated_logo.py"):
+    for name in (
+        "generate_brand_assets.py",
+        "generated_asset_checks.py",
+        "generate_animated_logo.py",
+    ):
         shutil.copyfile(source / name, tools / name)
-    command = [uv, "run", "--script", str(tools / "generate_animated_logo.py")]
+    script = tools / "generate_animated_logo.py"
+    command = [uv, "run", "--script", str(script)]
     output = tmp_path / "docs" / "assets"
-    expected = {p.name: p.read_bytes() for p in ASSETS.glob("veyro-logo-animated*")}
+    gif = output / "veyro-logo-animated.gif"
+    poster = output / "veyro-logo-animated-poster.png"
+    expected_visuals = (
+        decode_rgb(ASSETS / gif.name),
+        canonical_png((ASSETS / poster.name).read_bytes()),
+    )
+
     for _ in range(2):
         subprocess.run(command, capture_output=True, check=True)
-        assert {p.name: p.read_bytes() for p in output.iterdir()} == expected
+        frames, applications, _ = read_gif(gif)
+        assert len(frames) == 40
+        assert {frame["delay"] for frame in frames} == {10}
+        assert applications == [(b"NETSCAPE2.0", b"\x01\x00\x00")]
+        assert (decode_rgb(gif), canonical_png(poster.read_bytes())) == expected_visuals
+
     subprocess.run(command + ["--check"], capture_output=True, check=True)
-    gif = output / "veyro-logo-animated.gif"
+    generated_poster = poster.read_bytes()
+    poster.write_bytes(encode_png(canonical_png(generated_poster)))
+    assert poster.read_bytes() != generated_poster
+    canonical_before = (poster.read_bytes(), poster.stat().st_mtime_ns)
+    subprocess.run(command + ["--check"], capture_output=True, check=True)
+    assert (poster.read_bytes(), poster.stat().st_mtime_ns) == canonical_before
+
+    source_text = script.read_text()
+    assets_before = {
+        path.name: (path.read_bytes(), path.stat().st_mtime_ns) for path in output.iterdir()
+    }
+    for changed_constant in ("FRAMES, FRAME_MS = 39, 100", "FRAMES, FRAME_MS = 40, 125"):
+        script.write_text(source_text.replace("FRAMES, FRAME_MS = 40, 100", changed_constant))
+        result = subprocess.run(command + ["--check"], capture_output=True, text=True, check=False)
+        assert result.returncode == 1 and gif.name in result.stdout
+        assert {
+            path.name: (path.read_bytes(), path.stat().st_mtime_ns) for path in output.iterdir()
+        } == assets_before
+    script.write_text(source_text)
+
     gif.write_bytes(b"stale")
     before = gif.stat().st_mtime_ns
-    poster = output / "veyro-logo-animated-poster.png"
     poster.unlink()
     result = subprocess.run(command + ["--check"], capture_output=True, text=True, check=False)
     assert result.returncode == 1

@@ -138,7 +138,8 @@ def write_runtime(tmp_path: Path) -> tuple[Path, QuantizationRuntime]:
     packages.write_text("mlx-lm==0.31.3\n")
     quantizer = tmp_path / "llama-quantize"
     executable(quantizer)
-    python = Path(sys.executable).resolve()
+    python = tmp_path / "venv-python"
+    python.symlink_to(Path(sys.executable).resolve())
     runtime = QuantizationRuntime(
         framework_version="0.31.3",
         python=python,
@@ -194,6 +195,23 @@ def test_quantization_preflight_verifies_model_adapter_runtime_licence_and_disk(
     blocked = preflight_quantization(run)
     assert blocked.ready is False
     assert any(item.startswith("adapter_artifact_invalid") for item in blocked.blockers)
+
+
+def test_quantization_preflight_rejects_writable_interpreter_target(tmp_path):
+    run = quantization_run(tmp_path)
+    unsafe = tmp_path / "writable-python"
+    unsafe.write_text("#!/bin/sh\nexit 0\n")
+    unsafe.chmod(0o777)
+    payload = json.loads(run.runtime_manifest.read_text())
+    python = Path(payload["python"])
+    python.unlink()
+    python.symlink_to(unsafe)
+    payload["python_sha256"] = sha(unsafe)
+    run.runtime_manifest.write_text(json.dumps(payload))
+    changed = run.model_copy(update={"runtime_manifest_sha256": sha(run.runtime_manifest)})
+
+    result = preflight_quantization(changed)
+    assert "quantization_runtime_invalid:python" in result.blockers
 
 
 def test_quantization_preflight_refuses_an_unfunded_peak_disk_budget(tmp_path):

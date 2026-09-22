@@ -32,7 +32,10 @@ QUESTIONS = {
     "done": NoulQuestion(prompt="Complete?"),
     "kind": ChoiceQuestion(
         prompt="Kind?",
-        outcomes=[Outcome(label="code", description="Source"), Outcome(label="text", description="Text")],
+        outcomes=[
+            Outcome(label="code", description="Source"),
+            Outcome(label="text", description="Text"),
+        ],
     ),
     "quality": ScoreQuestion(
         prompt="Quality?",
@@ -41,7 +44,9 @@ QUESTIONS = {
             ScoreOutcome(label="high", description="Complete", value=10),
         ],
     ),
-    "constant": ChoiceQuestion(prompt="Only?", outcomes=[Outcome(label="only", description="Only")]),
+    "constant": ChoiceQuestion(
+        prompt="Only?", outcomes=[Outcome(label="only", description="Only")]
+    ),
 }
 
 
@@ -86,10 +91,12 @@ print(json.dumps({"model": "rl-agent", "answers": answers, "usage": {"input_toke
     runtime_root = tmp_path / "runtime"
     runtime_root.mkdir()
     (runtime_root / "runtime.txt").write_text("pinned runtime")
+    python = tmp_path / "venv-python"
+    python.symlink_to(Path(sys.executable).resolve())
     return LayaProfile(
         id="laya",
-        python=Path(sys.executable),
-        python_sha256=digest(Path(sys.executable).resolve()),
+        python=python,
+        python_sha256=digest(python.resolve()),
         runtime_root=runtime_root,
         runtime_sha256=_tree_sha256(runtime_root),
         launcher=launcher,
@@ -220,6 +227,22 @@ def test_runtime_hash_drift_fails_before_inference(tmp_path, monkeypatch):
         evaluate_laya(profile, {}, QUESTIONS, timeout=10)
 
 
+def test_runtime_rejects_writable_interpreter_target_before_inference(tmp_path, monkeypatch):
+    profile = fake_profile(tmp_path)
+    unsafe = tmp_path / "writable-python"
+    unsafe.write_text("#!/bin/sh\nexit 0\n")
+    unsafe.chmod(0o777)
+    profile.python.unlink()
+    profile.python.symlink_to(unsafe)
+    profile = profile.model_copy(update={"python_sha256": digest(unsafe)})
+    monkeypatch.setattr(
+        "veyro.laya_evaluation.subprocess.run",
+        lambda *args, **kwargs: pytest.fail("unsafe runtime must fail before launch"),
+    )
+    with pytest.raises(ValueError, match="Unsafe Laya runtime file"):
+        evaluate_laya(profile, {}, QUESTIONS, timeout=10)
+
+
 def test_dependency_runtime_drift_fails_before_inference(tmp_path, monkeypatch):
     profile = fake_profile(tmp_path)
     (profile.runtime_root / "runtime.txt").write_text("changed")
@@ -246,18 +269,21 @@ def test_dependency_runtime_content_is_checked_when_layout_matches(tmp_path, mon
 
 
 def test_inherited_network_sandbox_is_not_nested(monkeypatch):
+    monkeypatch.setattr("veyro.laya_evaluation.sys.platform", "darwin")
     monkeypatch.setattr("veyro.laya_evaluation._network_outbound_denied", lambda: True)
     monkeypatch.setattr(
         "veyro.laya_evaluation.shutil.which",
         lambda *args: pytest.fail("inherited sandbox must not launch sandbox-exec"),
     )
     command = ["python", "laya"]
-    assert __import__("veyro.laya_evaluation", fromlist=["_offline_command"])._offline_command(
-        command
-    ) == command
+    assert (
+        __import__("veyro.laya_evaluation", fromlist=["_offline_command"])._offline_command(command)
+        == command
+    )
 
 
 def test_environment_marker_cannot_spoof_network_sandbox(monkeypatch):
+    monkeypatch.setattr("veyro.laya_evaluation.sys.platform", "darwin")
     monkeypatch.setenv("VEYRO_NETWORK_SANDBOXED", "1")
     monkeypatch.setattr("veyro.laya_evaluation._network_outbound_denied", lambda: False)
     monkeypatch.setattr("veyro.laya_evaluation.shutil.which", lambda name: "/sandbox-exec")

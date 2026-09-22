@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from test_animated_brand import read_gif
+from test_animated_brand import canonical_png, encode_png, read_gif
 
 ROOT = Path(__file__).resolve().parents[1]
 DIAGRAM = ROOT / "docs/assets/veyro-supervision.gif"
@@ -58,14 +58,31 @@ def test_decoded_diagram_animates_only_connectors_not_text_or_geometry():
     assert len(stable) == 120 and len(set(stable)) == 1
 
 
-def test_diagram_generator_is_current_and_nonwriting():
+def test_diagram_generator_is_current_and_nonwriting(tmp_path: Path):
     uv = shutil.which("uv")
     if uv is None:
         pytest.skip("uv is required for the isolated diagram builder")
-    assets = [DIAGRAM, DIAGRAM.with_suffix(".png"), DIAGRAM.parent / "veyro-task-readout.png"]
+
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    for name in ("generated_asset_checks.py", "generate_supervision_diagram.py"):
+        shutil.copyfile(ROOT / "tools" / name, tools / name)
+    output = tmp_path / "docs/assets"
+    output.mkdir(parents=True)
+    names = ("veyro-supervision.gif", "veyro-supervision.png", "veyro-task-readout.png")
+    assets = []
+    for name in names:
+        asset = output / name
+        shutil.copyfile(DIAGRAM.parent / name, asset)
+        assets.append(asset)
+    for asset in assets[1:]:
+        encoded = asset.read_bytes()
+        asset.write_bytes(encode_png(canonical_png(encoded)))
+        assert asset.read_bytes() != encoded
+
     before = [(asset.read_bytes(), asset.stat().st_mtime_ns) for asset in assets]
     subprocess.run(
-        [uv, "run", "--script", str(ROOT / "tools/generate_supervision_diagram.py"), "--check"],
+        [uv, "run", "--script", str(tools / "generate_supervision_diagram.py"), "--check"],
         capture_output=True,
         check=True,
         timeout=60,

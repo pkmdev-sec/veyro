@@ -537,7 +537,13 @@ def _verify_runtime(runtime: TrainingRuntime, blockers: list[str]) -> None:
         ),
     ):
         try:
-            _verified_file(path, digest, executable=name in {"python", "launcher"})
+            _verified_file(
+                path,
+                digest,
+                executable=name in {"python", "launcher"},
+                allow_symlink=name == "python",
+                allow_root_owner=name == "python",
+            )
         except (OSError, ValueError):
             blockers.append(f"training_runtime_invalid:{name}")
 
@@ -595,7 +601,15 @@ def _run_worker(
     timeout: float,
     model_root: Path,
 ) -> tuple[int, bytes, bytes, bool]:
-    command = _offline_command([str(runtime.python), "-B", "-I", str(runtime.launcher)])
+    python = _verified_file(
+        runtime.python,
+        runtime.python_sha256,
+        executable=True,
+        allow_symlink=True,
+        allow_root_owner=True,
+    )
+    launcher = _verified_file(runtime.launcher, runtime.launcher_sha256, executable=True)
+    command = _offline_command([str(python), "-B", "-I", str(launcher)])
     environment = _offline_environment(model_root)
     with tempfile.TemporaryFile() as stdout_file, tempfile.TemporaryFile() as stderr_file:
         process = subprocess.Popen(
@@ -692,13 +706,18 @@ def _verified_file(
     *,
     size: int | None = None,
     executable: bool = False,
+    allow_symlink: bool = False,
+    allow_root_owner: bool = False,
 ) -> Path:
+    is_symlink = path.is_symlink()
     resolved = path.resolve(strict=True)
     info = resolved.stat()
+    allowed_owners = {os.getuid(), 0} if allow_root_owner else {os.getuid()}
     if (
-        path.is_symlink()
+        (is_symlink and not allow_symlink)
+        or (is_symlink and path.lstat().st_uid not in allowed_owners)
         or not stat.S_ISREG(info.st_mode)
-        or info.st_uid != os.getuid()
+        or info.st_uid not in allowed_owners
         or info.st_mode & 0o022
         or (executable and not os.access(resolved, os.X_OK))
     ):

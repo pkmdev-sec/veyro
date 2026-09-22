@@ -162,7 +162,7 @@ def evaluate_grounding_shadow(
     case: GroundingCase,
 ) -> GroundingShadowReceipt:
     """Run one offline assessment while keeping its decision non-authoritative."""
-    _verify_profile(profile)
+    python, launcher = _verify_profile(profile)
     _reject_retired_case(case)
     prompt = render_grounding_prompt(case)
     payload = {
@@ -177,7 +177,7 @@ def evaluate_grounding_shadow(
     started = time.monotonic()
     try:
         process = subprocess.run(
-            _offline_command([str(profile.python), "-B", "-I", str(profile.launcher)]),
+            _offline_command([str(python), "-B", "-I", str(launcher)]),
             input=json.dumps(payload, allow_nan=False),
             capture_output=True,
             text=True,
@@ -245,9 +245,15 @@ def _reject_retired_case(case: GroundingCase) -> None:
         raise ValueError("retired Selene holdout cases cannot be rerun in shadow mode")
 
 
-def _verify_profile(profile: GroundingShadowProfile) -> None:
-    _verified_file(profile.python, profile.python_sha256, executable=True)
-    _verified_file(profile.launcher, profile.launcher_sha256, executable=True)
+def _verify_profile(profile: GroundingShadowProfile) -> tuple[Path, Path]:
+    python = _verified_file(
+        profile.python,
+        profile.python_sha256,
+        executable=True,
+        allow_symlink=True,
+        allow_root_owner=True,
+    )
+    launcher = _verified_file(profile.launcher, profile.launcher_sha256, executable=True)
     _verified_file(profile.package_manifest, profile.package_manifest_sha256)
     roots = {
         "base_model": _verified_root(profile.base_model_root),
@@ -262,6 +268,7 @@ def _verify_profile(profile: GroundingShadowProfile) -> None:
         _verified_file(resolved, item.sha256, size=item.size)
     if profile.calibration is not None and profile.calibration_sha256 is not None:
         _verified_file(profile.calibration, profile.calibration_sha256)
+    return python, launcher
 
 
 def _load_calibration(profile: GroundingShadowProfile) -> CalibrationArtifact | None:
@@ -292,13 +299,18 @@ def _verified_file(
     *,
     size: int | None = None,
     executable: bool = False,
+    allow_symlink: bool = False,
+    allow_root_owner: bool = False,
 ) -> Path:
+    is_symlink = path.is_symlink()
     resolved = path.resolve(strict=True)
     info = resolved.stat()
+    allowed_owners = {os.getuid(), 0} if allow_root_owner else {os.getuid()}
     if (
-        path.is_symlink()
+        (is_symlink and not allow_symlink)
+        or (is_symlink and path.lstat().st_uid not in allowed_owners)
         or not stat.S_ISREG(info.st_mode)
-        or info.st_uid != os.getuid()
+        or info.st_uid not in allowed_owners
         or info.st_mode & 0o022
         or (executable and not os.access(resolved, os.X_OK))
     ):

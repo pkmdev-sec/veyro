@@ -35,6 +35,7 @@ def verified_resident_model(monkeypatch, tmp_path):
 
     monkeypatch.setattr(LocalModels, "require_resident", require_resident)
 
+
 def command(source: str) -> str:
     return shlex.join([sys.executable, "-c", source])
 
@@ -258,9 +259,10 @@ def test_opencode_checkpoint_waits_through_partial_state_write(tmp_path, monkeyp
     reads = iter([{}, {}, {"phase": "verifying"}, previous, blocked])
     monkeypatch.setattr(runner, "_read_json", lambda path: next(reads))
     monkeypatch.setattr(runner.time, "sleep", lambda seconds: None)
-    assert runner._await_checkpoint(
-        tmp_path / "state.json", runner._decision_marker(previous)
-    ) == blocked
+    assert (
+        runner._await_checkpoint(tmp_path / "state.json", runner._decision_marker(previous))
+        == blocked
+    )
 
 
 def test_opencode_runner_ends_at_operator_review_boundary(tmp_path):
@@ -398,6 +400,7 @@ def test_cli_requires_local_profile_and_explicit_autonomy(tmp_path, monkeypatch)
             "version": "1.18.30",
         },
     )
+    monkeypatch.setattr("veyro.agents.shutil.which", lambda _name: "/not-launched/opencode")
     cases = [
         [],
         ["--autonomous"],

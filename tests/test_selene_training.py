@@ -154,7 +154,8 @@ def fixture_run(
     fake_launcher(launcher, succeeds=succeeds)
     package_manifest = tmp_path / "packages.txt"
     package_manifest.write_text("framework==1.0\n")
-    python = Path(sys.executable).resolve()
+    python = tmp_path / "venv-python"
+    python.symlink_to(Path(sys.executable).resolve())
     runtime = TrainingRuntime(
         framework="test-framework",
         framework_version="1.0",
@@ -323,6 +324,24 @@ def test_manifest_digest_drift_blocks_before_claim(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="model manifest SHA-256 mismatch"):
         preflight_training(run)
     assert not list(run.receipt_directory.iterdir())
+
+
+def test_preflight_rejects_writable_interpreter_target(tmp_path, monkeypatch):
+    run = fixture_run(tmp_path)
+    patch_dataset(monkeypatch, run)
+    unsafe = tmp_path / "writable-python"
+    unsafe.write_text("#!/bin/sh\nexit 0\n")
+    unsafe.chmod(0o777)
+    payload = json.loads(run.runtime_manifest.read_text())
+    python = Path(payload["python"])
+    python.unlink()
+    python.symlink_to(unsafe)
+    payload["python_sha256"] = sha(unsafe)
+    run.runtime_manifest.write_text(json.dumps(payload))
+    changed = run.model_copy(update={"runtime_manifest_sha256": sha(run.runtime_manifest)})
+
+    report = preflight_training(changed)
+    assert "training_runtime_invalid:python" in report.blockers
 
 
 def test_runtime_rejects_unsupported_method_or_stage(tmp_path, monkeypatch):

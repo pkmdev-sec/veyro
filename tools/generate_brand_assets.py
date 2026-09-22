@@ -8,6 +8,8 @@ import struct
 import zlib
 from pathlib import Path
 
+from generated_asset_checks import assets_needing_regeneration
+
 WIDTH, HEIGHT, SCALE = 160, 64, 4
 ASSETS = Path(__file__).resolve().parents[1] / "docs" / "assets"
 BACKGROUND = (9, 17, 29)
@@ -119,11 +121,7 @@ def main() -> int:
     pixels = draw_logo()
     assets = {"veyro-logo.svg": render_svg(pixels), "veyro-logo.png": render_png(pixels)}
     if args.check:
-        stale = [
-            name
-            for name, data in assets.items()
-            if not (ASSETS / name).exists() or (ASSETS / name).read_bytes() != data
-        ]
+        stale = assets_needing_regeneration(ASSETS, assets)
         if stale:
             print("Brand assets need regeneration: " + ", ".join(stale))
             return 1
