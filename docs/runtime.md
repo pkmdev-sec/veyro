@@ -68,4 +68,5 @@ hardware failure, or restore scenario.
 | `src/veyro/workers/codex_app_server.py` | Opt-in steerable App Server |
 
 The factory's historical environment reference is [`.env.example`](../.env.example).
-`VEYRO_JEV_*` configures this internal experiment, not the pinned `supervise` assessor.
+`VEYRO_JEV_*` configures this internal experiment. Public `veyro supervise` does
+not construct an assessor or read these settings.

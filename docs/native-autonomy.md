@@ -185,8 +185,11 @@ protocol tests, not substitutes for the real native canaries.
 
 ### Typed advisory evaluation
 
-Use `--evaluator examples/native-judge.json` to try the checked-in [typed criteria](native-judge.md), or supply your own rubric. For the local dual-model
-path, also pass `--coding-profile coder30 --evaluation-profile laya`. Evaluation runs only after
-the executable checks pass. Low or uncertain scores request bounded repairs. Passing scores stop
-for operator review; they cannot authorize completion. Existing-session supervision remains a
-separate control path.
+Use `--evaluator examples/native-judge.json` to try the checked-in [typed criteria](native-judge.md), or supply your own rubric. The
+`--coding-profile coder30 --evaluation-profile laya` pair documented in the local
+evaluation guides is only a recorded example for an already pre-provisioned
+maintainer machine that matches the pinned Laya profile. This repository does not
+publish a reproducible Laya installation or checkpoint acquisition procedure.
+Evaluation runs only after the executable checks pass. Low or uncertain scores
+request bounded repairs. Passing scores stop for operator review; they cannot
+authorize completion. Existing-session supervision remains a separate control path.

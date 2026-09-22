@@ -74,10 +74,13 @@ Loading both readout profiles uses substantial memory. Local coding through Olla
 another copy of the selected model. Do not assume both coding models and both readout
 workers can remain resident on every machine.
 
-## Run the dual-model task harness
+## Recorded dual-model task example
 
-Warm the 30B Ollama coding model. Laya loads its pinned typed-decisions checkpoint
-on demand. Then launch a native autonomous session with both roles explicit:
+The following command records a run on an already pre-provisioned maintainer
+machine whose runtime and checkpoint match the pinned Laya profile. It is not a
+first-run setup path. This repository does not publish a reproducible Laya
+installation or checkpoint acquisition procedure. On that machine, warm the 30B
+Ollama coding model before launching the native autonomous session:
 
 ```sh
 veyro local warm coder30
@@ -90,9 +93,9 @@ veyro agent opencode --repo . --autonomous \
   --allow-uncalibrated-evaluator
 ```
 
-Both profile flags are required for the local pair. The coding profile binds OpenCode to Qwen3 Coder 30B through
-Ollama. The evaluation profile snapshots the pinned Laya typed-decisions identity into
-the evaluator config.
+For this recorded run, both profile flags select the local pair. The coding profile
+binds OpenCode to Qwen3 Coder 30B through Ollama. The evaluation profile snapshots
+the pinned Laya typed-decisions identity into the evaluator config.
 The configuration is launch-scoped. Veyro does not edit global provider settings or
 remove native permission denials.
 
@@ -375,11 +378,14 @@ state-change check. This is further evidence against using its raw scores as a s
 - Native denial controls and executable checks remain authoritative. Do not weaken them to
   make a local model appear successful.
 
-### Native executable selection
+### Recorded native executable selection
 
-The deployment resolves the verified OpenCode executable, disables model discovery and
-automatic updates, pins the configured Ollama model, and runs the complete process tree in
-a macOS network sandbox that allows loopback only:
+The command below is another recorded example from the same pre-provisioned
+maintainer environment. It is not a public Laya setup procedure.
+
+The recorded deployment resolved the verified OpenCode executable, disabled model
+discovery and automatic updates, pinned the configured Ollama model, and ran the
+complete process tree in a macOS network sandbox that allowed loopback only:
 
 ```sh
 veyro agent opencode --autonomous \

@@ -29,12 +29,13 @@ tests exercise rejection, replay limits, exact approval, claim persistence,
 reconnect deduplication, cancellation, and metadata filtering.
 They do not substitute for native delivery proof.
 
-## Check the assessor deployment
+## Check LocalJev for explicit assessment experiments
 
-Before enabling reviewed controls, verify that the local deployment is the one you
-intend to trust. Veyro requests `jev-latest` at fixed `http://127.0.0.1:8080`.
-Its checkpoint provenance is a configured label, not a digest attested by the
-server for each inference. A passing stop canary does not remove this limitation.
+This deployment check applies only to the standalone live assessment and direct
+library integrations. It does not enable assessment in public `veyro supervise`
+or make either historical approved-stop canary runnable. The configured
+checkpoint provenance is a label, not a digest attested by the server for each
+inference.
 
 1. Query readiness without routing loopback traffic through ambient proxies:
 
@@ -76,26 +77,20 @@ This drives the actual discovery, attachment, and default-observe supervision
 commands. It sends no control and confirms the selected native session still
 exists. It does not prove complete history or access to another client's session.
 
-## Verify one approved Prime control
+## Historical approved-control record
 
-Read this scope before running the command: it creates and stops **one disposable
-resident `noSession` fixture**, not a selected user session. The pinned LocalJev
-service must be available. `--approve-stop` is explicit approval for this fixture
-only; the canary supplies the exact request-bound evidence through CLI stdin.
+The checked-in approved-stop result is historical. Its command used
+`veyro.supervision.rollout_canary`, which invokes the public `veyro supervise`
+path. Current `veyro supervise` constructs no assessor, so the review-required
+stop returns `semantic_evidence_required` before approval or delivery.
 
-```sh
-.venv/bin/python -m veyro.supervision.rollout_canary --repo /path/to/repo \
-  --approved-by OPERATOR --approve-stop
-```
+`veyro.supervision.prime_canary` is also not a current replacement. It constructs
+an assessment service, but the current control loop does not consume that service.
+Its review-required stop fails at the same semantic gate.
 
-Require `status: passed`, `control: executed`, one delivery claim, a terminal
-`verification`, and `native_fixture_removed: true`. The canary uses the actual
-`veyro supervise` subprocess. It sends no native-agent work prompt, removes its private
-operator files/ledger, and verifies native roster removal. The resident fixture
-allows a separate CLI client to attach without bypassing client-owned access rules.
-This proves approved stop, not active-turn steering, interruption, or automatic
-native delivery. A stale-observation rejection is a valid safety result but not a
-successful canary; inspect fixture cleanup before a new independent canary run.
+Do not run either approved-stop module as current qualification evidence. The
+historical JSON report records an earlier result only. Use the read-only Prime and
+OpenCode canaries below to verify current existing-session integration.
 
 ## Verify OpenCode observation
 
@@ -146,12 +141,14 @@ passed **346 tests**, including eight documentation checks. Ruff, dependency
 compatibility, and `git diff --check` passed. The installed pre-rename
 entry point also accepted the documented `supervise --help` command.
 
-All four native checks passed without native-agent prompts. Prime observation preserved
-the selected existing session. Approved Prime stop used one claim and verified
-`session_failed` for the disposable stopped worker; that terminal event is the
-expected stop evidence, not a failed assessment. OpenCode preserved its fixture
-through attachment and removed its isolated server afterward. Codex preserved
-native trust and managed policy while delivering `SessionEnd`.
+At the recorded historical revision, all four native checks passed without
+native-agent prompts. Prime observation preserved the selected existing session.
+The approved Prime stop used one claim and verified `session_failed` for the
+disposable stopped worker; that terminal event was the expected stop evidence,
+not a failed assessment. Current HEAD no longer reproduces that approved-stop
+path, as described above. OpenCode preserved its fixture through attachment and
+removed its isolated server afterward. Codex preserved native trust and managed
+policy while delivering `SessionEnd`.
 
 Historical runs reproduced a timing race in
 `tests/test_integration.py::test_noisy_events_are_coalesced` on baseline `43f33c2`.

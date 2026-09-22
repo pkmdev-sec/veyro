@@ -1,13 +1,16 @@
-# How localjev turns Qwen3-14B into a typed assessor
+# How explicit LocalJev paths use Qwen3-14B
 
-Veyro sends structured state and named questions to localjev at
-`http://127.0.0.1:8080`. localjev uses Ollama's `qwen3:14b` to generate answers in
-the Jev-compatible response format. The Python client is `typesafe-sdk`;
-`jev-latest` is a request alias, not a claim that the hosted Jev model is running.
+The standalone assessment example, library-injected supervision components, and
+the internal legacy factory runtime can send structured state and named questions
+to LocalJev at `http://127.0.0.1:8080`. LocalJev uses Ollama's `qwen3:14b` to
+generate answers in the Jev-compatible response format. Public `veyro supervise`
+does not construct an assessor or call this service. The Python client is
+`typesafe-sdk`; `jev-latest` is a request alias, not a claim that the hosted Jev
+model is running.
 
 ## Seven checkpoint judgments
 
-The existing-session control plane defines seven Noul questions in
+The library supervision components define seven Noul questions in
 `src/veyro/supervision/checkpoints.py`, version `supervision-checkpoint-v1`:
 
 - `meaningful_progress`
@@ -20,10 +23,11 @@ The existing-session control plane defines seven Noul questions in
 
 [Noul](https://docs.typesafe.ai/primitives/noul) represents a yes/no judgment as a
 value between zero and one. The [TypeSafe Python SDK](https://docs.typesafe.ai/sdk/python)
-provides the wire-protocol client; it does not select Veyro's underlying weights. All seven
-questions receive the same reduced state in one SDK `system_one` request.
-localjev may group inference internally; one SDK request does not imply seven
-independent GPU evaluations or a fixed latency.
+provides the wire-protocol client; it does not select Veyro's underlying weights.
+When a library caller invokes `LocalJevCheckpointAssessor`, all seven questions
+receive the same reduced state in one SDK `system_one` request. LocalJev may group
+inference internally; one SDK request does not imply seven independent GPU
+evaluations or a fixed latency.
 
 The separate factory runtime uses nine questions under `veyro-assessment-v1` in
 `src/veyro/veyro/jev.py`. Those include implementation completeness and worker
@@ -31,11 +35,12 @@ status. They are not the existing-session checkpoint schema.
 
 ## What reaches the model
 
-`LocalJevCheckpointAssessor` sends the checkpoint, reduced session state, and any
-explicit task context. The current `supervise` command supplies no task-context
-text. Normalized supervision state excludes native transcripts, tool arguments,
-tool output, credentials, and file contents. It can still include sensitive IDs,
-repository paths, counts, digests, and approval metadata.
+When explicitly invoked by library code, `LocalJevCheckpointAssessor` sends the
+checkpoint, reduced session state, and any explicit task context. Normalized
+supervision state excludes native transcripts, tool arguments, tool output,
+credentials, and file contents. It can still include sensitive IDs, repository
+paths, counts, digests, and approval metadata. Public `veyro supervise` does not
+invoke this assessor.
 
 The internal legacy factory observation can contain task text, Git diffs, and worker
 output. Its top-level command is unavailable; do not apply the control plane's metadata-only claim.

@@ -1,8 +1,10 @@
 # Run the jeff shadow canary
 
 This procedure installs the pinned GLiFormer weight file and starts jeff as a local,
-authenticated shadow provider. jeff remains optional and non-authoritative. LocalJev with
-`qwen3:14b` remains the only provider that can affect Veyro policy decisions.
+authenticated shadow provider for the internal legacy factory experiment. jeff
+remains optional and non-authoritative. LocalJev with `qwen3:14b` is the only
+provider that can affect that experiment's policy decisions. Public
+`veyro supervise` calls neither provider.
 
 ## Pinned artifacts
 
@@ -123,9 +125,9 @@ Before enabling Veyro shadow traffic, send one live nine-question System One req
 its provider, checkpoint, question version, and inference metadata. A successful health check alone
 is not proof that model inference works.
 
-## 5. Enable shadow traffic only after live verification
+## 5. Enable legacy factory shadow traffic only after live verification
 
-Set the shadow endpoint without changing the authoritative LocalJev settings:
+Set the shadow endpoint without changing the legacy factory's LocalJev settings:
 
 ```bash
 export VEYRO_JEV_SHADOW_PROVIDER_ID=jeff-gliformer-large-v1
@@ -138,7 +140,7 @@ export VEYRO_JEV_SHADOW_MAX_STATE_CHARS=20000
 export VEYRO_JEV_SHADOW_STATE_FORMAT=kv
 ```
 
-Keep `VEYRO_JEV_BASE_URL` pointed at LocalJev. Shadow failures are recorded separately and must
-not fail, steer, stop, route, escalate, or finish a Veyro run. Do not promote jeff until both
-providers have run against the same labeled Veyro observations and the recorded promotion gates
-pass.
+Keep the legacy factory's `VEYRO_JEV_BASE_URL` pointed at LocalJev. Shadow failures
+are recorded separately and must not fail, steer, stop, route, escalate, or finish
+a factory run. Do not promote jeff until both providers have run against the same
+labeled factory observations and the recorded promotion gates pass.

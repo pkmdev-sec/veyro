@@ -11,7 +11,7 @@ supervision improves task success, cost, latency, or safety.
 | Contract and policy tests | Typed reduction, capability checks, approval binding, rejection, claim retention | A real provider accepted a control |
 | localjev synthetic example | Qwen3-14B deployment connectivity and valid checkpoint score shape | Calibration, general accuracy, per-response weight identity |
 | Prime read-only canary | Existing-session observation without prompts or controls | Complete history or access to another client's session |
-| Approved disposable Prime stop | CLI approval input, one durable claim, and a later terminal event | Automatic control, active-turn steering, or task completion |
+| Historical approved Prime stop record | An earlier implementation recorded exact approval, one claim, and a terminal event | That current HEAD can assess, authorize, or deliver the stop; both approved-stop canaries now fail at `semantic_evidence_required` |
 | OpenCode observation canary | Authenticated HTTP/SSE and preservation of an empty fixture session | Live follow-up, approval reply, or interrupt delivery |
 | Codex native hook canary | Native-approved `SessionEnd` to a metadata helper | Live queue execution or synchronous tool authorization |
 | Codex helper-process tests | Helper publication to the authenticated broker | Native hook loading in every installation |
@@ -23,10 +23,12 @@ from one pinned installation is not a compatibility claim for another version.
 
 ## Model identity and privacy
 
-The configured assessor is `localjev-qwen3-14b` with Ollama tag `qwen3:14b`.
-Readiness and the installed digest check deployment configuration. They do not
-attest the weights behind every response. Model-generated probabilities remain
-uncertain even when their JSON shape is valid.
+The configured LocalJev identity for explicit assessment paths is
+`localjev-qwen3-14b` with Ollama tag `qwen3:14b`. Those paths are the standalone
+example, library-injected supervision, and internal legacy factory runtime, not
+public `veyro supervise`. Readiness and the installed digest check deployment
+configuration. They do not attest the weights behind every response.
+Model-generated probabilities remain uncertain even when their JSON shape is valid.
 
 The existing-session path records normalized metadata and digests, not native
 transcripts or tool contents. Paths and IDs can still be sensitive. The factory
